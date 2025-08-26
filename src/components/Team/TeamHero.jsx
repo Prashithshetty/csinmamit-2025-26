@@ -1,0 +1,26 @@
+import { motion } from 'framer-motion'
+
+const TeamHero = () => {
+  return (
+    <section className="relative py-20 overflow-hidden">
+      <div className="absolute inset-0 animated-bg opacity-10" />
+      <div className="container-custom relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center"
+        >
+          <h1 className="heading-1 mb-4">
+            Meet Our <span className="gradient-text-animated">Team</span>
+          </h1>
+          <p className="body-text max-w-3xl mx-auto">
+            The passionate individuals behind CSI NMAMIT who work tirelessly to create 
+            amazing experiences and opportunities for our community.
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+export default TeamHero

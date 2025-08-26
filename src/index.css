@@ -1,0 +1,363 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Custom color variables */
+    --primary-blue: 59, 130, 246;
+    --cyber-blue: 0, 212, 255;
+    --cyber-purple: 168, 85, 247;
+    --cyber-pink: 236, 72, 153;
+    
+    /* Tailwind CSS variables for custom colors */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+  }
+  
+  .dark {
+    /* Dark mode color variables */
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary-500 dark:bg-primary-400 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-600 dark:bg-primary-300;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-primary-500/30 text-primary-900 dark:bg-primary-400/30 dark:text-primary-100;
+  }
+}
+
+@layer components {
+  /* Glassmorphism Card */
+  .glass-card {
+    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl;
+  }
+
+  /* Neon Glow Effect */
+  .neon-glow {
+    filter: drop-shadow(0 0 20px rgba(var(--primary-blue), 0.5));
+  }
+
+  .neon-glow-cyber {
+    filter: drop-shadow(0 0 25px rgba(var(--cyber-blue), 0.6));
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 via-cyber-purple to-cyber-pink bg-clip-text text-transparent;
+  }
+
+  .gradient-text-animated {
+    @apply bg-gradient-to-r from-primary-600 via-cyber-purple to-cyber-pink bg-clip-text text-transparent;
+    background-size: 200% auto;
+    animation: textShimmer 3s linear infinite;
+  }
+
+  /* Button Base */
+  .btn-base {
+    @apply px-6 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 active:scale-95;
+  }
+
+  .btn-primary {
+    @apply btn-base bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 shadow-lg hover:shadow-primary-500/25;
+  }
+
+  .btn-cyber {
+    @apply btn-base relative overflow-hidden bg-gradient-to-r from-cyber-blue/10 to-cyber-purple/10 border border-cyber-blue/50 text-cyber-blue hover:border-cyber-purple/50 hover:text-cyber-purple;
+  }
+
+  .btn-cyber::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(var(--cyber-blue), 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn-cyber:hover::before {
+    left: 100%;
+  }
+
+  /* Card Hover Effects */
+  .card-hover {
+    @apply transition-all duration-300 hover:translate-y-[-4px] hover:shadow-2xl;
+  }
+
+  .card-3d {
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+  }
+
+  .card-3d:hover {
+    transform: rotateY(10deg) rotateX(-10deg);
+  }
+
+  /* Animated Background */
+  .animated-bg {
+    background: linear-gradient(-45deg, #3b82f6, #a855f7, #ec4899, #00d4ff);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+  }
+
+  /* Cyber Grid Background */
+  .cyber-grid {
+    background-image: 
+      linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: -1px -1px;
+  }
+
+  /* Loading Skeleton */
+  .skeleton {
+    @apply bg-gray-200 dark:bg-gray-800 rounded animate-pulse;
+  }
+
+  /* Section Padding */
+  .section-padding {
+    @apply py-16 md:py-24 lg:py-32;
+  }
+
+  /* Container */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Text Styles */
+  .heading-1 {
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold;
+  }
+
+  .heading-2 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold;
+  }
+
+  .heading-3 {
+    @apply text-2xl md:text-3xl lg:text-4xl font-semibold;
+  }
+
+  .body-text {
+    @apply text-base md:text-lg text-gray-600 dark:text-gray-400;
+  }
+
+  /* Input Styles */
+  .input-field {
+    @apply w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all duration-300;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300;
+  }
+
+  .badge-cyber {
+    @apply badge bg-gradient-to-r from-cyber-blue/10 to-cyber-purple/10 text-cyber-blue border border-cyber-blue/30;
+  }
+}
+
+@layer utilities {
+  /* Animations */
+  @keyframes gradient {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes textShimmer {
+    0% {
+      background-position: -200% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+    }
+  }
+
+  /* Utility Classes */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Perspective for 3D effects */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  /* Backdrop filters */
+  .backdrop-blur-xs {
+    backdrop-filter: blur(2px);
+  }
+
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+  }
+
+  .backdrop-blur-md {
+    backdrop-filter: blur(8px);
+  }
+
+  .backdrop-blur-lg {
+    backdrop-filter: blur(16px);
+  }
+
+  .backdrop-blur-xl {
+    backdrop-filter: blur(24px);
+  }
+
+  /* Glow Effects */
+  .glow-sm {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+
+  .glow-md {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+
+  .glow-lg {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+  }
+
+  .glow-xl {
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.5);
+  }
+
+  /* Text Shadow */
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow-md {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow-glow {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+}
+
+/* Dark mode specific styles */
+.dark {
+  color-scheme: dark;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

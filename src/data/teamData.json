@@ -1,0 +1,343 @@
+{
+  "facultyData": [
+    {
+      "id": 1,
+      "name": "Dr. Sharadha",
+      "role": "Faculty Coordinator",
+      "image": "/faculty/sharadha.jpg",
+      "branch": "Computer Science",
+      "email": "sharadha@nmamit.in",
+      "linkedin": "#",
+      "description": "Leading CSI NMAMIT with passion for technology education"
+    },
+    {
+      "id": 2,
+      "name": "Prof. Chithra",
+      "role": "Technical Advisor",
+      "image": "/faculty/chithra.jpg",
+      "branch": "Information Science",
+      "email": "chithra@nmamit.in",
+      "linkedin": "#",
+      "description": "Guiding students in cutting-edge technology projects"
+    },
+    {
+      "id": 3,
+      "name": "Prof. Sneha",
+      "role": "Event Coordinator",
+      "image": "/faculty/sneha.jpg",
+      "branch": "Computer Science",
+      "email": "sneha@nmamit.in",
+      "linkedin": "#",
+      "description": "Organizing impactful technical events and workshops"
+    },
+    {
+      "id": 4,
+      "name": "Prof. Pratheeksha",
+      "role": "Mentor",
+      "image": "/faculty/pratheeksha.jpg",
+      "branch": "Information Science",
+      "email": "pratheeksha@nmamit.in",
+      "linkedin": "#",
+      "description": "Mentoring students for competitive programming"
+    }
+  ],
+  "studentTeamData": [
+  {
+    "name": "Takshak Shetty",
+    "role": "President",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/takshak-shetty",
+    "github": "https://github.com/Takshak-Shetty",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756211178/TakshakShetty_mvfasv.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 1
+  },
+  {
+    "name": "Harshitha P Salian",
+    "role": "Vice President",
+    "branch": "",
+    "year": 4,
+    "linkedin": "https://www.linkedin.com/in/harshitha-p-s-163574288",
+    "github": "https://github.com/harshithaps11",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756211178/harshitha-p-salian_ml9ejx.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 2
+  },
+  {
+    "name": "Ashwin Arun",
+    "role": "Secretary",
+    "branch": "",
+    "year": 4,
+    "linkedin": "https://www.linkedin.com/in/winashcs",
+    "github": "https://github.com/winashcs",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214398/ashwin-arun_a4yurr.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 3
+  },
+  {
+    "name": "Shravya N Bhat",
+    "role": "Joint Secretary",
+    "branch": "",
+    "year": 4,
+    "linkedin": "https://www.linkedin.com/in/shravya-n-bhat-077694284",
+    "github": "https://github.com/Shravya2820",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756211178/shravya-n-bhat_difdsg.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 4
+  },
+  {
+    "name": "Shreya Irniraya",
+    "role": "Treasurer",
+    "branch": "",
+    "year": 4,
+    "linkedin": "https://www.linkedin.com/in/shreyaik",
+    "github": "https://github.com/ShreyaIK06",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214400/shreya-irniraya_xhd6kc.png",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 5
+  },
+  {
+    "name": "Jeevan",
+    "role": "Program Committee Head",
+    "branch": "",
+    "year": 4,
+    "linkedin": "#",
+    "github": "#",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214398/Jeevanshetty_wkhsmz.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 6
+  },
+  {
+    "name": "Shradda Shet",
+    "role": "Program Committee Co-head",
+    "branch": "",
+    "year": 4,
+    "linkedin": "https://www.linkedin.com/in/shraddhashet03",
+    "github": "https://github.com/shraddha-shet",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756211176/Shraddha-shet_udeojs.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 7
+  },
+  {
+    "name": "Alima Raniya",
+    "role": "MC Committee",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/alima-raniya",
+    "github": "https://github.com/AlimaRaniya",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214397/alima-raniya_hcvkmk.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 8
+  },
+  {
+    "name": "Niharika",
+    "role": "MC Committee",
+    "branch": "",
+    "year": 2,
+    "linkedin": "https://www.linkedin.com/in/niharika-niranjan-19778a290",
+    "github": "https://github.com/NiharikaN-CB",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756211177/niharika_jcgjhx.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 9
+  },
+  {
+    "name": "Prashith Shetty",
+    "role": "Technical (Lead)",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/prashith-shetty-a91508244/",
+    "github": "https://github.com/Prashithshetty",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756211180/Prashith-Shetty_hfivbo.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 10
+  },
+  {
+    "name": "Anish Kumar",
+    "role": "Technical Team",
+    "branch": "",
+    "year": 4,
+    "linkedin": "https://www.linkedin.com/in/anish-kumar-1a5bb133a/",
+    "github": "https://github.com/iotserver24",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214398/anish-kumar_bzpi5s.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 11
+  },
+  {
+    "name": "Alen Chettiar",
+    "role": "Technical Team",
+    "branch": "",
+    "year": 2,
+    "linkedin": "https://www.linkedin.com/in/alen-chettiar-940329355",
+    "github": "https://github.com/AlenChettiar",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214397/alen-chettiar_eprk27.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 12
+  },
+  {
+    "name": "Thrisha K",
+    "role": "Technical Team",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/thrisha-k-b17599321",
+    "github": "https://github.com/ThrishahK",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214401/thrisha-k_eksr96.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 13
+  },
+  {
+    "name": "M K Subrahmanya",
+    "role": "Technical Team",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/subrahmanya-m-k-788700327/",
+    "github": "https://github.com/MKSubrahmanya12345",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214398/m-k-subrahmanya_i0qqv7.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 14
+  },
+  {
+    "name": "Nithin K R",
+    "role": "Technical Team",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/nithinkr06",
+    "github": "https://github.com/NITHINKR06",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756211177/nithin-k-r_pbqzzl.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 15
+  },
+  {
+    "name": "Akshay S Mayya",
+    "role": "Graphics",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/akshay-mayya-b59159242/",
+    "github": "https://github.com/167389073",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214398/akshay-s-mayya_sogxoc.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 16
+  },
+  {
+    "name": "Pratheeksha",
+    "role": "Graphics",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/pratheeksha-7323b928a",
+    "github": "https://github.com/pratheeksha63",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756211177/pratheeksha_yhddjd.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 17
+  },
+  {
+    "name": "Sanjana C Upadhya",
+    "role": "Graphics",
+    "branch": "",
+    "year": 4,
+    "linkedin": "https://www.linkedin.com/in/sanjana-upadhya-a8493b321",
+    "github": "https://github.com/sanjana03upadhya",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214400/sanjana-c-upadhya_qd0ygl.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 18
+  },
+  {
+    "name": "Sonal Hegde",
+    "role": "Social Media",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/sonalhegde",
+    "github": "https://github.com/Sonalhegde",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756211178/sonal-hegde_jqggtd.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 19
+  },
+  {
+    "name": "Prathiksha S",
+    "role": "Publicity (Lead)",
+    "branch": "",
+    "year": 4,
+    "linkedin": "https://www.linkedin.com/in/prathiksha-s-/",
+    "github": "https://github.com/PrathikshaAmin",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214399/prathiksha-s_w0hevf.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 20
+  },
+  {
+    "name": "Anand Bobba",
+    "role": "Publicity (Lead)",
+    "branch": "",
+    "year": 4,
+    "linkedin": "https://www.linkedin.com/in/anandbobba",
+    "github": "https://github.com/anandbobba",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214398/anand-bobba_oqv1iw.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 21
+  },
+  {
+    "name": "Shrinidhi M Shetty",
+    "role": "Publicity",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/shrinidhi-m-shetty-230050295",
+    "github": "https://github.com/Shrinidhimshetty",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214400/shrinidhi-m-shetty_rjabnr.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 22
+  },
+  {
+    "name": "Shreya Sridhara",
+    "role": "Publicity",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/shreya-shridhara-50b44831b",
+    "github": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214399/shreya-shridhara_twc6ev.jpg",
+    "imageSrc": "",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 23
+  },
+  {
+    "name": "Vedant Suresh Mahalle",
+    "role": "Event Management Lead",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/vedant-mahalle-b217b4290/",
+    "github": "https://github.com/Vedant10Mahalle",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214401/vedant-mahalle_pcq6sl.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 24
+  },
+  {
+    "name": "Vidyalakshmi Kamath",
+    "role": "Event Management Lead",
+    "branch": "",
+    "year": 3,
+    "linkedin": "https://www.linkedin.com/in/vidyalakshmi-kamath-086311325",
+    "github": "https://github.com/Vidya-kama-th",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214402/vidyalakshmi-kamath_hsohkv.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 25
+  },
+  {
+    "name": "Ananya S Nayak",
+    "role": "Event Management",
+    "branch": "",
+    "year": 2,
+    "linkedin": "https://www.linkedin.com/in/ananya-s-nayak-18171b363",
+    "github": "https://github.com/Ananyasn98",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214397/ananya-s-nayak_tbt7ko.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 26
+  },
+  {
+    "name": "Tanisha U Prakash",
+    "role": "Event Management",
+    "branch": "",
+    "year": 2,
+    "linkedin": "https://www.linkedin.com/in/tanisha-u-prakash-713910320",
+    "github": "https://github.com/Tanishauprakash05",
+    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214399/tanisha-u-prakash_w3mkcc.jpg",
+    "skills": ["Leadership", "Full Stack", "AI/ML"],
+    "order": 27
+  }
+  ]
+}

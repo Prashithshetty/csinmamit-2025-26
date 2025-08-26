@@ -1,0 +1,157 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    function isValidEmail(email) {
+      return email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+    
+    function isValidPhone(phone) {
+      return phone.matches('^[6-9][0-9]{9}$');
+    }
+    
+    function isValidUSN(usn) {
+      return usn.matches('^[1-4]NM(2[0-9])[A-Z]{2}[0-9]{3}$');
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own data
+      allow read: if isOwner(userId);
+      
+      // Users can create their own profile
+      allow create: if isOwner(userId) && 
+        isValidEmail(request.resource.data.email) &&
+        request.resource.data.createdAt == request.time;
+      
+      // Users can update their own profile with restrictions
+      allow update: if isOwner(userId) && 
+        // Prevent changing critical fields
+        request.resource.data.email == resource.data.email &&
+        request.resource.data.uid == resource.data.uid &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        // Validate phone if provided
+        (!('phone' in request.resource.data) || isValidPhone(request.resource.data.phone)) &&
+        // Validate USN if provided
+        (!('usn' in request.resource.data) || isValidUSN(request.resource.data.usn));
+      
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+    
+    // Memberships collection
+    match /memberships/{membershipId} {
+      // Users can read their own membership
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Only backend/admin can create memberships (after payment verification)
+      allow create: if false; // Should be created by backend only
+      
+      // Only backend/admin can update memberships
+      allow update: if false; // Should be updated by backend only
+      
+      // No one can delete memberships
+      allow delete: if false;
+    }
+    
+    // Payments collection (sensitive)
+    match /payments/{paymentId} {
+      // Only the user who made the payment or admin can read
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Only backend can create payment records
+      allow create: if false; // Backend only
+      
+      // Payments cannot be updated
+      allow update: if false;
+      
+      // Payments cannot be deleted
+      allow delete: if false;
+    }
+    
+    // Events collection (public read)
+    match /events/{eventId} {
+      // Anyone can read events
+      allow read: if true;
+      
+      // Only admins can create/update/delete events
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Team members collection (public read)
+    match /team/{memberId} {
+      // Anyone can read team information
+      allow read: if true;
+      
+      // Only admins can modify team data
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Event registrations
+    match /registrations/{registrationId} {
+      // Users can read their own registrations
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Users can create registrations for themselves
+      allow create: if isOwner(request.resource.data.userId) &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.status == 'pending';
+      
+      // Only admins can update registration status
+      allow update: if isAdmin();
+      
+      // Users can delete their own pending registrations
+      allow delete: if isOwner(resource.data.userId) && 
+        resource.data.status == 'pending';
+    }
+    
+    // Admin collection (highly restricted)
+    match /admins/{adminId} {
+      // Only admins can read admin list
+      allow read: if isAdmin();
+      
+      // No one can modify admin list through client
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+    
+    // Audit logs (write-only for clients)
+    match /audit_logs/{logId} {
+      // Only admins can read logs
+      allow read: if isAdmin();
+      
+      // Anyone authenticated can write logs (for tracking)
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.timestamp == request.time;
+      
+      // Logs cannot be updated or deleted
+      allow update: if false;
+      allow delete: if false;
+    }
+    
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
