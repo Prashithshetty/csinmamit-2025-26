@@ -22,7 +22,7 @@ const StudentCard = ({ member, index, onClick }) => {
           />
 
           {/* Bottom Gradient with Name + Role */}
-          <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+          <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/100 via-black/70 to-transparent">
             <h3 className="text-lg font-bold text-white">{member.name}</h3>
             <p className="text-sm text-gray-300">{member.role}</p>
           </div>

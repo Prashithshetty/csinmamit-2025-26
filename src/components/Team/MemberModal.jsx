@@ -32,7 +32,7 @@ const MemberModal = ({ member, onClose }) => {
           <div className="text-center">
             {/* Profile Image */}
             <img
-              src={member.image}
+              src={member.imageSrc}
               alt={member.name}
               className="w-32 h-32 mx-auto rounded-full object-cover mb-4"
             />

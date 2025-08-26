@@ -1,33 +1,32 @@
 import { Users, GraduationCap } from 'lucide-react'
 
 const TeamTabs = ({ activeTab, setActiveTab }) => {
+  const tabs = [
+    { id: 'students', label: 'Student Team', icon: Users },
+    { id: 'faculty', label: 'Faculty', icon: GraduationCap },
+  ]
+
   return (
-    <section className="sticky top-16 z-20 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+    <section className="relative z-20 -mt-8">
       <div className="container-custom">
         <div className="flex justify-center">
-          <div className="inline-flex p-1 rounded-lg bg-gray-100 dark:bg-gray-800">
-            <button
-              onClick={() => setActiveTab('students')}
-              className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                activeTab === 'students'
-                  ? 'bg-white dark:bg-gray-900 text-primary-600 dark:text-primary-400 shadow-md'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
-            >
-              <Users className="inline-block mr-2" size={20} />
-              Student Team
-            </button>
-            <button
-              onClick={() => setActiveTab('faculty')}
-              className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                activeTab === 'faculty'
-                  ? 'bg-white dark:bg-gray-900 text-primary-600 dark:text-primary-400 shadow-md'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
-            >
-              <GraduationCap className="inline-block mr-2" size={20} />
-              Faculty
-            </button>
+          <div className="relative inline-flex bg-white/80 dark:bg-gray-900/70 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-full shadow-xl p-1">
+            {tabs.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300
+                  ${
+                    activeTab === id
+                      ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                  }
+                `}
+              >
+                <Icon size={18} />
+                {label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
