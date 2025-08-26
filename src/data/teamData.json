@@ -263,17 +263,6 @@
     "order": 20
   },
   {
-    "name": "Anand Bobba",
-    "role": "Publicity (Lead)",
-    "branch": "",
-    "year": 4,
-    "linkedin": "https://www.linkedin.com/in/anandbobba",
-    "github": "https://github.com/anandbobba",
-    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214398/anand-bobba_oqv1iw.jpg",
-    "skills": ["Leadership", "Full Stack", "AI/ML"],
-    "order": 21
-  },
-  {
     "name": "Shrinidhi M Shetty",
     "role": "Publicity",
     "branch": "",
@@ -294,17 +283,6 @@
     "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214399/shreya-shridhara_twc6ev.jpg",
     "skills": ["Leadership", "Full Stack", "AI/ML"],
     "order": 23
-  },
-  {
-    "name": "Vedant Suresh Mahalle",
-    "role": "Event Management Lead",
-    "branch": "",
-    "year": 3,
-    "linkedin": "https://www.linkedin.com/in/vedant-mahalle-b217b4290/",
-    "github": "https://github.com/Vedant10Mahalle",
-    "imageSrc": "https://res.cloudinary.com/dqnlrrcgb/image/upload/v1756214401/vedant-mahalle_pcq6sl.jpg",
-    "skills": ["Leadership", "Full Stack", "AI/ML"],
-    "order": 24
   },
   {
     "name": "Vidyalakshmi Kamath",
