@@ -1,227 +1,185 @@
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Github, 
-  Linkedin, 
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  Mail,
+  MapPin,
+  Github,
+  Linkedin,
   Twitter,
   Instagram,
   Heart,
   ExternalLink,
-  ArrowUpRight
-} from 'lucide-react'
+  Send,
+} from "lucide-react";
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
-  const footerLinks = {
-    'Quick Links': [
-      { label: 'Home', path: '/' },
-      { label: 'Events', path: '/events' },
-      { label: 'Team', path: '/team' },
-      { label: 'Join CSI', path: '/recruit' },
-    ],
-    'Resources': [
-      { label: 'About CSI', path: '#' },
-      { label: 'Membership Benefits', path: '#' },
-      { label: 'Past Events', path: '/events' },
-      { label: 'Gallery', path: '#' },
-    ],
-    'Connect': [
-      { label: 'Contact Us', path: '#', icon: Mail },
-      { label: 'NMAMIT Website', path: 'https://nmamit.nitte.edu.in', external: true },
-      { label: 'CSI India', path: 'https://www.csi-india.org', external: true },
-      { label: 'Feedback', path: '#' },
-    ],
-  }
+  const quickLinks = [
+    { label: "Home", path: "/" },
+    { label: "Events", path: "/events" },
+    { label: "Team", path: "/team" },
+    { label: "Join CSI", path: "/recruit" },
+    { label: "About", path: "#" },
+    { label: "Gallery", path: "#" },
+  ];
 
   const socialLinks = [
-    { icon: Github, href: '#', label: 'GitHub' },
-    { icon: Linkedin, href: '#', label: 'LinkedIn' },
-    { icon: Twitter, href: '#', label: 'Twitter' },
-    { icon: Instagram, href: '#', label: 'Instagram' },
-  ]
+    { icon: Github, href: "#", label: "GitHub" },
+    { icon: Linkedin, href: "#", label: "LinkedIn" },
+    { icon: Twitter, href: "#", label: "Twitter" },
+    { icon: Instagram, href: "#", label: "Instagram" },
+  ];
 
   return (
-    <footer className="relative mt-20 border-t border-gray-200 dark:border-gray-800">
-      {/* Gradient Line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary-500 to-transparent" />
-      
-      <div className="container-custom py-12 lg:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+    <footer className="bg-white dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800">
+      {/* Main Footer Content */}
+      <div className="container-custom py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          
           {/* Brand Section */}
           <div className="lg:col-span-2">
-            <div className="flex items-center space-x-3 mb-4">
-              <img 
-                src="/csi-logo.png" 
-                alt="CSI Logo" 
-                className="h-12 w-12"
-              />
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                <img src="/csi-logo.png" alt="CSI" className="w-8 h-8" />
+              </div>
               <div>
-                <h3 className="text-xl font-bold gradient-text">CSI NMAMIT</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Computer Society of India
-                </p>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  CSI NMAMIT
+                </h3>
+                <p className="text-sm text-gray-500">Computer Society of India</p>
               </div>
             </div>
             
-            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md">
-              Empowering students through technology, innovation, and community. 
-              Join us in shaping the future of tech at NMAMIT.
+            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md leading-relaxed">
+              Empowering the next generation of tech innovators through community, 
+              learning, and hands-on experience at NMAM Institute of Technology.
             </p>
-
-            {/* Contact Info */}
-            <div className="space-y-3">
+            
+            {/* Contact Info - Clean & Simple */}
+            <div className="space-y-3 mb-6">
               <a 
-                href="mailto:csi@nmamit.in" 
-                className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition-colors"
+                href="mailto:csi@nmamit.in"
+                className="flex items-center gap-3 text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-colors group"
               >
-                <Mail size={18} />
+                <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
+                  <Mail size={16} />
+                </div>
                 <span>csi@nmamit.in</span>
               </a>
-              <div className="flex items-start space-x-2 text-gray-600 dark:text-gray-400">
-                <MapPin size={18} className="mt-1 flex-shrink-0" />
-                <span>
-                  NMAM Institute of Technology,<br />
-                  Nitte, Karkala Taluk,<br />
-                  Udupi - 574110
-                </span>
+              
+              <div className="flex items-start gap-3 text-gray-600 dark:text-gray-400">
+                <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mt-0">
+                  <MapPin size={16} />
+                </div>
+                <div>
+                  <p>NMAM Institute of Technology</p>
+                  <p>Nitte, Udupi - 574110, Karnataka</p>
+                </div>
               </div>
             </div>
 
             {/* Social Links */}
-            <div className="flex space-x-3 mt-6">
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-500 mr-2">Follow us:</span>
               {socialLinks.map(({ icon: Icon, href, label }) => (
                 <motion.a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900/30 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-300"
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  className="w-9 h-9 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-blue-500 hover:text-white transition-all duration-200"
                   aria-label={label}
                 >
-                  <Icon size={20} />
+                  <Icon size={18} />
                 </motion.a>
               ))}
             </div>
           </div>
 
-          {/* Links Sections */}
-          {Object.entries(footerLinks).map(([title, links]) => (
-            <div key={title}>
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                {title}
-              </h4>
-              <ul className="space-y-2">
-                {links.map(({ label, path, external, icon: Icon }) => (
-                  <li key={label}>
-                    {external ? (
-                      <a
-                        href={path}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-1 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition-colors group"
-                      >
-                        {Icon && <Icon size={16} />}
-                        <span>{label}</span>
-                        <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </a>
-                    ) : (
-                      <Link
-                        to={path}
-                        className="flex items-center space-x-1 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition-colors"
-                      >
-                        {Icon && <Icon size={16} />}
-                        <span>{label}</span>
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Quick Links
+            </h4>
+            <nav className="space-y-3">
+              {quickLinks.map(({ label, path }) => (
+                <Link
+                  key={label}
+                  to={path}
+                  className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
-        {/* Newsletter Section */}
-        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
-          <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-            <div className="text-center lg:text-left">
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                Stay Updated
-              </h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Subscribe to our newsletter for latest events and updates
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+          {/* Newsletter */}
+          <div>
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Stay Connected
+            </h4>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Get updates on events, workshops, and opportunities.
+            </p>
+            
+            <div className="flex gap-2">
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="input-field sm:w-64"
+                className="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
-              <button className="btn-primary flex items-center justify-center space-x-2">
-                <span>Subscribe</span>
-                <ArrowUpRight size={18} />
+              <button className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center">
+                <Send size={16} />
               </button>
             </div>
+            
+            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+              <div className="flex flex-col gap-2 text-sm">
+                <a href="https://nmamit.nitte.edu.in" target="_blank" rel="noopener noreferrer" 
+                   className="flex items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-colors">
+                  <span>NMAMIT Website</span>
+                  <ExternalLink size={14} />
+                </a>
+                <a href="https://www.csi-india.org" target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-colors">
+                  <span>CSI India</span>
+                  <ExternalLink size={14} />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 text-center md:text-left">
-              © {currentYear} CSI NMAMIT. All rights reserved.
-            </p>
-            <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-              <Link to="#" className="hover:text-primary-500 transition-colors">
-                Privacy Policy
-              </Link>
-              <span>•</span>
-              <Link to="#" className="hover:text-primary-500 transition-colors">
-                Terms of Service
+      {/* Bottom Bar */}
+      <div className="border-t border-gray-100 dark:border-gray-800 py-6">
+        <div className="container-custom">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+              <span>© {currentYear} CSI NMAMIT</span>
+              <Link to="#" className="hover:text-blue-600 transition-colors">Privacy Policy</Link>
+              <Link to="#" className="hover:text-blue-600 transition-colors">Terms</Link>
+            </div>
+            
+            <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+              <span>Made with</span>
+              <Heart size={14} className="text-red-500 fill-red-500 mx-1" />
+              <span>by</span>
+              <Link 
+                to="/tech-team" 
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors font-medium"
+              >
+                CSI Tech Team
               </Link>
             </div>
-            <p className="flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-400">
-              <span>Made with</span>
-              <Heart size={16} className="text-red-500 fill-red-500" />
-              <span>by CSI Tech Team</span>
-            </p>
           </div>
         </div>
       </div>
-
-      {/* Animated Wave Background */}
-      <div className="absolute bottom-0 left-0 right-0 overflow-hidden pointer-events-none">
-        <svg
-          className="relative block w-full h-20 text-primary-500/5"
-          preserveAspectRatio="none"
-          viewBox="0 0 1200 120"
-        >
-          <motion.path
-            d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
-            fill="currentColor"
-            animate={{
-              d: [
-                "M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z",
-                "M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z",
-              ],
-            }}
-            transition={{
-              repeat: Infinity,
-              repeatType: "reverse",
-              duration: 10,
-              ease: "easeInOut",
-            }}
-          />
-        </svg>
-      </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;
