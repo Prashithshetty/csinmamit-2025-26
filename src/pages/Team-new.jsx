@@ -11,8 +11,6 @@ const Team = () => {
   const [activeTab, setActiveTab] = useState('students')
   const [selectedMember, setSelectedMember] = useState(null)
 
-  console.log(studentTeamData, facultyData ,"data check here !!")
-
   return (
     <div className="min-h-screen pt-20">
       {/* Hero Section */}

@@ -50,7 +50,8 @@ const Navbar = () => {
     }`}>
       <div className="container-custom">
         <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
+          
+          {/* ✅ Logo + Text always visible */}
           <Link 
             to="/" 
             className="flex items-center space-x-3 group"
@@ -63,11 +64,11 @@ const Navbar = () => {
               />
               <div className="absolute inset-0 bg-primary-500 blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
             </div>
-            <div className="hidden sm:block">
-              <h1 className="text-lg md:text-xl font-bold gradient-text-animated">
+            <div className="block">
+              <h1 className="text-base sm:text-lg md:text-xl font-bold gradient-text-animated">
                 CSI NMAMIT
               </h1>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 leading-none">
                 Computer Society of India
               </p>
             </div>
