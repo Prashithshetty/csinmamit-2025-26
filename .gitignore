@@ -29,3 +29,4 @@ SECURITY.md
 .env.test
 .env.production
 .env.local
+/src/utils/emailDiagnostics.js

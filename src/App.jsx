@@ -38,92 +38,44 @@ const AdminLoading = () => (
 function App() {
   
   useEffect(() => {
-    // Disable console in production
-    if (import.meta.env.VITE_APP_ENV === 'production') {
-      console.log = () => {}
-      console.warn = () => {}
-      console.error = () => {}
-      console.info = () => {}
-      console.debug = () => {}
-    }
-
-    // Detect DevTools (basic protection)
-    const detectDevTools = () => {
-      const threshold = 160
-      const widthThreshold = window.outerWidth - window.innerWidth > threshold
-      const heightThreshold = window.outerHeight - window.innerHeight > threshold
-      
-      if (widthThreshold || heightThreshold) {
-        if (import.meta.env.VITE_APP_ENV === 'production') {
-          document.body.innerHTML = 'DevTools detected. This action has been logged.'
-        }
-      }
-    }
-
-    // Check periodically
-    const interval = setInterval(detectDevTools, 1000)
-
-    // Prevent right-click in production
-    const handleContextMenu = (e) => {
-      if (import.meta.env.VITE_APP_ENV === 'production') {
-        e.preventDefault()
-        return false
-      }
-    }
-
-    // Prevent text selection on payment pages
+    // Only apply minimal security in production
+    // Removed aggressive DevTools detection and console blocking for better UX
+    
+    // Only prevent text selection on sensitive payment pages
     const handleSelectStart = (e) => {
       const restrictedPaths = ['/recruit', '/profile']
       if (restrictedPaths.includes(window.location.pathname)) {
-        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-          e.preventDefault()
-          return false
+        // Only prevent selection on payment-related elements
+        if (e.target.closest('.payment-info, .card-details, .sensitive-data')) {
+          if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault()
+            return false
+          }
         }
       }
     }
 
-    // Prevent keyboard shortcuts
-    const handleKeyDown = (e) => {
+    // Optional: Add a subtle watermark instead of blocking right-click
+    const addWatermark = () => {
       if (import.meta.env.VITE_APP_ENV === 'production') {
-        // Prevent F12
-        if (e.keyCode === 123) {
-          e.preventDefault()
-          return false
-        }
-        // Prevent Ctrl+Shift+I
-        if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
-          e.preventDefault()
-          return false
-        }
-        // Prevent Ctrl+Shift+J
-        if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
-          e.preventDefault()
-          return false
-        }
-        // Prevent Ctrl+U
-        if (e.ctrlKey && e.keyCode === 85) {
-          e.preventDefault()
-          return false
-        }
-        // Prevent Ctrl+S
-        if (e.ctrlKey && e.keyCode === 83) {
-          e.preventDefault()
-          return false
-        }
+        // You can add a watermark to copied content instead of blocking
+        document.addEventListener('copy', (e) => {
+          const selection = window.getSelection().toString()
+          if (selection.length > 50) {
+            e.clipboardData.setData('text/plain', selection + '\n\n© CSI NMAMIT')
+            e.preventDefault()
+          }
+        })
       }
     }
 
     // Add event listeners
-    document.addEventListener('contextmenu', handleContextMenu)
     document.addEventListener('selectstart', handleSelectStart)
-    document.addEventListener('keydown', handleKeyDown)
+    addWatermark()
 
     // Cleanup
     return () => {
-      clearInterval(interval)
-      document.removeEventListener('contextmenu', handleContextMenu)
       document.removeEventListener('selectstart', handleSelectStart)
-      document.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
 
