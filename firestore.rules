@@ -2,154 +2,328 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper functions
+    // ============================================================================
+    // HELPER FUNCTIONS
+    // ============================================================================
+    
+    // Check if user is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
     
+    // Check if user owns the resource
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
-    
+
+    // Check if user has admin role
     function isAdmin() {
-      return isAuthenticated() && 
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
+    // Validate string field length
+    function isValidStringLength(field, minLen, maxLen) {
+      return field is string && 
+             field.size() >= minLen && 
+             field.size() <= maxLen;
+    }
+    
+    // Validate email format (basic check)
     function isValidEmail(email) {
-      return email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+      return email is string && 
+             email.matches('.*@.*\\..*') && 
+             email.size() <= 254;
     }
     
+    // Validate phone number (basic check)
     function isValidPhone(phone) {
-      return phone.matches('^[6-9][0-9]{9}$');
+      return phone is string && 
+             phone.matches('[0-9+\\-\\s()]+') && 
+             phone.size() >= 10 && 
+             phone.size() <= 20;
     }
     
+    // Validate USN format (adjust pattern as needed)
     function isValidUSN(usn) {
-      return usn.matches('^[1-4]NM(2[0-9])[A-Z]{2}[0-9]{3}$');
+      return usn is string && 
+             usn.matches('[0-9A-Z]+') && 
+             usn.size() >= 8 && 
+             usn.size() <= 15;
     }
     
-    // Users collection
+    // Check if only allowed fields are being updated
+    function onlyUpdatingFields(allowedFields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(allowedFields);
+    }
+    
+    // Rate limiting helper (basic implementation)
+    function isWithinRateLimit() {
+      // This is a basic check - for production, consider using external rate limiting
+      return request.time > resource.data.get('lastUpdated', timestamp.value(0)) + duration.value(1, 's');
+    }
+    
+    // ============================================================================
+    // USER PROFILES
+    // ============================================================================
+    
     match /users/{userId} {
-      // Users can read their own data
+      // Users can read their own profile
       allow read: if isOwner(userId);
       
-      // Users can create their own profile
+      // Users can create their own profile with valid data
       allow create: if isOwner(userId) && 
-        isValidEmail(request.resource.data.email) &&
-        request.resource.data.createdAt == request.time;
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0;
       
-      // Users can update their own profile with restrictions
-      allow update: if isOwner(userId) && 
-        // Prevent changing critical fields
-        request.resource.data.email == resource.data.email &&
-        request.resource.data.uid == resource.data.uid &&
-        request.resource.data.createdAt == resource.data.createdAt &&
-        // Validate phone if provided
-        (!('phone' in request.resource.data) || isValidPhone(request.resource.data.phone)) &&
-        // Validate USN if provided
-        (!('usn' in request.resource.data) || isValidUSN(request.resource.data.usn));
+      // Users can update their own profile
+      allow update: if isOwner(userId) &&
+        isValidUserUpdate(request.resource.data, resource.data) &&
+        onlyUpdatingFields(['name', 'bio', 'branch', 'usn', 'github', 'linkedin', 'phone', 'certificates', 'updatedAt']);
       
-      // Only admins can delete users
-      allow delete: if isAdmin();
+      // Users can delete their own profile
+      allow delete: if isOwner(userId);
+      
+      // Validate user data structure and content
+       function isValidUserData(data) {
+        return data.keys().hasOnly(['name', 'bio', 'branch', 'usn', 'github', 'linkedin', 'phone', 'role', 'certificates', 'createdAt', 'updatedAt']) &&
+               isValidStringLength(data.name, 1, 100) &&
+               (data.bio == null || isValidStringLength(data.bio, 0, 500)) &&
+               (data.branch == null || isValidStringLength(data.branch, 0, 100)) &&
+               (data.usn == null || isValidUSN(data.usn)) &&
+               (data.github == null || isValidStringLength(data.github, 0, 200)) &&
+               (data.linkedin == null || isValidStringLength(data.linkedin, 0, 200)) &&
+               (data.phone == null || isValidPhone(data.phone)) &&
+                (data.role == null || data.role in ['User', 'EXECUTIVE MEMBER', 'member', 'core', 'admin']) &&
+               (data.certificates == null || data.certificates is list) &&
+               (data.createdAt == null || data.createdAt is timestamp) &&
+               (data.updatedAt == null || data.updatedAt is timestamp);
+      }
+      
+      // Validate user update (more restrictive than create)
+      function isValidUserUpdate(newData, oldData) {
+        return isValidUserData(newData) &&
+               newData.createdAt == oldData.createdAt && // Prevent changing creation time
+               newData.role == oldData.role; // Prevent changing role
+      }
     }
     
-    // Memberships collection
-    match /memberships/{membershipId} {
-      // Users can read their own membership
-      allow read: if isOwner(resource.data.userId) || isAdmin();
-      
-      // Only backend/admin can create memberships (after payment verification)
-      allow create: if false; // Should be created by backend only
-      
-      // Only backend/admin can update memberships
-      allow update: if false; // Should be updated by backend only
-      
-      // No one can delete memberships
-      allow delete: if false;
-    }
+    // ============================================================================
+    // CORE TEAM MEMBERS
+    // ============================================================================
     
-    // Payments collection (sensitive)
-    match /payments/{paymentId} {
-      // Only the user who made the payment or admin can read
-      allow read: if isOwner(resource.data.userId) || isAdmin();
-      
-      // Only backend can create payment records
-      allow create: if false; // Backend only
-      
-      // Payments cannot be updated
-      allow update: if false;
-      
-      // Payments cannot be deleted
-      allow delete: if false;
-    }
-    
-    // Events collection (public read)
-    match /events/{eventId} {
-      // Anyone can read events
+    match /core/{document=**} {
+      // Public read access for displaying team
       allow read: if true;
       
-      // Only admins can create/update/delete events
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      // Admins can write core team data
+      allow write: if isAdmin() && isValidCoreTeamData(request.resource.data);
+      
+      function isValidCoreTeamData(data) {
+        return data.keys().hasOnly(['name', 'position', 'bio', 'image', 'github', 'linkedin', 'email', 'order', 'active', 'year', 'createdAt', 'updatedAt']) &&
+               isValidStringLength(data.name, 1, 100) &&
+               isValidStringLength(data.position, 1, 100) &&
+               (data.bio == null || isValidStringLength(data.bio, 0, 1000)) &&
+               (data.image == null || isValidStringLength(data.image, 0, 500)) &&
+               (data.github == null || isValidStringLength(data.github, 0, 200)) &&
+               (data.linkedin == null || isValidStringLength(data.linkedin, 0, 200)) &&
+               (data.email == null || isValidEmail(data.email)) &&
+               (data.order == null || data.order is number) &&
+               (data.active == null || data.active is bool) &&
+               (data.year == null || data.year is number);
+      }
     }
     
-    // Team members collection (public read)
-    match /team/{memberId} {
-      // Anyone can read team information
+    // ============================================================================
+    // TEAM MEMBERS
+    // ============================================================================
+    
+    match /team-members/{document=**} {
+      // Public read access for displaying team
       allow read: if true;
       
-      // Only admins can modify team data
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      // Authenticated users can create team member entries (for applications)
+      allow create: if isAuthenticated() && isValidTeamMemberData(request.resource.data);
+      
+      // Only admins can update/delete team member data
+      allow update, delete: if isAdmin();
+      
+      function isValidTeamMemberData(data) {
+        return data.keys().hasOnly(['name', 'position', 'bio', 'image', 'github', 'linkedin', 'email', 'usn', 'branch', 'year', 'active', 'approved', 'createdAt', 'updatedAt']) &&
+               isValidStringLength(data.name, 1, 100) &&
+               (data.position == null || isValidStringLength(data.position, 0, 100)) &&
+               (data.bio == null || isValidStringLength(data.bio, 0, 500)) &&
+               (data.image == null || isValidStringLength(data.image, 0, 500)) &&
+               (data.github == null || isValidStringLength(data.github, 0, 200)) &&
+               (data.linkedin == null || isValidStringLength(data.linkedin, 0, 200)) &&
+               (data.email == null || isValidEmail(data.email)) &&
+               (data.usn == null || isValidUSN(data.usn)) &&
+               (data.branch == null || isValidStringLength(data.branch, 0, 100)) &&
+               (data.year == null || data.year is number) &&
+               (data.active == null || data.active is bool) &&
+               (data.approved == null || data.approved is bool);
+      }
     }
     
-    // Event registrations
-    match /registrations/{registrationId} {
-      // Users can read their own registrations
-      allow read: if isOwner(resource.data.userId) || isAdmin();
+    // ============================================================================
+    // EVENTS
+    // ============================================================================
+    
+    match /events/{document=**} {
+      // Public read access for displaying events
+      allow read: if true;
       
-      // Users can create registrations for themselves
-      allow create: if isOwner(request.resource.data.userId) &&
+      // Admins can write event data
+      allow write: if isAdmin() && isValidEventData(request.resource.data);
+      
+      function isValidEventData(data) {
+        return data.keys().hasOnly(['title', 'description', 'brief', 'image', 'cloudinaryUrl', 'originalImagePath', 'date', 'time', 'venue', 'category', 'type', 'entryFee', 'organizers', 'contactPersons', 'year', 'published', 'registrationsAvailable', 'participants', 'participantCount', 'searchTitle', 'searchDescription', 'status', 'featured', 'createdAt', 'updatedAt']) &&
+               isValidStringLength(data.title, 1, 200) &&
+               isValidStringLength(data.description, 1, 5000) &&
+               (data.brief == null || isValidStringLength(data.brief, 0, 1000)) &&
+               (data.image == null || isValidStringLength(data.image, 0, 500)) &&
+               (data.cloudinaryUrl == null || isValidStringLength(data.cloudinaryUrl, 0, 500)) &&
+               (data.venue == null || isValidStringLength(data.venue, 0, 200)) &&
+               (data.category == null || data.category in ['PREVIOUS', 'UPCOMING', 'CURRENT']) &&
+               (data.type == null || data.type in ['SOLO', 'TEAM']) &&
+               (data.entryFee == null || data.entryFee is number) &&
+               (data.year == null || data.year is number) &&
+               (data.published == null || data.published is bool) &&
+               (data.registrationsAvailable == null || data.registrationsAvailable is bool) &&
+               (data.participants == null || data.participants is list) &&
+               (data.participantCount == null || data.participantCount is number) &&
+               (data.featured == null || data.featured is bool);
+      }
+    }
+    
+    // ============================================================================
+    // TEAMS (User-created teams for events)
+    // ============================================================================
+    
+    match /teams/{teamId} {
+      // Authenticated users can read teams they're part of or created
+      allow read: if isAuthenticated() && 
+        (resource.data.custid == request.auth.uid || 
+         request.auth.uid in resource.data.get('members', []));
+      
+      // Authenticated users can create teams
+      allow create: if isAuthenticated() && 
+        isValidTeamData(request.resource.data) &&
+        request.resource.data.custid == request.auth.uid &&
         request.resource.data.createdAt == request.time &&
-        request.resource.data.status == 'pending';
+        request.resource.data.updatedAt == request.time;
       
-      // Only admins can update registration status
-      allow update: if isAdmin();
+      // Team owners can update teams
+      allow update: if isAuthenticated() && 
+        resource.data.custid == request.auth.uid &&
+        isValidTeamUpdate(request.resource.data, resource.data) &&
+        request.resource.data.updatedAt == request.time &&
+        isWithinRateLimit();
       
-      // Users can delete their own pending registrations
-      allow delete: if isOwner(resource.data.userId) && 
-        resource.data.status == 'pending';
+      // Only team owners can delete teams
+      allow delete: if isAuthenticated() && 
+        resource.data.custid == request.auth.uid;
+      
+      function isValidTeamData(data) {
+        return data.keys().hasOnly(['name', 'description', 'custid', 'members', 'maxMembers', 'eventId', 'status', 'createdAt', 'updatedAt']) &&
+               isValidStringLength(data.name, 1, 100) &&
+               (data.description == null || isValidStringLength(data.description, 0, 500)) &&
+               data.custid is string &&
+               (data.members == null || (data.members is list && data.members.size() <= 10)) &&
+               (data.maxMembers == null || (data.maxMembers is number && data.maxMembers >= 1 && data.maxMembers <= 10)) &&
+               (data.eventId == null || data.eventId is string) &&
+               (data.status == null || data.status in ['active', 'inactive', 'full']);
+      }
+      
+      function isValidTeamUpdate(newData, oldData) {
+        return isValidTeamData(newData) &&
+               newData.custid == oldData.custid && // Prevent changing team owner
+               newData.createdAt == oldData.createdAt && // Prevent changing creation time
+               onlyUpdatingFields(['name', 'description', 'members', 'maxMembers', 'eventId', 'status', 'updatedAt']);
+      }
     }
     
-    // Admin collection (highly restricted)
-    match /admins/{adminId} {
-      // Only admins can read admin list
-      allow read: if isAdmin();
+    // ============================================================================
+    // RECRUITS (Membership applications)
+    // ============================================================================
+    
+    match /recruits/{document=**} {
+      // Authenticated users can read recruit data
+      allow read: if isAuthenticated();
       
-      // No one can modify admin list through client
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      // Public can create recruit applications (for membership registration)
+      allow create: if isValidRecruitData(request.resource.data) &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.updatedAt == request.time &&
+        request.resource.data.get('paymentStatus', 'pending') == 'pending';
+      
+      // Authenticated users can update recruit data (for processing applications)
+      allow update: if isAuthenticated() && 
+        isValidRecruitUpdate(request.resource.data, resource.data) &&
+        request.resource.data.updatedAt == request.time;
+      
+      // Authenticated users can delete recruit data
+      allow delete: if isAuthenticated();
+      
+      function isValidRecruitData(data) {
+        return data.keys().hasOnly(['name', 'dateOfBirth', 'usn', 'yearOfStudy', 'branch', 'mobileNumber', 'personalEmail', 'collegeEmail', 'membershipPlan', 'csiIdea', 'paymentStatus', 'paymentId', 'orderId', 'createdAt', 'updatedAt']) &&
+               isValidStringLength(data.name, 1, 100) &&
+               data.dateOfBirth is timestamp &&
+               isValidUSN(data.usn) &&
+               isValidStringLength(data.yearOfStudy, 1, 20) &&
+               isValidStringLength(data.branch, 1, 100) &&
+               isValidPhone(data.mobileNumber) &&
+               isValidEmail(data.personalEmail) &&
+               (data.collegeEmail == null || isValidEmail(data.collegeEmail)) &&
+               isValidStringLength(data.membershipPlan, 1, 50) &&
+               isValidStringLength(data.csiIdea, 1, 2000) &&
+               (data.paymentStatus == null || data.paymentStatus in ['pending', 'completed', 'failed']) &&
+               (data.paymentId == null || isValidStringLength(data.paymentId, 0, 100)) &&
+               (data.orderId == null || isValidStringLength(data.orderId, 0, 100));
+      }
+      
+      function isValidRecruitUpdate(newData, oldData) {
+        return isValidRecruitData(newData) &&
+               newData.createdAt == oldData.createdAt && // Prevent changing creation time
+               // Allow updating payment status and processing fields
+               onlyUpdatingFields(['paymentStatus', 'paymentId', 'orderId', 'updatedAt']);
+      }
     }
     
-    // Audit logs (write-only for clients)
-    match /audit_logs/{logId} {
-      // Only admins can read logs
-      allow read: if isAdmin();
+    // ============================================================================
+    // METADATA (System information)
+    // ============================================================================
+    
+    match /metadata/{document=**} {
+      // Public read access for system information
+      allow read: if true;
       
-      // Anyone authenticated can write logs (for tracking)
-      allow create: if isAuthenticated() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.timestamp == request.time;
-      
-      // Logs cannot be updated or deleted
-      allow update: if false;
-      allow delete: if false;
+      // Authenticated users can write metadata
+      allow write: if isAuthenticated();
     }
     
-    // Default deny all
+    // ============================================================================
+    // GENERAL COLLECTIONS
+    // ============================================================================
+    
+    match /admin/{document=**} {
+      // Only admins can access admin collections
+      allow read, write: if isAdmin();
+    }
+    
+    match /logs/{document=**} {
+      // Only admins can access logs
+      allow read, write: if isAdmin();
+    }
+    
+    match /analytics/{document=**} {
+      // Only admins can access analytics
+      allow read, write: if isAdmin();
+    }
+    
+    // ============================================================================
+    // SECURITY: Default deny all other access
+    // ============================================================================
+    
     match /{document=**} {
       allow read, write: if false;
     }

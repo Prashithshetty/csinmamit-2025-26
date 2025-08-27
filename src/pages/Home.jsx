@@ -10,10 +10,10 @@ const Home = () => {
     <div className="overflow-hidden">
       <Hero />
       <About />
-      <Features />
+      {/* <Features /> */}
       <Highlights />
       <Testimonials />
-      <CTA />
+      {/* <CTA /> */}
     </div>
   )
 }

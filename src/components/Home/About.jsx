@@ -16,44 +16,44 @@ const About = () => {
     threshold: 0.1
   })
 
-  const features = [
-    {
-      icon: Rocket,
-      title: 'Innovation Hub',
-      description: 'Foster creativity and bring groundbreaking ideas to life through collaborative projects.',
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      icon: Target,
-      title: 'Skill Development',
-      description: 'Master cutting-edge technologies through hands-on workshops and expert mentorship.',
-      color: 'from-purple-500 to-pink-500'
-    },
-    {
-      icon: Lightbulb,
-      title: 'Tech Excellence',
-      description: 'Stay ahead with the latest industry trends and emerging technologies.',
-      color: 'from-green-500 to-teal-500'
-    },
-    {
-      icon: Users2,
-      title: 'Community',
-      description: 'Connect with like-minded tech enthusiasts and industry professionals.',
-      color: 'from-orange-500 to-red-500'
-    },
-    {
-      icon: GraduationCap,
-      title: 'Learning Path',
-      description: 'Structured learning programs designed for all skill levels.',
-      color: 'from-indigo-500 to-purple-500'
-    },
-    {
-      icon: Award,
-      title: 'Recognition',
-      description: 'Showcase your skills in competitions and earn industry recognition.',
-      color: 'from-pink-500 to-rose-500'
-    }
-  ]
+  // const features = [
+  //   {
+  //     icon: Rocket,
+  //     title: 'Innovation Hub',
+  //     description: 'Foster creativity and bring groundbreaking ideas to life through collaborative projects.',
+  //     color: 'from-blue-500 to-cyan-500'
+  //   },
+  //   {
+  //     icon: Target,
+  //     title: 'Skill Development',
+  //     description: 'Master cutting-edge technologies through hands-on workshops and expert mentorship.',
+  //     color: 'from-purple-500 to-pink-500'
+  //   },
+  //   {
+  //     icon: Lightbulb,
+  //     title: 'Tech Excellence',
+  //     description: 'Stay ahead with the latest industry trends and emerging technologies.',
+  //     color: 'from-green-500 to-teal-500'
+  //   },
+  //   {
+  //     icon: Users2,
+  //     title: 'Community',
+  //     description: 'Connect with like-minded tech enthusiasts and industry professionals.',
+  //     color: 'from-orange-500 to-red-500'
+  //   },
+  //   {
+  //     icon: GraduationCap,
+  //     title: 'Learning Path',
+  //     description: 'Structured learning programs designed for all skill levels.',
+  //     color: 'from-indigo-500 to-purple-500'
+  //   },
+  //   {
+  //     icon: Award,
+  //     title: 'Recognition',
+  //     description: 'Showcase your skills in competitions and earn industry recognition.',
+  //     color: 'from-pink-500 to-rose-500'
+  //   }
+  // ]
 
   return (
     <section className="section-padding relative" ref={ref}>
@@ -147,7 +147,7 @@ const About = () => {
         </div>
 
         {/* Feature Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
@@ -174,7 +174,7 @@ const About = () => {
               </Tilt>
             </motion.div>
           ))}
-        </div>
+        </div> */}
       </div>
 
       {/* Background Decoration */}

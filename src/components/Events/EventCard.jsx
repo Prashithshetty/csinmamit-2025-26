@@ -15,7 +15,7 @@ const EventCard = ({ event, index }) => {
         visible: { opacity: 1, y: 0 }
       }}
       whileHover={{ y: -5 }}
-      className="group"
+      className="group -mt-10"
     >
       <div className="h-full glass-card rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300">
         {/* Event Image */}

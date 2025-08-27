@@ -13,10 +13,6 @@ const EventsHero = () => {
           <h1 className="heading-1 mb-4">
             Our <span className="gradient-text-animated">Events</span>
           </h1>
-          <p className="body-text max-w-3xl mx-auto">
-            Discover our exciting lineup of workshops, seminars, hackathons, and more. 
-            Join us to learn, compete, and grow your skills.
-          </p>
         </motion.div>
       </div>
     </section>

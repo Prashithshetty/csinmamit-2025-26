@@ -1,97 +1,73 @@
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React from 'react'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Loader } from 'lucide-react'
-import toast from 'react-hot-toast'
-
-// Components
+import { useProfileFirestore } from '../hooks/useProfileFirestore'
 import ProfileHero from '../components/Profile/ProfileHero'
 import ProfileCard from '../components/Profile/ProfileCard'
-import QuickActions from '../components/Profile/QuickActions'
 import ProfileForm from '../components/Profile/ProfileForm'
+import ProfileStats from '../components/Profile/ProfileStats'
 import MembershipDetails from '../components/Profile/MembershipDetails'
-
-// Hooks
-import { useProfile } from '../hooks/useProfile'
+import QuickActions from '../components/Profile/QuickActions'
+import { Toaster } from 'react-hot-toast'
 
 const Profile = () => {
-  const navigate = useNavigate()
   const { user, loading: authLoading } = useAuth()
-  
   const {
     profileData,
     isEditing,
-    loading,
+    loading: profileLoading,
     handleEdit,
     handleCancel,
     handleSave,
     handleInputChange
-  } = useProfile()
+  } = useProfileFirestore()
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/')
-      toast.error('Please sign in to view your profile')
-    }
-  }, [user, authLoading, navigate])
-
-  // Loading state
-  if (authLoading) {
+  // Show loading state
+  if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader className="w-8 h-8 animate-spin text-primary-500" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
-  // Return null if no user (will redirect)
+  // Redirect if not authenticated
   if (!user) {
-    return null
+    return <Navigate to="/" replace />
   }
 
-  // Extract membership details
-  const membershipStatus = user.membership?.status || 'inactive'
-  const membershipType = user.membership?.type || 'Free'
-  const membershipExpiry = user.membership?.expiresAt
-
   return (
-    <div className="min-h-screen pt-20 pb-10">
-      {/* Hero Section */}
-      <ProfileHero />
-
-      <div className="container-custom">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Sidebar */}
-          <div>
-            <ProfileCard 
-              user={user}
-              membershipStatus={membershipStatus}
-              membershipType={membershipType}
-            />
+    <>
+      <Toaster position="top-right" />
+      
+      <ProfileHero user={user} />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Profile Card & Quick Actions */}
+          <div className="lg:col-span-1 space-y-6">
+            <ProfileCard user={user} profileData={profileData} />
             <QuickActions />
           </div>
-
-          {/* Right Content */}
-          <div>
+          
+          {/* Right Column - Profile Form & Other Components */}
+          <div className="lg:col-span-2 space-y-6">
             <ProfileForm
               profileData={profileData}
               isEditing={isEditing}
-              loading={loading}
+              loading={profileLoading}
               onEdit={handleEdit}
-              onSave={handleSave}
               onCancel={handleCancel}
+              onSave={handleSave}
               onInputChange={handleInputChange}
             />
-            <MembershipDetails
-              membershipStatus={membershipStatus}
-              membershipType={membershipType}
-              membershipExpiry={membershipExpiry}
-            />
+            
+            {/* <ProfileStats user={user} /> */}
+            <MembershipDetails user={user} />
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

@@ -9,7 +9,10 @@ import {
   Edit,
   Save,
   X,
-  Loader
+  Loader,
+  Github,
+  Linkedin,
+  CreditCard
 } from 'lucide-react'
 
 const ProfileForm = ({
@@ -170,6 +173,57 @@ const ProfileForm = ({
               <option value="Third Year">Third Year</option>
               <option value="Final Year">Final Year</option>
             </select>
+          </div>
+
+          {/* USN */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <CreditCard size={16} />
+              USN
+            </label>
+            <input
+              type="text"
+              name="usn"
+              value={profileData.usn || ''}
+              onChange={onInputChange}
+              disabled={!isEditing}
+              placeholder="4NM21CS000"
+              className="input-field"
+            />
+          </div>
+
+          {/* GitHub */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <Github size={16} />
+              GitHub Username
+            </label>
+            <input
+              type="text"
+              name="github"
+              value={profileData.github || ''}
+              onChange={onInputChange}
+              disabled={!isEditing}
+              placeholder="username"
+              className="input-field"
+            />
+          </div>
+
+          {/* LinkedIn */}
+          <div className="md:col-span-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <Linkedin size={16} />
+              LinkedIn Profile URL
+            </label>
+            <input
+              type="text"
+              name="linkedin"
+              value={profileData.linkedin || ''}
+              onChange={onInputChange}
+              disabled={!isEditing}
+              placeholder="https://linkedin.com/in/username"
+              className="input-field"
+            />
           </div>
 
           {/* Bio */}
