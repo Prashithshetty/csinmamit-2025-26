@@ -9,7 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "cloudinary": "^2.7.0",
+    "crypto-js": "^4.2.0",
     "firebase": "^10.8.0",
     "framer-motion": "^11.0.3",
     "lucide-react": "^0.358.0",

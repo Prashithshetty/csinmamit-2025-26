@@ -13,6 +13,7 @@ import {
   collection as firebaseCollection
 } from 'firebase/firestore'
 import toast from 'react-hot-toast'
+import emailService from '../services/emailService'
 
 // Use appropriate functions based on mode
 let signInWithPopup, signOut, onAuthStateChanged
@@ -48,8 +49,8 @@ export const useAdminAuth = () => useContext(AdminAuthContext)
 
 // Admin whitelist - Add admin emails here
 const ADMIN_WHITELIST = [
-  'admin@csinmamit.com',
-  'csi@nmamit.in',
+  'csidatabasenmamit@gmail.com',
+  'csi nmamit',
   // Add more admin emails as needed
 ]
 
@@ -72,10 +73,6 @@ export const AdminAuthProvider = ({ children }) => {
 
   // Check if user is whitelisted admin
   const isWhitelistedAdmin = (email) => {
-    // In demo mode, always return true for demo admin email
-    if (isDemoMode && email === 'admin@csinmamit.com') {
-      return true
-    }
     return ADMIN_WHITELIST.includes(email.toLowerCase())
   }
 
@@ -88,8 +85,8 @@ export const AdminAuthProvider = ({ children }) => {
       
       // In demo mode, simulate admin user
       if (isDemoMode) {
-        user.email = 'admin@csinmamit.com'
-        user.displayName = 'Admin User'
+        user.email = 'csidatabasenmamit@gmail.com'
+        user.displayName = 'csi nmamit'
       }
       
       // Check if user is in admin whitelist
@@ -120,46 +117,65 @@ export const AdminAuthProvider = ({ children }) => {
     }
   }
 
+
   // Send OTP Email (Step 2)
   const sendOTPEmail = async (email, name) => {
     try {
-      const otp = generateOTP()
-      const expiryTime = Date.now() + OTP_EXPIRY_TIME
+      // Use the frontend email service to send OTP directly through EmailJS
+      const result = await emailService.sendOTPEmail(email, name)
       
-      // Store OTP in Firestore (in production, use Cloud Functions)
-      const otpRef = doc(db, 'adminOTPs', email)
-      await setDoc(otpRef, {
-        otp: otp, // In production, hash this
-        email: email,
-        expiryTime: expiryTime,
-        used: false,
-        createdAt: serverTimestamp()
-      })
-
-      // In demo mode or development, show OTP in console
-      console.log(`🔐 OTP for ${email}: ${otp}`)
-      
-      if (isDemoMode) {
-        toast.success(`Demo OTP: ${otp}`, { duration: 10000 })
-      } else {
-        toast.success(`OTP sent to ${email}. Check console for demo.`)
+      if (result.success) {
+        if (result.emailSkipped) {
+          // EmailJS not configured - development mode
+          toast.error('⚠️ Email service not configured! Check console for setup instructions.', { duration: 8000 })
+          console.warn('📧 EmailJS is not configured. The OTP was not sent via email.')
+          console.warn('To enable email sending:')
+          console.warn('1. Sign up at https://www.emailjs.com/')
+          console.warn('2. Follow the instructions in EMAILJS_SETUP.md')
+          console.warn('3. Add credentials to .env.local file')
+          
+          // Only show OTP in console for development testing
+          if (import.meta.env.DEV && result.otp) {
+            console.log(`🔐 Development OTP (not sent via email): ${result.otp}`)
+            toast.info(`Dev Mode - OTP: ${result.otp} (Email not sent)`, { duration: 10000 })
+          }
+        } else if (result.emailError) {
+          // Email sending failed but OTP generated
+          toast.error('⚠️ Email sending failed! Check console for OTP.', { duration: 8000 })
+          if (import.meta.env.DEV && result.otp) {
+            console.log(`🔐 Fallback OTP (email failed): ${result.otp}`)
+            toast(`Dev Mode - OTP: ${result.otp} (Email failed)`, { 
+              duration: 10000,
+              icon: '⚠️'
+            })
+          }
+        } else {
+          // Email sent successfully
+          toast.success(`✅ OTP sent to ${email}! Check your inbox and spam folder.`, { duration: 6000 })
+          console.log(`✅ OTP email sent successfully to ${email}`)
+          
+          // Don't show OTP in production when email is sent
+          if (import.meta.env.DEV && result.otp) {
+            // In dev mode, optionally show OTP for debugging even when email is sent
+            console.log(`🔐 Dev Mode - OTP sent via email: ${result.otp}`)
+          }
+        }
       }
       
       setOtpSent(true)
       
-      // Auto-expire OTP
+      // Auto-expire OTP UI state
       setTimeout(() => {
         setOtpSent(false)
       }, OTP_EXPIRY_TIME)
       
       return true
     } catch (error) {
-      console.error('Error sending OTP:', error)
-      toast.error('Failed to send OTP')
+      console.error('❌ Error sending OTP:', error)
+      toast.error(error.message || 'Failed to send OTP. Please try again.')
       return false
     }
   }
-
   // Verify OTP (Step 3)
   const verifyOTP = async (inputOTP) => {
     if (!pendingAdmin) {
@@ -169,35 +185,13 @@ export const AdminAuthProvider = ({ children }) => {
 
     setAuthLoading(true)
     try {
-      // Get OTP from Firestore
-      const otpRef = doc(db, 'adminOTPs', pendingAdmin.email)
-      const otpDoc = await getDoc(otpRef)
+      // Use the frontend email service to verify OTP
+      const result = await emailService.verifyOTP(pendingAdmin.email, inputOTP)
       
-      if (!otpDoc.exists()) {
-        toast.error('OTP not found')
+      if (!result.success) {
+        toast.error(result.message || 'Invalid OTP')
         return false
       }
-
-      const otpData = otpDoc.data()
-      
-      // Check if OTP is valid
-      if (otpData.used) {
-        toast.error('OTP already used')
-        return false
-      }
-
-      if (Date.now() > otpData.expiryTime) {
-        toast.error('OTP expired')
-        return false
-      }
-
-      if (otpData.otp !== inputOTP) {
-        toast.error('Invalid OTP')
-        return false
-      }
-
-      // Mark OTP as used
-      await setDoc(otpRef, { used: true }, { merge: true })
 
       // Create/update admin user in Firestore
       const adminRef = doc(db, 'admins', pendingAdmin.uid)
@@ -256,6 +250,7 @@ export const AdminAuthProvider = ({ children }) => {
       return false
     }
 
+    // Use the sendOTPEmail function to resend
     return await sendOTPEmail(pendingAdmin.email, pendingAdmin.name)
   }
 

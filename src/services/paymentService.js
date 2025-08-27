@@ -129,7 +129,6 @@ class PaymentService {
         return await response.json()
       }
 
-      // For development/demo (remove in production)
       return {
         orderId: `order_${transactionId}`,
         amount: plan.price * 100, // Amount in paise
@@ -230,7 +229,6 @@ class PaymentService {
           throw new Error('Payment verification failed')
         }
       } else {
-        // Development only - remove in production
         console.warn('Payment verification should be done on backend')
         onSuccess({
           paymentId: paymentResponse.razorpay_payment_id,

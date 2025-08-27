@@ -40,19 +40,11 @@ if (hasFirebaseConfig) {
   
   console.log('✅ Firebase initialized successfully')
 } else {
-  // Use demo mode if no Firebase config
-  console.warn('⚠️ Firebase configuration not found. Running in DEMO MODE.')
-  console.info('📖 To use real Firebase, see FIREBASE_SETUP_GUIDE.md')
+  // Firebase configuration is required
+  console.error('⚠️ Firebase configuration not found.')
+  console.info('📖 To configure Firebase, see FIREBASE_SETUP_GUIDE.md')
   
-  // Import demo Firebase synchronously
-  const demoFirebase = await import('./firebase-demo.js')
-  
-  auth = demoFirebase.auth
-  googleProvider = demoFirebase.googleProvider
-  db = demoFirebase.db
-  storage = demoFirebase.storage
-  isDemoMode = true
-  app = demoFirebase.default
+  throw new Error('Firebase configuration is required. Please set up your Firebase environment variables.')
 }
 
 // Export all services

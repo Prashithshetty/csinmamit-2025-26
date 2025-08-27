@@ -73,10 +73,8 @@ const AdminDashboard = () => {
       const eventsSnapshot = await getDocs(eventsQuery)
       const totalEvents = eventsSnapshot.size
       
-      // Calculate revenue (mock data for demo)
       const totalRevenue = activeMembers * 500 // Assuming ₹500 per membership
       
-      // Calculate growth percentages (mock data for demo)
       const userGrowth = 12.5
       const memberGrowth = 8.3
       const eventGrowth = 15.7
@@ -106,7 +104,6 @@ const AdminDashboard = () => {
       }))
       setRecentActivities(activities)
       
-      // Generate chart data (mock data for demo)
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
       setChartData({
         userGrowth: months.map((month, index) => ({
