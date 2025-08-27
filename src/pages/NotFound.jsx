@@ -5,20 +5,12 @@ import { useTheme } from '../contexts/ThemeContext' // make sure the path is cor
 
 const NotFound = () => {
   const { isDark } = useTheme()
-  const [currentQuote, setCurrentQuote] = useState(0)
 
   const inspirationalQuotes = [
     { text: "Every error is a step towards innovation", author: "CSI Philosophy" },
     { text: "The best debugging happens when you explore new paths", author: "Unknown Developer" },
     { text: "404: An opportunity to discover something better", author: "Tech Wisdom" }
   ]
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentQuote((prev) => (prev + 1) % inspirationalQuotes.length)
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [])
 
   const pathSuggestions = [
     { label: 'Home', path: '/', icon: Home, description: 'Start fresh' },
@@ -38,10 +30,10 @@ const NotFound = () => {
   // Dynamic colors based on theme
   const bgOverlay = isDark ? 'bg-black/60 backdrop-blur-lg' : 'bg-white/20 backdrop-blur-md'
   const cardBg = isDark ? 'from-black/20 to-black/30' : 'from-white/20 to-white/30'
-  const textMain = isDark ? 'text-cyber-blue' : 'text-primary-blue'
+  const textMain = isDark ? 'text-cyber-black' : 'text-primary-blue'
   const gradient404 = isDark 
-    ? 'from-primary-blue via-cyber-blue to-cyber-purple' 
-    : 'from-cyber-pink via-cyber-purple to-cyber-blue'
+    ? 'from-primary-white via-cyber-pink to-cyber-white' 
+    : 'from-cyber-white via-cyber-pink to-cyber-blue'
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -66,7 +58,7 @@ const NotFound = () => {
                 transition={{ delay: 0.2, duration: 0.6 }}
                 className="text-8xl md:text-9xl font-black leading-none mb-4"
               >
-                <span className={`bg-gradient-to-r ${gradient404} bg-clip-text text-transparent`}>
+                <span className={`bg-gradient-to-r text-black  dark:text-cyan-50 ${gradient404} bg-clip-text text-transparent`}>
                   404
                 </span>
               </motion.div>
