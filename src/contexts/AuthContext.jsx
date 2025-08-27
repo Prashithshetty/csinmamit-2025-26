@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [authLoading, setAuthLoading] = useState(false)
+  const [isProfileIncomplete, setIsProfileIncomplete] = useState(false)
 
   // Sign in with Google
   const signInWithGoogle = async () => {
@@ -110,6 +111,41 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  // Check if profile is complete
+  const checkProfileCompletion = async (userData = null) => {
+    try {
+      let data = userData
+      
+      // If no data provided, fetch from current user
+      if (!data && user?.uid) {
+        const userRef = doc(db, 'users', user.uid)
+        const userSnap = await getDoc(userRef)
+        if (userSnap.exists()) {
+          data = userSnap.data()
+        }
+      }
+      
+      if (!data) {
+        setIsProfileIncomplete(false)
+        return false
+      }
+      
+      // Check required fields for profile completion
+      const requiredFields = ['name', 'phone', 'branch', 'year', 'usn']
+      const isIncomplete = requiredFields.some(field => {
+        const value = data[field] || data.profile?.[field]
+        return !value || value === ''
+      })
+      
+      setIsProfileIncomplete(isIncomplete)
+      return !isIncomplete
+    } catch (error) {
+      console.error('Error checking profile completion:', error)
+      setIsProfileIncomplete(false)
+      return false
+    }
+  }
+
   // Get user data from Firestore
   const getUserData = async (uid) => {
     try {
@@ -133,15 +169,21 @@ export const AuthProvider = ({ children }) => {
         // Get additional user data from Firestore
         const userData = await getUserData(firebaseUser.uid)
         
-        setUser({
+        const fullUserData = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           name: firebaseUser.displayName,
           photoURL: firebaseUser.photoURL,
           ...userData
-        })
+        }
+        
+        setUser(fullUserData)
+        
+        // Check if profile is complete
+        await checkProfileCompletion(fullUserData)
       } else {
         setUser(null)
+        setIsProfileIncomplete(false)
       }
       setLoading(false)
     })
@@ -153,10 +195,12 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     authLoading,
+    isProfileIncomplete,
     signInWithGoogle,
     logout,
     updateUserProfile,
-    getUserData
+    getUserData,
+    checkProfileCompletion
   }
 
   return (
