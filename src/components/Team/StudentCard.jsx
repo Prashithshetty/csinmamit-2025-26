@@ -18,7 +18,7 @@ const StudentCard = ({ member, index, onClick }) => {
           <img
             src={member.imageSrc}
             alt={member.name}
-            className="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
           />
 
           {/* Bottom Gradient with Name + Role */}
@@ -38,12 +38,12 @@ const StudentCard = ({ member, index, onClick }) => {
           <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-5">
             
             {/* Branch + Year */}
-            <div className="text-sm text-gray-300 mb-3">
+            {/* <div className="text-sm text-gray-300 mb-3">
               <span>{member.branch}</span> • <span>{member.year}</span>
-            </div>
+            </div> */}
 
             {/* Skills */}
-            <div className="flex flex-wrap justify-center gap-2 mb-4">
+            {/* <div className="flex flex-wrap justify-center gap-2 mb-4">
               {member.skills.map(skill => (
                 <span
                   key={skill}
@@ -52,7 +52,7 @@ const StudentCard = ({ member, index, onClick }) => {
                   {skill}
                 </span>
               ))}
-            </div>
+            </div> */}
 
             {/* Socials */}
             <div className="flex gap-4">
