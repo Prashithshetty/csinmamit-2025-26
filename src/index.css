@@ -1,3 +1,6 @@
+/* Import Django Admin Styles */
+@import './styles/django-admin.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -1,0 +1,432 @@
+/* Django Admin Style Overrides */
+
+/* Base Colors */
+:root {
+  --django-primary: #417690;
+  --django-primary-dark: #205067;
+  --django-secondary: #79aec8;
+  --django-success: #70bf2b;
+  --django-danger: #ba2121;
+  --django-danger-dark: #8a1919;
+  --django-warning: #efb80b;
+  --django-info: #417690;
+  --django-light-bg: #f8f8f8;
+  --django-border: #ddd;
+  --django-border-light: #eee;
+  --django-text: #333;
+  --django-text-light: #666;
+  --django-link: #417690;
+  --django-link-hover: #205067;
+  --django-row-hover: #f5f5f5;
+  --django-row-selected: #ffffe0;
+  --django-row-selected-hover: #ffffcc;
+}
+
+/* Django Admin Typography */
+.django-admin {
+  font-family: "Roboto", "Lucida Grande", "DejaVu Sans", "Bitstream Vera Sans", Verdana, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--django-text);
+}
+
+/* Django Admin Headers */
+.django-admin h1 {
+  font-size: 24px;
+  font-weight: normal;
+  margin: 0 0 20px 0;
+  color: var(--django-text);
+}
+
+.django-admin h2 {
+  font-size: 20px;
+  font-weight: normal;
+  margin: 0 0 15px 0;
+  color: var(--django-text);
+}
+
+.django-admin h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  color: var(--django-text);
+}
+
+/* Django Admin Links */
+.django-admin a {
+  color: var(--django-link);
+  text-decoration: none;
+}
+
+.django-admin a:hover {
+  color: var(--django-link-hover);
+  text-decoration: underline;
+}
+
+/* Django Admin Buttons */
+.django-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  font-size: 13px;
+  line-height: 1;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+
+.django-btn-primary {
+  background-color: var(--django-primary);
+  color: white;
+}
+
+.django-btn-primary:hover {
+  background-color: var(--django-primary-dark);
+}
+
+.django-btn-success {
+  background-color: var(--django-success);
+  color: white;
+}
+
+.django-btn-danger {
+  background-color: var(--django-danger);
+  color: white;
+}
+
+.django-btn-danger:hover {
+  background-color: var(--django-danger-dark);
+}
+
+.django-btn-default {
+  background-color: white;
+  color: var(--django-text);
+  border: 1px solid var(--django-border);
+}
+
+.django-btn-default:hover {
+  background-color: var(--django-row-hover);
+}
+
+/* Django Admin Tables */
+.django-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.django-table thead {
+  background-color: var(--django-light-bg);
+}
+
+.django-table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: normal;
+  color: var(--django-text-light);
+  border-bottom: 1px solid var(--django-border);
+}
+
+.django-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--django-border-light);
+}
+
+.django-table tbody tr:nth-child(even) {
+  background-color: #fcfcfc;
+}
+
+.django-table tbody tr:hover {
+  background-color: var(--django-row-hover);
+}
+
+.django-table tbody tr.selected {
+  background-color: var(--django-row-selected);
+}
+
+.django-table tbody tr.selected:hover {
+  background-color: var(--django-row-selected-hover);
+}
+
+/* Django Admin Forms */
+.django-form-row {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-bottom: 1px solid var(--django-border-light);
+}
+
+.django-form-row:last-child {
+  border-bottom: none;
+}
+
+.django-form-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: normal;
+  color: var(--django-text);
+}
+
+.django-form-input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 13px;
+  border: 1px solid var(--django-border);
+  border-radius: 4px;
+  background-color: white;
+}
+
+.django-form-input:focus {
+  outline: none;
+  border-color: var(--django-secondary);
+  box-shadow: 0 0 0 2px rgba(121, 174, 200, 0.25);
+}
+
+/* Django Admin Modules */
+.django-module {
+  background-color: white;
+  border: 1px solid var(--django-border);
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.django-module-header {
+  background-color: var(--django-secondary);
+  color: white;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 4px 4px 0 0;
+}
+
+.django-module-content {
+  padding: 15px;
+}
+
+/* Django Admin Messages */
+.django-message {
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.django-message-success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.django-message-error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.django-message-warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+}
+
+.django-message-info {
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  color: #0c5460;
+}
+
+/* Django Admin Breadcrumbs */
+.django-breadcrumbs {
+  padding: 8px 15px;
+  background-color: var(--django-primary);
+  color: white;
+  font-size: 13px;
+}
+
+.django-breadcrumbs a {
+  color: white;
+  text-decoration: none;
+}
+
+.django-breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+/* Django Admin Sidebar */
+.django-sidebar {
+  background-color: var(--django-light-bg);
+  border-right: 1px solid var(--django-border);
+}
+
+.django-sidebar-section {
+  margin-bottom: 20px;
+}
+
+.django-sidebar-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #999;
+  padding: 0 15px;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.django-sidebar-link {
+  display: block;
+  padding: 8px 15px;
+  color: var(--django-link);
+  text-decoration: none;
+  font-size: 13px;
+  transition: background-color 0.15s;
+}
+
+.django-sidebar-link:hover {
+  background-color: #e5e5e5;
+}
+
+.django-sidebar-link.active {
+  background-color: var(--django-secondary);
+  color: white;
+  font-weight: 600;
+}
+
+/* Django Admin Pagination */
+.django-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background-color: var(--django-light-bg);
+  border-top: 1px solid var(--django-border);
+  font-size: 13px;
+}
+
+.django-pagination-info {
+  color: var(--django-text-light);
+}
+
+.django-pagination-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.django-pagination-btn {
+  padding: 5px 10px;
+  background-color: white;
+  border: 1px solid var(--django-border);
+  border-radius: 3px;
+  color: var(--django-text);
+  text-decoration: none;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.django-pagination-btn:hover {
+  background-color: var(--django-row-hover);
+}
+
+.django-pagination-btn.active {
+  background-color: var(--django-primary);
+  color: white;
+  border-color: var(--django-primary);
+}
+
+.django-pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Django Admin Filters */
+.django-filter {
+  background-color: var(--django-light-bg);
+  border: 1px solid var(--django-border);
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.django-filter-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.django-filter-input {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+.django-filter-select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 13px;
+  background-color: white;
+}
+
+/* Django Admin Actions */
+.django-actions {
+  background-color: var(--django-light-bg);
+  border: 1px solid var(--django-border);
+  border-radius: 4px;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.django-actions-select {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 13px;
+  background-color: white;
+}
+
+/* Django Admin Inline Forms */
+.django-inline-group {
+  margin-bottom: 20px;
+}
+
+.django-inline-header {
+  background-color: var(--django-light-bg);
+  padding: 8px 12px;
+  border: 1px solid var(--django-border);
+  border-bottom: none;
+  font-weight: 600;
+  color: var(--django-text);
+}
+
+.django-inline-form {
+  border: 1px solid var(--django-border);
+  padding: 15px;
+  background-color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .django-admin {
+    font-size: 13px;
+  }
+  
+  .django-table {
+    font-size: 12px;
+  }
+  
+  .django-table th,
+  .django-table td {
+    padding: 6px 8px;
+  }
+  
+  .django-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
