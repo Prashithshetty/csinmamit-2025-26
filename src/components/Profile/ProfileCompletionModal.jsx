@@ -27,6 +27,10 @@ const ProfileCompletionModal = ({ isOpen, onComplete }) => {
   })
   const [errors, setErrors] = useState({})
 
+  if (location.pathname.startsWith("/admin")) {
+    return null
+  }
+
   // Initialize form with existing user data
   useEffect(() => {
     if (user) {
