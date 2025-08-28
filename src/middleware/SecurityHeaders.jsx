@@ -71,18 +71,15 @@ const SecurityHeaders = ({ children }) => {
   }, [location])
 
   // Add security-related meta tags
+  // Add security-related meta tags
   useEffect(() => {
     // Add CSP meta tag
     const cspMeta = document.createElement('meta')
     cspMeta.httpEquiv = 'Content-Security-Policy'
-    cspMeta.content = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://accounts.google.com https://checkout.razorpay.com https://*.firebaseapp.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.emailjs.com https://api.razorpay.com https://checkout.razorpay.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://accounts.google.com https://*.googleapis.com https://api.cloudinary.com https://res.cloudinary.com; frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://accounts.google.com https://*.firebaseapp.com https://*.firebaseauth.com; font-src 'self' data:;"
+    cspMeta.content = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://accounts.google.com https://checkout.razorpay.com https://*.firebaseapp.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.emailjs.com https://api.razorpay.com https://checkout.razorpay.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://accounts.google.com https://*.googleapis.com https://api.cloudinary.com https://res.cloudinary.com; frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://accounts.google.com https://*.firebaseapp.com https://*.firebaseauth.com; font-src 'self' data:; frame-ancestors 'self';"
     document.head.appendChild(cspMeta)
 
-    // Add X-Frame-Options
-    const xframeMeta = document.createElement('meta')
-    xframeMeta.httpEquiv = 'X-Frame-Options'
-    xframeMeta.content = 'DENY'
-    document.head.appendChild(xframeMeta)
+    // X-Frame-Options cannot be set via meta; must be an HTTP header. Use CSP frame-ancestors instead.
 
     // Add X-Content-Type-Options
     const xcontentMeta = document.createElement('meta')
@@ -93,7 +90,6 @@ const SecurityHeaders = ({ children }) => {
     // Cleanup
     return () => {
       if (cspMeta.parentNode) cspMeta.parentNode.removeChild(cspMeta)
-      if (xframeMeta.parentNode) xframeMeta.parentNode.removeChild(xframeMeta)
       if (xcontentMeta.parentNode) xcontentMeta.parentNode.removeChild(xcontentMeta)
     }
   }, [])

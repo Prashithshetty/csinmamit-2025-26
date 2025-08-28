@@ -73,20 +73,12 @@ service cloud.firestore {
     }
     
     match /users/{userId} {
-      // Users can read their own profile
-      allow read: if isOwner(userId);
-      
-      // Users can create their own profile with valid data
-      allow create: if isOwner(userId) && 
-        request.resource.data.name is string &&
-        request.resource.data.name.size() > 0;
-      
-      // Users can update their own profile
-      allow update: if isOwner(userId);
-      
-      // Users can delete their own profile
-      allow delete: if isOwner(userId);
-      
+      // Owners and admins access
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUserData(request.resource.data);
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isOwner(userId) || isAdmin();
+
       // Validate user data structure and content
        function isValidUserData(data) {
         return data.keys().hasOnly(['name', 'bio', 'branch', 'usn', 'github', 'linkedin', 'phone', 'role', 'certificates', 'createdAt', 'updatedAt']) &&
@@ -103,10 +95,9 @@ service cloud.firestore {
                (data.updatedAt == null || data.updatedAt is timestamp);
       }
       
-      // Validate user update (more restrictive than create)
       function isValidUserUpdate(newData, oldData) {
         return isValidUserData(newData) &&
-               newData.createdAt == oldData.createdAt; // Prevent changing creation time
+               newData.createdAt == oldData.createdAt;
       }
     }
     
@@ -171,36 +162,61 @@ service cloud.firestore {
     // EVENTS
     // ============================================================================
     
-    match /events/{document=**} {
+    match /events/{eventId} {
       // Public read access for displaying events
       allow read: if true;
-      
-      // Authenticated users can write event data (temporary for testing)
-      // TODO: Change back to admin-only after testing
-      allow write: if isAdmin() && isValidEventData(request.resource.data);
-      
+
+      // CREATE: require full valid payload
+      allow create: if request.auth != null &&
+        isValidEventData(request.resource.data);
+
+      // UPDATE: allow partial updates (only selected fields), keep createdAt immutable
+      allow update: if request.auth != null &&
+        isValidEventUpdate(request.resource.data, resource.data);
+
+      // DELETE: allow signed-in (tighten to isAdmin() for prod)
+      allow delete: if request.auth != null;
+
       function isValidEventData(data) {
-        return data.keys().hasOnly(['title', 'description', 'brief', 'image', 'cloudinaryUrl', 'originalImagePath', 'date', 'time', 'venue', 'category', 'type', 'entryFee', 'organizers', 'contactPersons', 'year', 'published', 'registrationsAvailable', 'participants', 'participantCount', 'searchTitle', 'searchDescription', 'status', 'featured', 'createdAt', 'updatedAt']) &&
-               isValidStringLength(data.title, 1, 200) &&
-               isValidStringLength(data.description, 1, 5000) &&
-               (data.brief == null || isValidStringLength(data.brief, 0, 1000)) &&
-               (data.image == null || isValidStringLength(data.image, 0, 1000)) &&
-               (data.cloudinaryUrl == null || isValidStringLength(data.cloudinaryUrl, 0, 1000)) &&
-               (data.venue == null || isValidStringLength(data.venue, 0, 200)) &&
-               (data.category == null || data.category in ['PREVIOUS', 'UPCOMING', 'CURRENT', 'ONGOING']) &&
-               (data.type == null || data.type in ['SOLO', 'TEAM', 'INDIVIDUAL', 'WORKSHOP', 'SEMINAR', 'COMPETITION', 'BOOTCAMP']) &&
-               (data.entryFee == null || data.entryFee is number) &&
-               (data.year == null || data.year is number) &&
-               (data.published == null || data.published is bool) &&
-               (data.registrationsAvailable == null || data.registrationsAvailable is bool) &&
-               (data.participants == null || data.participants is list) &&
-               (data.participantCount == null || data.participantCount is number) &&
-               (data.featured == null || data.featured is bool) &&
-               (data.status == null || data.status in ['active', 'completed', 'cancelled', 'postponed']) &&
-               (data.organizers == null || isValidStringLength(data.organizers, 0, 200)) &&
-               (data.contactPersons == null || data.contactPersons is list) &&
-               (data.searchTitle == null || data.searchTitle is string) &&
-               (data.searchDescription == null || data.searchDescription is string);
+        return data.keys().hasOnly([
+          'title','description','brief','image','cloudinaryUrl','originalImagePath',
+          'date','time','venue','category','type','entryFee','organizers',
+          'contactPersons','year','published','registrationsAvailable',
+          'participants','participantCount','searchTitle','searchDescription',
+          'status','featured','createdAt','updatedAt'
+        ]) &&
+          isValidStringLength(data.title, 1, 200) &&
+          isValidStringLength(data.description, 1, 5000) &&
+          (data.brief == null || isValidStringLength(data.brief, 0, 1000)) &&
+          (data.image == null || isValidStringLength(data.image, 0, 1000)) &&
+          (data.cloudinaryUrl == null || isValidStringLength(data.cloudinaryUrl, 0, 1000)) &&
+          (data.venue == null || isValidStringLength(data.venue, 0, 200)) &&
+          (data.category == null || data.category in ['PREVIOUS','UPCOMING','CURRENT','ONGOING']) &&
+          (data.type == null || data.type in ['SOLO','TEAM','INDIVIDUAL','WORKSHOP','SEMINAR','COMPETITION','BOOTCAMP']) &&
+          (data.entryFee == null || data.entryFee is number) &&
+          (data.year == null || data.year is number) &&
+          (data.published == null || data.published is bool) &&
+          (data.registrationsAvailable == null || data.registrationsAvailable is bool) &&
+          (data.participants == null || data.participants is list) &&
+          (data.participantCount == null || data.participantCount is number) &&
+          (data.featured == null || data.featured is bool) &&
+          (data.status == null || data.status in ['active','completed','cancelled','postponed']) &&
+          (data.organizers == null || isValidStringLength(data.organizers, 0, 200)) &&
+          (data.contactPersons == null || data.contactPersons is list) &&
+          (data.searchTitle == null || data.searchTitle is string) &&
+          (data.searchDescription == null || data.searchDescription is string);
+      }
+
+      // Partial update validator: only allowed keys and createdAt must not change
+      function isValidEventUpdate(newData, oldData) {
+        return newData.diff(oldData).affectedKeys().hasOnly([
+          'title','description','brief','image','cloudinaryUrl','originalImagePath',
+          'date','time','venue','category','type','entryFee','organizers',
+          'contactPersons','year','published','registrationsAvailable',
+          'participants','participantCount','searchTitle','searchDescription',
+          'status','featured','updatedAt'
+        ]) &&
+          newData.createdAt == oldData.createdAt;
       }
     }
     

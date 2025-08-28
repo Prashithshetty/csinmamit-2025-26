@@ -27,8 +27,9 @@ const AdminLayout = lazy(() => import('./components/Admin/AdminLayout'))
 const AdminGuard = lazy(() => import('./components/Admin/AdminGuard'))
 const AdminLogin = lazy(() => import('./pages/Admin/AdminLogin'))
 const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard'))
-const AdminUsers = lazy(() => import('./pages/Admin/AdminUsers'))
+const AdminUsers = lazy(() => import('./pages/Admin/AdminUsers-clean'))
 const AdminEvents = lazy(() => import('./pages/Admin/AdminEvents'))
+const AdminEMembers = lazy(() => import('./pages/Admin/AdminEMembers-clean'))
 
 // Loading component for lazy loaded admin routes
 const AdminLoading = () => (
@@ -127,7 +128,7 @@ function AppContent() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="events" element={<AdminEvents />} />
-            <Route path="members" element={<div className="p-6"><h1 className="text-3xl font-bold text-white">Members Management</h1><p className="text-gray-400 mt-2">Coming soon...</p></div>} />
+            <Route path="members" element={<AdminEMembers/>} />
             <Route path="payments" element={<div className="p-6"><h1 className="text-3xl font-bold text-white">Payments Management</h1><p className="text-gray-400 mt-2">Coming soon...</p></div>} />
             <Route path="content" element={<div className="p-6"><h1 className="text-3xl font-bold text-white">Content Management</h1><p className="text-gray-400 mt-2">Coming soon...</p></div>} />
             <Route path="analytics" element={<div className="p-6"><h1 className="text-3xl font-bold text-white">Analytics</h1><p className="text-gray-400 mt-2">Coming soon...</p></div>} />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Calendar, RefreshCw, Download, Upload } from 'lucide-react'
+import { Plus, Calendar, RefreshCw, Download, Upload, Trash2, X } from 'lucide-react'
 import EventForm from '../../components/Admin/EventForm'
 import EventList from '../../components/Admin/EventList'
 import { 
@@ -24,6 +24,10 @@ export default function AdminEvents() {
     upcoming: 0,
     previous: 0
   })
+
+  // Delete confirmation modal state
+  const [deleteId, setDeleteId] = useState(null)
+  const [deleteTitle, setDeleteTitle] = useState('')
 
   // Load events on component mount
   useEffect(() => {
@@ -67,43 +71,56 @@ export default function AdminEvents() {
     setFormLoading(true)
     try {
       if (selectedEvent) {
-        // Update existing event
         await updateEvent(selectedEvent.id, eventData, imageFile)
         toast.success('Event updated successfully!')
       } else {
-        // Create new event
         await createEvent(eventData, imageFile)
         toast.success('Event created successfully!')
-        console.log(eventData)
       }
       setShowEventForm(false)
       setSelectedEvent(null)
-      loadEvents() // Reload events
+      loadEvents()
     } catch (error) {
-      console.error('Error saving event:', error.message)
-      console.log('Error saving event:', error.message)
+      console.error('Error saving event:', error?.message || error)
       toast.error(selectedEvent ? 'Failed to update event' : 'Failed to create event')
     } finally {
       setFormLoading(false)
     }
   }
 
-  const handleDeleteEvent = async (eventId) => {
+  // Open delete confirmation
+  const requestDeleteEvent = (eventId) => {
+    const evt = events.find(e => e.id === eventId)
+    setDeleteId(eventId)
+    setDeleteTitle(evt?.title || 'this event')
+  }
+
+  // Confirm delete
+  const confirmDeleteEvent = async () => {
+    if (!deleteId) return
     try {
-      await deleteEvent(eventId)
+      await deleteEvent(deleteId)
       toast.success('Event deleted successfully!')
-      loadEvents() // Reload events
+      setDeleteId(null)
+      setDeleteTitle('')
+      loadEvents()
     } catch (error) {
       console.error('Error deleting event:', error)
       toast.error('Failed to delete event')
     }
   }
 
+  // Cancel delete
+  const cancelDelete = () => {
+    setDeleteId(null)
+    setDeleteTitle('')
+  }
+
   const handleTogglePublished = async (eventId, published) => {
     try {
       await toggleEventPublished(eventId, published)
       toast.success(`Event ${published ? 'published' : 'unpublished'} successfully!`)
-      loadEvents() // Reload events
+      loadEvents()
     } catch (error) {
       console.error('Error toggling event published status:', error)
       toast.error('Failed to update event status')
@@ -114,7 +131,7 @@ export default function AdminEvents() {
     try {
       await updateEvent(eventId, { featured })
       toast.success(`Event ${featured ? 'featured' : 'unfeatured'} successfully!`)
-      loadEvents() // Reload events
+      loadEvents()
     } catch (error) {
       console.error('Error toggling event featured status:', error)
       toast.error('Failed to update event status')
@@ -140,9 +157,8 @@ export default function AdminEvents() {
       reader.onload = async (event) => {
         try {
           const importedEvents = JSON.parse(event.target.result)
-          // Here you would typically validate and import the events
           toast.success(`Ready to import ${importedEvents.length} events`)
-          // You can implement batch import logic here
+          // Implement batch import here if needed
         } catch (error) {
           toast.error('Invalid file format')
         }
@@ -283,7 +299,7 @@ export default function AdminEvents() {
         <EventList
           events={events}
           onEdit={handleEditEvent}
-          onDelete={handleDeleteEvent}
+          onDelete={requestDeleteEvent}
           onTogglePublished={handleTogglePublished}
           onToggleFeatured={handleToggleFeatured}
           loading={loading}
@@ -301,6 +317,40 @@ export default function AdminEvents() {
           }}
           loading={formLoading}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Confirm Deletion</h3>
+              <button onClick={cancelDelete} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="p-4">
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                Are you sure you want to delete "<span className="font-medium">{deleteTitle}</span>"? This action cannot be undone.
+              </p>
+            </div>
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end space-x-3">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteEvent}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center space-x-2"
+              >
+                <Trash2 size={16} />
+                <span>Delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
