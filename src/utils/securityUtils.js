@@ -114,7 +114,7 @@ export const getCSPHeaders = () => {
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://api.razorpay.com",
+      "connect-src 'self' https://api.razorpay.com https://api.cloudinary.com https://res.cloudinary.com",
       "frame-src https://api.razorpay.com",
       "object-src 'none'",
       "base-uri 'self'",

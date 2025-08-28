@@ -23,33 +23,65 @@ export const useEvents = (initialYear = '2024') => {
       setError(null)
       
       try {
-        // For now, using mock data
-        // In production, replace with Firestore query
-        const yearEvents = mockEvents[selectedYear] || []
-        setEvents(yearEvents)
-        setFilteredEvents(yearEvents)
-        
-        // Uncomment for Firestore integration
-        /*
+        // Fetch from Firestore
         const eventsRef = collection(db, 'events')
         const q = query(
           eventsRef,
-          where('year', '==', selectedYear),
+          where('year', '==', parseInt(selectedYear)),
+          where('published', '==', true),
           orderBy('date', 'desc')
         )
-        const snapshot = await getDocs(q)
-        const eventsData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }))
-        setEvents(eventsData)
-        setFilteredEvents(eventsData)
-        */
+        
+        try {
+          const snapshot = await getDocs(q)
+          const eventsData = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }))
+          setEvents(eventsData)
+          setFilteredEvents(eventsData)
+        } catch (firestoreError) {
+          // If Firestore query fails (e.g., index not created), try without orderBy
+          console.warn('Firestore query with orderBy failed, trying without ordering:', firestoreError)
+          
+          const simpleQuery = query(
+            eventsRef,
+            where('year', '==', parseInt(selectedYear)),
+            where('published', '==', true)
+          )
+          
+          const snapshot = await getDocs(simpleQuery)
+          const eventsData = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }))
+          
+          // Sort manually if orderBy failed
+          eventsData.sort((a, b) => {
+            const dateA = new Date(a.date || a.createdAt)
+            const dateB = new Date(b.date || b.createdAt)
+            return dateB - dateA
+          })
+          
+          setEvents(eventsData)
+          setFilteredEvents(eventsData)
+        }
+        
+        // If no events in Firestore, fallback to mock data
+        if (events.length === 0 && mockEvents[selectedYear]) {
+          console.log('No events in Firestore, using mock data')
+          const yearEvents = mockEvents[selectedYear] || []
+          setEvents(yearEvents)
+          setFilteredEvents(yearEvents)
+        }
       } catch (err) {
         console.error('Error loading events:', err)
         setError('Failed to load events')
-        setEvents([])
-        setFilteredEvents([])
+        
+        // Fallback to mock data on error
+        const yearEvents = mockEvents[selectedYear] || []
+        setEvents(yearEvents)
+        setFilteredEvents(yearEvents)
       } finally {
         setLoading(false)
       }

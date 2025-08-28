@@ -50,7 +50,7 @@ export const useAdminAuth = () => useContext(AdminAuthContext)
 // Admin whitelist - Add admin emails here
 const ADMIN_WHITELIST = [
   'csidatabasenmamit@gmail.com',
-  'csi nmamit',
+  '',
   // Add more admin emails as needed
 ]
 
