@@ -12,8 +12,12 @@ import {
   FileText,
   User,
   Save,
-  Loader
+  Loader,
+  CheckCircle,
+  CloudUpload
 } from 'lucide-react'
+import { uploadToCloudinary } from '../../services/eventService'
+import { toast } from 'react-hot-toast'
 
 const EventForm = ({ event, onSubmit, onCancel, loading }) => {
   const [formData, setFormData] = useState({
@@ -37,6 +41,9 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
 
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
+  const [cloudinaryUrl, setCloudinaryUrl] = useState(null)
+  const [imageUploading, setImageUploading] = useState(false)
+  const [imageUploaded, setImageUploaded] = useState(false)
   const [errors, setErrors] = useState({})
   const [contactPerson, setContactPerson] = useState({ name: '', phone: '', email: '' })
 
@@ -54,6 +61,8 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
       })
       if (event.image) {
         setImagePreview(event.image)
+        setCloudinaryUrl(event.image)
+        setImageUploaded(true) // For editing, image is already uploaded
       }
     }
   }, [event])
@@ -84,6 +93,32 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
       }
       reader.readAsDataURL(file)
       setErrors(prev => ({ ...prev, image: '' }))
+      // Reset upload status when new image is selected
+      setImageUploaded(false)
+      setCloudinaryUrl(null)
+    }
+  }
+
+  const handleImageUpload = async () => {
+    if (!imageFile) {
+      toast.error('Please select an image first')
+      return
+    }
+
+    setImageUploading(true)
+    try {
+      const folder = `csi-events/${formData.year || new Date().getFullYear()}`
+      const url = await uploadToCloudinary(imageFile, folder)
+      setCloudinaryUrl(url)
+      setImageUploaded(true)
+      toast.success('Image uploaded successfully! You can now fill in the event details.')
+      setErrors(prev => ({ ...prev, image: '' }))
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast.error('Failed to upload image. Please try again.')
+      setErrors(prev => ({ ...prev, image: 'Failed to upload image' }))
+    } finally {
+      setImageUploading(false)
     }
   }
 
@@ -112,7 +147,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
     if (!formData.date) newErrors.date = 'Date is required'
     if (!formData.year) newErrors.year = 'Year is required'
     if (!formData.venue) newErrors.venue = 'Venue is required'
-    if (!imageFile && !event?.image) newErrors.image = 'Event poster is required'
+    if (!cloudinaryUrl) newErrors.image = 'Event poster must be uploaded first'
     
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -121,7 +156,13 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (validateForm()) {
-      onSubmit(formData, imageFile)
+      // Pass the cloudinary URL along with form data
+      const submitData = {
+        ...formData,
+        cloudinaryUrl: cloudinaryUrl
+      }
+      console.log(submitData)
+      onSubmit(submitData, null) // No need to pass imageFile since it's already uploaded
     }
   }
 
@@ -149,20 +190,31 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Image Upload */}
-          <div>
+          <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Event Poster *
+              Step 1: Upload Event Poster * (Required before filling form)
             </label>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-start space-x-4">
               <div className="flex-1">
-                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
+                <label className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer ${
+                  imageUploaded 
+                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
+                    : 'border-gray-300 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-800'
+                }`}>
                   {imagePreview ? (
-                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover rounded-lg" />
+                    <div className="relative w-full h-full">
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover rounded-lg" />
+                      {imageUploaded && (
+                        <div className="absolute top-2 right-2 bg-green-500 text-white p-2 rounded-full">
+                          <CheckCircle size={24} />
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <Upload className="w-10 h-10 mb-3 text-gray-400" />
                       <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                        <span className="font-semibold">Click to upload</span> or drag and drop
+                        <span className="font-semibold">Click to select image</span> or drag and drop
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         PNG, JPG or JPEG (MAX. 5MB)
@@ -174,15 +226,58 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                     className="hidden"
                     accept="image/*"
                     onChange={handleImageChange}
+                    disabled={imageUploading}
                   />
                 </label>
+                
+                {/* Upload Button */}
+                {imageFile && !imageUploaded && (
+                  <button
+                    type="button"
+                    onClick={handleImageUpload}
+                    disabled={imageUploading}
+                    className="mt-3 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                  >
+                    {imageUploading ? (
+                      <>
+                        <Loader className="animate-spin" size={20} />
+                        <span>Uploading to Cloudinary...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CloudUpload size={20} />
+                        <span>Upload Image to Cloudinary</span>
+                      </>
+                    )}
+                  </button>
+                )}
+                
+                {/* Success Message */}
+                {imageUploaded && (
+                  <div className="mt-3 p-3 bg-green-100 dark:bg-green-900/30 border border-green-500 rounded-lg">
+                    <p className="text-sm text-green-700 dark:text-green-300 flex items-center">
+                      <CheckCircle className="mr-2" size={16} />
+                      Image uploaded successfully! You can now fill in the event details.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
             {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image}</p>}
           </div>
 
-          {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Form Fields Section - Disabled until image is uploaded */}
+          <div className={`space-y-6 ${!imageUploaded ? 'opacity-50 pointer-events-none' : ''}`}>
+            {!imageUploaded && (
+              <div className="p-4 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-500 rounded-lg">
+                <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                  Please upload the event poster first to enable the form fields.
+                </p>
+              </div>
+            )}
+
+            {/* Basic Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <FileText className="inline w-4 h-4 mr-1" />
@@ -215,10 +310,10 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 ))}
               </select>
             </div>
-          </div>
+            </div>
 
-          {/* Description */}
-          <div>
+            {/* Description */}
+            <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Description *
             </label>
@@ -231,10 +326,10 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
               placeholder="Enter detailed event description"
             />
             {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
-          </div>
+            </div>
 
-          {/* Brief */}
-          <div>
+            {/* Brief */}
+            <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Brief Summary
             </label>
@@ -246,10 +341,10 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Short summary of the event"
             />
-          </div>
+            </div>
 
-          {/* Date, Time, Year */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Date, Time, Year */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Calendar className="inline w-4 h-4 mr-1" />
@@ -294,10 +389,10 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
               />
               {errors.year && <p className="mt-1 text-sm text-red-600">{errors.year}</p>}
             </div>
-          </div>
+            </div>
 
-          {/* Venue, Type, Status */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Venue, Type, Status */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <MapPin className="inline w-4 h-4 mr-1" />
@@ -345,10 +440,10 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 ))}
               </select>
             </div>
-          </div>
+            </div>
 
-          {/* Organizers and Entry Fee */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Organizers and Entry Fee */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Users className="inline w-4 h-4 mr-1" />
@@ -378,10 +473,10 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-          </div>
+            </div>
 
-          {/* Contact Persons */}
-          <div>
+            {/* Contact Persons */}
+            <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               <User className="inline w-4 h-4 mr-1" />
               Contact Persons
@@ -432,10 +527,10 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 </div>
               ))}
             </div>
-          </div>
+            </div>
 
-          {/* Checkboxes */}
-          <div className="flex flex-wrap gap-4">
+            {/* Checkboxes */}
+            <div className="flex flex-wrap gap-4">
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -468,6 +563,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
               />
               <span className="text-sm text-gray-700 dark:text-gray-300">Featured Event</span>
             </label>
+            </div>
           </div>
 
           {/* Action Buttons */}

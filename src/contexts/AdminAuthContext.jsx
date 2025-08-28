@@ -56,7 +56,7 @@ const ADMIN_WHITELIST = [
 
 // OTP configuration
 const OTP_EXPIRY_TIME = 10 * 60 * 1000 // 10 minutes
-const SESSION_TIMEOUT = 30 * 60 * 1000 // 30 minutes
+const SESSION_TIMEOUT = 60 * 60 * 1000 // 30 minutes
 
 export const AdminAuthProvider = ({ children }) => {
   const [adminUser, setAdminUser] = useState(null)
@@ -67,9 +67,9 @@ export const AdminAuthProvider = ({ children }) => {
   const [pendingAdmin, setPendingAdmin] = useState(null)
 
   // Generate OTP
-  const generateOTP = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString()
-  }
+  // const generateOTP = () => {
+  //   return Math.floor(100000 + Math.random() * 900000).toString()
+  // }
 
   // Check if user is whitelisted admin
   const isWhitelistedAdmin = (email) => {
@@ -211,6 +211,18 @@ export const AdminAuthProvider = ({ children }) => {
           content: true,
           settings: true
         }
+      }, { merge: true })
+
+      // Also create/update user document with admin role for Firestore rules
+      const userRef = doc(db, 'users', pendingAdmin.uid)
+      await setDoc(userRef, {
+        uid: pendingAdmin.uid,
+        email: pendingAdmin.email,
+        name: pendingAdmin.name,
+        photoURL: pendingAdmin.photoURL,
+        role: 'admin',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       }, { merge: true })
 
       // Set admin session

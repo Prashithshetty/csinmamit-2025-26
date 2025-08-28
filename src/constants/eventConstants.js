@@ -19,7 +19,7 @@ export const EVENT_TYPE_COLORS = {
 }
 
 // Available years for filtering
-export const EVENT_YEARS = ['2024', '2023', '2022', '2021', '2020']
+export const EVENT_YEARS = ['2025','2024', '2023', '2022', '2021', '2020', '2019']
 
 // Event status configurations
 export const EVENT_STATUS = {

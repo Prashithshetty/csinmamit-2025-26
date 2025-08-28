@@ -53,15 +53,18 @@ export const uploadToCloudinary = async (file, folder = 'csi-events') => {
 /**
  * Create a new event
  * @param {Object} eventData - Event data object
- * @param {File} imageFile - Event poster image file
+ * @param {File} imageFile - Event poster image file (optional if cloudinaryUrl is provided)
  * @returns {Promise<string>} - ID of created event
  */
 export const createEvent = async (eventData, imageFile) => {
   try {
     let cloudinaryUrl = ''
     
-    // Upload image to Cloudinary if provided
-    if (imageFile) {
+    // Check if cloudinaryUrl is already provided in eventData
+    if (eventData.cloudinaryUrl) {
+      cloudinaryUrl = eventData.cloudinaryUrl
+    } else if (imageFile) {
+      // Upload image to Cloudinary if file is provided
       const folder = `csi-events/${eventData.year || new Date().getFullYear()}`
       cloudinaryUrl = await uploadToCloudinary(imageFile, folder)
     }
@@ -84,11 +87,18 @@ export const createEvent = async (eventData, imageFile) => {
       year: parseInt(eventData.year) || new Date().getFullYear()
     }
 
+    // // Remove the cloudinaryUrl from eventDoc if it was passed in eventData
+    // delete eventDoc.cloudinaryUrl
+
+    console.log('Creating event with data:', eventDoc)
+
     // Add to Firestore
     const docRef = await addDoc(collection(db, 'events'), eventDoc)
+    console.log(docRef, 'Document written with ID: ', docRef.id)
     return docRef.id
   } catch (error) {
-    console.error('Error creating event:', error)
+    console.error('Error creating event:', error.message)
+    console.log('Error creating event:', error.message)
     throw error
   }
 }
@@ -97,19 +107,23 @@ export const createEvent = async (eventData, imageFile) => {
  * Update an existing event
  * @param {string} eventId - Event document ID
  * @param {Object} eventData - Updated event data
- * @param {File} imageFile - New event poster image file (optional)
+ * @param {File} imageFile - New event poster image file (optional if cloudinaryUrl is provided)
  * @returns {Promise<void>}
  */
 export const updateEvent = async (eventId, eventData, imageFile) => {
   try {
     let updateData = { ...eventData }
     
-    // Upload new image if provided
-    if (imageFile) {
+    // Check if cloudinaryUrl is already provided in eventData
+    if (eventData.cloudinaryUrl) {
+      updateData.image = eventData.cloudinaryUrl
+      // Remove the cloudinaryUrl field as we don't need to store it separately
+      // delete updateData.cloudinaryUrl
+    } else if (imageFile) {
+      // Upload new image if file is provided
       const folder = `csi-events/${eventData.year || new Date().getFullYear()}`
       const cloudinaryUrl = await uploadToCloudinary(imageFile, folder)
       updateData.image = cloudinaryUrl
-      updateData.cloudinaryUrl = cloudinaryUrl
     }
 
     // Update Firestore document
@@ -170,8 +184,8 @@ export const getAllEvents = async (filters = {}) => {
       q = query(q, where('published', '==', filters.published))
     }
     
-    // Add ordering
-    q = query(q, orderBy('year', 'desc'), orderBy('createdAt', 'desc'))
+    // Add ordering - simplified to avoid index requirements
+    q = query(q, orderBy('createdAt', 'desc'))
     
     const snapshot = await getDocs(q)
     const events = []

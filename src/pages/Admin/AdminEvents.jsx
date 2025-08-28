@@ -74,12 +74,14 @@ export default function AdminEvents() {
         // Create new event
         await createEvent(eventData, imageFile)
         toast.success('Event created successfully!')
+        console.log(eventData)
       }
       setShowEventForm(false)
       setSelectedEvent(null)
       loadEvents() // Reload events
     } catch (error) {
-      console.error('Error saving event:', error)
+      console.error('Error saving event:', error.message)
+      console.log('Error saving event:', error.message)
       toast.error(selectedEvent ? 'Failed to update event' : 'Failed to create event')
     } finally {
       setFormLoading(false)

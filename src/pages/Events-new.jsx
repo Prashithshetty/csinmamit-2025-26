@@ -17,7 +17,7 @@ const Events = () => {
     setSelectedType,
     searchTerm,
     setSearchTerm
-  } = useEvents('2024')
+  } = useEvents('2025')
 
   return (
     <div className="min-h-screen pt-20">

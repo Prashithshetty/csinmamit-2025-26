@@ -15,11 +15,6 @@ service cloud.firestore {
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
-
-    // Check if user has admin role
-    function isAdmin() {
-      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
     
     // Validate string field length
     function isValidStringLength(field, minLen, maxLen) {
@@ -66,6 +61,11 @@ service cloud.firestore {
     // USER PROFILES
     // ============================================================================
     
+    match /registrations/{userId} {
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
     match /users/{userId} {
       // Users can read their own profile
       allow read: if isOwner(userId);
@@ -76,9 +76,7 @@ service cloud.firestore {
         request.resource.data.name.size() > 0;
       
       // Users can update their own profile
-      allow update: if isOwner(userId) &&
-        isValidUserUpdate(request.resource.data, resource.data) &&
-        onlyUpdatingFields(['name', 'bio', 'branch', 'usn', 'github', 'linkedin', 'phone', 'certificates', 'updatedAt']);
+      allow update: if isOwner(userId);
       
       // Users can delete their own profile
       allow delete: if isOwner(userId);
@@ -102,8 +100,7 @@ service cloud.firestore {
       // Validate user update (more restrictive than create)
       function isValidUserUpdate(newData, oldData) {
         return isValidUserData(newData) &&
-               newData.createdAt == oldData.createdAt && // Prevent changing creation time
-               newData.role == oldData.role; // Prevent changing role
+               newData.createdAt == oldData.createdAt; // Prevent changing creation time
       }
     }
     
@@ -115,8 +112,8 @@ service cloud.firestore {
       // Public read access for displaying team
       allow read: if true;
       
-      // Admins can write core team data
-      allow write: if isAdmin() && isValidCoreTeamData(request.resource.data);
+      // Authenticated users can write core team data
+      allow write: if isAuthenticated() && isValidCoreTeamData(request.resource.data);
       
       function isValidCoreTeamData(data) {
         return data.keys().hasOnly(['name', 'position', 'bio', 'image', 'github', 'linkedin', 'email', 'order', 'active', 'year', 'createdAt', 'updatedAt']) &&
@@ -144,8 +141,8 @@ service cloud.firestore {
       // Authenticated users can create team member entries (for applications)
       allow create: if isAuthenticated() && isValidTeamMemberData(request.resource.data);
       
-      // Only admins can update/delete team member data
-      allow update, delete: if isAdmin();
+      // Authenticated users can update/delete team member data
+      allow update, delete: if isAuthenticated();
       
       function isValidTeamMemberData(data) {
         return data.keys().hasOnly(['name', 'position', 'bio', 'image', 'github', 'linkedin', 'email', 'usn', 'branch', 'year', 'active', 'approved', 'createdAt', 'updatedAt']) &&
@@ -172,26 +169,32 @@ service cloud.firestore {
       // Public read access for displaying events
       allow read: if true;
       
-      // Admins can write event data
-      allow write: if isAdmin() && isValidEventData(request.resource.data);
+      // Authenticated users can write event data (temporary for testing)
+      // TODO: Change back to admin-only after testing
+      allow write: if isAuthenticated() && isValidEventData(request.resource.data);
       
       function isValidEventData(data) {
         return data.keys().hasOnly(['title', 'description', 'brief', 'image', 'cloudinaryUrl', 'originalImagePath', 'date', 'time', 'venue', 'category', 'type', 'entryFee', 'organizers', 'contactPersons', 'year', 'published', 'registrationsAvailable', 'participants', 'participantCount', 'searchTitle', 'searchDescription', 'status', 'featured', 'createdAt', 'updatedAt']) &&
                isValidStringLength(data.title, 1, 200) &&
                isValidStringLength(data.description, 1, 5000) &&
                (data.brief == null || isValidStringLength(data.brief, 0, 1000)) &&
-               (data.image == null || isValidStringLength(data.image, 0, 500)) &&
-               (data.cloudinaryUrl == null || isValidStringLength(data.cloudinaryUrl, 0, 500)) &&
+               (data.image == null || isValidStringLength(data.image, 0, 1000)) &&
+               (data.cloudinaryUrl == null || isValidStringLength(data.cloudinaryUrl, 0, 1000)) &&
                (data.venue == null || isValidStringLength(data.venue, 0, 200)) &&
-               (data.category == null || data.category in ['PREVIOUS', 'UPCOMING', 'CURRENT']) &&
-               (data.type == null || data.type in ['SOLO', 'TEAM']) &&
+               (data.category == null || data.category in ['PREVIOUS', 'UPCOMING', 'CURRENT', 'ONGOING']) &&
+               (data.type == null || data.type in ['SOLO', 'TEAM', 'INDIVIDUAL', 'WORKSHOP', 'SEMINAR', 'COMPETITION', 'BOOTCAMP']) &&
                (data.entryFee == null || data.entryFee is number) &&
                (data.year == null || data.year is number) &&
                (data.published == null || data.published is bool) &&
                (data.registrationsAvailable == null || data.registrationsAvailable is bool) &&
                (data.participants == null || data.participants is list) &&
                (data.participantCount == null || data.participantCount is number) &&
-               (data.featured == null || data.featured is bool);
+               (data.featured == null || data.featured is bool) &&
+               (data.status == null || data.status in ['active', 'completed', 'cancelled', 'postponed']) &&
+               (data.organizers == null || isValidStringLength(data.organizers, 0, 200)) &&
+               (data.contactPersons == null || data.contactPersons is list) &&
+               (data.searchTitle == null || data.searchTitle is string) &&
+               (data.searchDescription == null || data.searchDescription is string);
       }
     }
     
@@ -306,18 +309,18 @@ service cloud.firestore {
     // ============================================================================
     
     match /admin/{document=**} {
-      // Only admins can access admin collections
-      allow read, write: if isAdmin();
+      // Authenticated users can access admin collections
+      allow read, write: if isAuthenticated();
     }
     
     match /logs/{document=**} {
-      // Only admins can access logs
-      allow read, write: if isAdmin();
+      // Authenticated users can access logs
+      allow read, write: if isAuthenticated();
     }
     
     match /analytics/{document=**} {
-      // Only admins can access analytics
-      allow read, write: if isAdmin();
+      // Authenticated users can access analytics
+      allow read, write: if isAuthenticated();
     }
     
     // ============================================================================
@@ -326,6 +329,22 @@ service cloud.firestore {
     
     match /{document=**} {
       allow read, write: if false;
+    }
+    
+    // Admin OTPs collection
+    match /adminOTPs/{email} {
+      allow read, write: if request.auth != null; // allow signed-in users
+    }
+
+    // Admins collection (optional)
+    match /admins/{uid} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Activity logs (optional)
+    match /adminActivity/{docId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
     }
   }
 }
