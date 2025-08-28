@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { auth, googleProvider, db, isDemoMode } from '../config/firebase'
+import { auth, googleProvider,isDemoMode, db } from '../config/firebase'
 import { 
   signInWithPopup as firebaseSignInWithPopup,
   signOut as firebaseSignOut,
@@ -47,12 +47,10 @@ const AdminAuthContext = createContext({})
 
 export const useAdminAuth = () => useContext(AdminAuthContext)
 
-// Admin whitelist - Add admin emails here
-const ADMIN_WHITELIST = [
-  'csidatabasenmamit@gmail.com',
-  '',
-  // Add more admin emails as needed
-]
+const ADMIN_WHITELIST = (import.meta.env.VITE_ADMIN_WHITELIST || "")
+  .split(",")
+  .map(email => email.trim().toLowerCase())
+  .filter(Boolean); // removes empty strings
 
 // OTP configuration
 const OTP_EXPIRY_TIME = 10 * 60 * 1000 // 10 minutes
@@ -84,10 +82,10 @@ export const AdminAuthProvider = ({ children }) => {
       const user = result.user
       
       // In demo mode, simulate admin user
-      if (isDemoMode) {
-        user.email = 'csidatabasenmamit@gmail.com'
-        user.displayName = 'csi nmamit'
-      }
+      // if (isDemoMode) {
+      //   user.email = 'csidatabasenmamit@gmail.com'
+      //   user.displayName = 'csi nmamit'
+      // }
       
       // Check if user is in admin whitelist
       if (!isWhitelistedAdmin(user.email)) {

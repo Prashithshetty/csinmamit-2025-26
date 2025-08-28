@@ -13,5 +13,14 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true
+  },
+  // Production hardening
+  build: {
+    sourcemap: false,
+    minify: 'esbuild'
+  },
+  esbuild: {
+    // Remove all console statements and debugger in production build output
+    drop: ['console', 'debugger']
   }
 })
