@@ -13,6 +13,7 @@ import ProfileCompletionModal from './components/Profile/ProfileCompletionModal'
 
 // Layout
 import Layout from './components/Layout/Layout'
+import UserGuard from './components/Layout/UserGuard'
 
 // Pages
 import Home from './pages/Home'
@@ -70,7 +71,7 @@ function AppContent() {
         <Toaster
           position="top-right"
           toastOptions={{
-            duration: 1000,
+            duration: 4000,
             style: {
               background: '#1f2937',
               color: '#fff',
@@ -98,9 +99,17 @@ function AppContent() {
             <Route index element={<Home />} />
             <Route path="events" element={<Events />} />
             <Route path="team" element={<Team />} />
-            <Route path="profile" element={<Profile />} />
             <Route path="recruit" element={<Recruit />} />
             <Route path="*" element={<NotFound />} />
+          </Route>
+
+          {/* Protected User Routes */}
+          <Route path="/profile" element={
+            <UserGuard>
+              <Layout />
+            </UserGuard>
+          }>
+            <Route index element={<Profile />} />
           </Route>
 
           {/* Admin Login - Public admin route */}

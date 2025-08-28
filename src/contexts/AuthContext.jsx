@@ -169,6 +169,15 @@ export const AuthProvider = ({ children }) => {
         // Get additional user data from Firestore
         const userData = await getUserData(firebaseUser.uid)
         
+        // Check if user is an admin - if so, don't set as regular user
+        if (userData?.role === 'admin') {
+          // Don't set regular user context for admin users
+          setUser(null)
+          setIsProfileIncomplete(false)
+          setLoading(false)
+          return
+        }
+        
         const fullUserData = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,

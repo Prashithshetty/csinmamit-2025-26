@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useAdminAuth } from '../../contexts/AdminAuthContext'
 import {
   Search,
@@ -237,9 +238,56 @@ const DeleteModal = ({ user, onConfirm, onCancel }) => (
   </div>
 )
 
+const AddUserModal = ({ onClose, onCreate }) => {
+  const [form, setForm] = useState({ name: '', email: '', role: 'User', usn: '', branch: '' })
+  const [submitting, setSubmitting] = useState(false)
+  
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: value }))
+  }
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!form.name?.trim() || !form.email?.trim()) {
+      toast.error('Name and Email are required')
+      return
+    }
+    setSubmitting(true)
+    await onCreate(form)
+    setSubmitting(false)
+  }
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded p-6 max-w-md w-full">
+        <h2 className="text-lg font-semibold text-[#333] mb-4">Add User</h2>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input name="name" value={form.name} onChange={handleChange} placeholder="Name" className="w-full px-3 py-2 border border-[#ccc] rounded" />
+          <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="Email" className="w-full px-3 py-2 border border-[#ccc] rounded" />
+          <div className="flex gap-2">
+            <input name="usn" value={form.usn} onChange={handleChange} placeholder="USN" className="flex-1 px-3 py-2 border border-[#ccc] rounded" />
+            <input name="branch" value={form.branch} onChange={handleChange} placeholder="Branch" className="flex-1 px-3 py-2 border border-[#ccc] rounded" />
+          </div>
+          <select name="role" value={form.role} onChange={handleChange} className="w-full px-3 py-2 border border-[#ccc] rounded">
+            {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+          </select>
+          <div className="flex justify-end gap-2 pt-2">
+            <button type="button" onClick={onClose} className="px-4 py-2 border border-[#ccc] rounded hover:bg-[#f5f5f5]">Cancel</button>
+            <button disabled={submitting} type="submit" className="px-4 py-2 bg-[#417690] text-white rounded hover:bg-[#205067]">
+              {submitting ? 'Creating...' : 'Create User'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 // Main Component
 const AdminUsers = () => {
   const { logAdminActivity } = useAdminAuth()
+  const location = useLocation()
   
   // State
   const [users, setUsers] = useState([])
@@ -254,6 +302,7 @@ const AdminUsers = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [userToDelete, setUserToDelete] = useState(null)
   const [editingUser, setEditingUser] = useState(null)
+  const [showAddModal, setShowAddModal] = useState(false)
 
   // Fetch users (fetch ALL docs without constraints)
   const fetchUsers = useCallback(async () => {
@@ -278,6 +327,12 @@ const AdminUsers = () => {
   useEffect(() => {
     fetchUsers()
   }, [])
+
+  // Open add modal via query param ?modal=add
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    setShowAddModal(params.get('modal') === 'add')
+  }, [location.search])
 
   // Filter and sort users
   const filteredUsers = useMemo(() => {
@@ -384,6 +439,33 @@ const AdminUsers = () => {
       toast.error('Failed to delete user')
     }
   }, [userToDelete, logAdminActivity])
+
+  const createUser = useCallback(async (payload) => {
+    try {
+      // Comply with rules: allowed keys only, createdAt/updatedAt timestamps
+      const newUser = {
+        name: payload.name.trim(),
+        branch: payload.branch?.trim() || null,
+        usn: payload.usn?.trim() || null,
+        role: payload.role || 'User',
+        certificates: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+      // Email not allowed on create; set via merge update after
+      const { addDoc, collection, doc, updateDoc } = await import('firebase/firestore')
+      const { db } = await import('../../config/firebase')
+      const docRef = await addDoc(collection(db, 'users'), newUser)
+      await updateDoc(doc(db, 'users', docRef.id), { email: payload.email.trim(), updatedAt: new Date() })
+
+      setUsers(prev => [{ id: docRef.id, ...newUser, email: payload.email.trim() }, ...prev])
+      toast.success('User created successfully')
+      await logAdminActivity('user_created', { userId: docRef.id })
+      setShowAddModal(false)
+    } catch (error) {
+      toast.error('Failed to create user')
+    }
+  }, [logAdminActivity])
 
   const exportToCSV = useCallback(() => {
     const headers = ['Name', 'Email', 'Role', 'USN', 'Branch', 'Year', 'Phone', 'Joined At']
@@ -524,6 +606,11 @@ const AdminUsers = () => {
             setUserToDelete(null)
           }}
         />
+      )}
+
+      {/* Add User Modal */}
+      {showAddModal && (
+        <AddUserModal onClose={() => setShowAddModal(false)} onCreate={createUser} />
       )}
     </div>
   )

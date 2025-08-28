@@ -313,6 +313,22 @@ export const AdminAuthProvider = ({ children }) => {
     }
   }, [sessionExpiry])
 
+  // Update session timeout
+  const updateSessionTimeout = (durationMs) => {
+    const newExpiry = Date.now() + durationMs
+    setSessionExpiry(newExpiry)
+    
+    // Update localStorage
+    const storedSession = localStorage.getItem('adminSession')
+    if (storedSession) {
+      const session = JSON.parse(storedSession)
+      session.expiry = newExpiry
+      localStorage.setItem('adminSession', JSON.stringify(session))
+    }
+    
+    toast.success(`Session extended by ${Math.floor(durationMs / 60000)} minutes`)
+  }
+
   // Check for existing session on mount
   useEffect(() => {
     const checkExistingSession = async () => {
@@ -353,6 +369,14 @@ export const AdminAuthProvider = ({ children }) => {
             uid: firebaseUser.uid
           })
         }
+      } else if (firebaseUser && !adminUser) {
+        // Check if this user is an admin
+        const adminData = await checkAdminStatus(firebaseUser.uid)
+        if (adminData) {
+          // This is an admin user, but we don't have admin session
+          // Don't set admin user without proper session
+          console.log('Admin user detected but no active session')
+        }
       }
     })
 
@@ -391,7 +415,8 @@ export const AdminAuthProvider = ({ children }) => {
     logoutAdmin,
     checkAdminStatus,
     logAdminActivity,
-    isWhitelistedAdmin
+    isWhitelistedAdmin,
+    updateSessionTimeout
   }
 
   return (

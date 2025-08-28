@@ -75,14 +75,15 @@ service cloud.firestore {
     match /users/{userId} {
       // Owners and admins access
       allow read: if isOwner(userId) || isAdmin();
-      allow create: if isOwner(userId) && isValidUserData(request.resource.data);
+      allow create: if isAuthenticated() && isValidUserData(request.resource.data);
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isOwner(userId) || isAdmin();
 
       // Validate user data structure and content
        function isValidUserData(data) {
-        return data.keys().hasOnly(['name', 'bio', 'branch', 'usn', 'github', 'linkedin', 'phone', 'role', 'certificates', 'createdAt', 'updatedAt']) &&
+        return data.keys().hasOnly(['name', 'email', 'bio', 'branch', 'usn', 'github', 'linkedin', 'phone', 'role', 'certificates', 'createdAt', 'updatedAt']) &&
                isValidStringLength(data.name, 1, 100) &&
+               (data.email == null || isValidEmail(data.email)) &&
                (data.bio == null || isValidStringLength(data.bio, 0, 500)) &&
                (data.branch == null || isValidStringLength(data.branch, 0, 100)) &&
                (data.usn == null || isValidUSN(data.usn)) &&
@@ -275,16 +276,12 @@ service cloud.firestore {
       // Authenticated users can read recruit data
       allow read: if isAuthenticated();
       
-      // Public can create recruit applications (for membership registration)
-      allow create: if isValidRecruitData(request.resource.data) &&
-        request.resource.data.createdAt == request.time &&
-        request.resource.data.updatedAt == request.time &&
-        request.resource.data.get('paymentStatus', 'pending') == 'pending';
+      // Authenticated users can create recruit applications
+      allow create: if isAuthenticated() && isValidRecruitData(request.resource.data);
       
       // Authenticated users can update recruit data (for processing applications)
       allow update: if isAuthenticated() && 
-        isValidRecruitUpdate(request.resource.data, resource.data) &&
-        request.resource.data.updatedAt == request.time;
+        isValidRecruitUpdate(request.resource.data, resource.data);
       
       // Authenticated users can delete recruit data
       allow delete: if isAuthenticated();
@@ -303,7 +300,9 @@ service cloud.firestore {
                isValidStringLength(data.csiIdea, 1, 2000) &&
                (data.paymentStatus == null || data.paymentStatus in ['pending', 'completed', 'failed']) &&
                (data.paymentId == null || isValidStringLength(data.paymentId, 0, 100)) &&
-               (data.orderId == null || isValidStringLength(data.orderId, 0, 100));
+               (data.orderId == null || isValidStringLength(data.orderId, 0, 100)) &&
+               (data.createdAt == null || data.createdAt is timestamp) &&
+               (data.updatedAt == null || data.updatedAt is timestamp);
       }
       
       function isValidRecruitUpdate(newData, oldData) {
@@ -360,7 +359,7 @@ service cloud.firestore {
 
     // Admins collection (optional)
     match /admins/{uid} {
-      allow read, write: if request.auth != null;
+      allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
     // Activity logs (optional)

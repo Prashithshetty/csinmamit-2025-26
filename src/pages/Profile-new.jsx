@@ -1,5 +1,4 @@
 import React from 'react'
-import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useProfileFirestore } from '../hooks/useProfileFirestore'
 import ProfileHero from '../components/Profile/ProfileHero'
@@ -20,11 +19,6 @@ const Profile = () => {
     handleSave,
     handleInputChange
   } = useProfileFirestore()
-
-  // Redirect if not authenticated
-  if (!authLoading && !user) {
-    return <Navigate to="/" replace />
-  }
 
   return (
     <>

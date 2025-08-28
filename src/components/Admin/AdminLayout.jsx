@@ -225,15 +225,18 @@ const AdminLayout = () => {
                 Recent Actions
               </h3>
               <div className="space-y-1 text-sm">
-                <a href="#" className="block px-3 py-1 text-[#417690] hover:bg-[#e5e5e5] rounded">
+                <button onClick={() => navigate('/admin/users?modal=add')}
+                  className="w-full text-left block px-3 py-1 text-[#417690] hover:bg-[#e5e5e5] rounded">
                   + Add User
-                </a>
-                <a href="#" className="block px-3 py-1 text-[#417690] hover:bg-[#e5e5e5] rounded">
+                </button>
+                <button onClick={() => navigate('/admin/events?modal=add')}
+                  className="w-full text-left block px-3 py-1 text-[#417690] hover:bg-[#e5e5e5] rounded">
                   + Add Event
-                </a>
-                <a href="#" className="block px-3 py-1 text-[#417690] hover:bg-[#e5e5e5] rounded">
+                </button>
+                <button onClick={() => navigate('/admin/members?modal=add')}
+                  className="w-full text-left block px-3 py-1 text-[#417690] hover:bg-[#e5e5e5] rounded">
                   + Add Member
-                </a>
+                </button>
               </div>
             </div>
           </nav>

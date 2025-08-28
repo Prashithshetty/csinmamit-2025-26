@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useAdminAuth } from '../../contexts/AdminAuthContext'
 import {
   Search,
@@ -238,9 +239,178 @@ const RemoveRoleModal = ({ member, onConfirm, onCancel }) => (
   </div>
 )
 
+const AddMemberModal = ({ onClose, onCreate }) => {
+  const [form, setForm] = useState({
+    name: '',
+    personalEmail: '',
+    collegeEmail: '',
+    usn: '',
+    branch: '',
+    yearOfStudy: '',
+    mobileNumber: '',
+    dateOfBirth: '',
+    membershipPlan: '',
+    paymentStatus: 'pending',
+    paymentId: '',
+    orderId: ''
+  })
+  const [errors, setErrors] = useState({})
+  const [submitting, setSubmitting] = useState(false)
+
+  const setField = (name, value) => {
+    setForm(prev => ({ ...prev, [name]: value }))
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: undefined }))
+  }
+
+  const validate = () => {
+    const newErrors = {}
+    if (!form.name?.trim()) newErrors.name = 'Name is required'
+    if (!form.personalEmail?.trim()) newErrors.personalEmail = 'Personal email is required'
+    if (!form.usn?.trim()) newErrors.usn = 'USN is required'
+    if (!form.branch?.trim()) newErrors.branch = 'Branch is required'
+    if (!form.yearOfStudy?.trim()) newErrors.yearOfStudy = 'Year of study is required'
+    if (!form.mobileNumber?.trim()) newErrors.mobileNumber = 'Mobile number is required'
+    if (!form.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required'
+    if (!form.membershipPlan?.trim()) newErrors.membershipPlan = 'Membership plan is required'
+    // CSI Idea is not required
+    return newErrors
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const newErrors = validate()
+    if (Object.keys(newErrors).length) {
+      setErrors(newErrors)
+      toast.error('Please correct the highlighted fields')
+      return
+    }
+    setSubmitting(true)
+    await onCreate(form)
+    setSubmitting(false)
+  }
+
+  const labelClass = 'block text-sm text-[#333] mb-1'
+  const inputClass = (hasError) => `w-full px-3 py-2 border ${hasError ? 'border-[#ba2121]' : 'border-[#ccc]'} rounded bg-white focus:outline-none focus:border-[#79aec8]`
+  const sectionClass = 'border border-[#eee] rounded p-3 bg-[#fafafa]'
+  const hintClass = 'text-xs text-gray-500'
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded sm:rounded p-4 sm:p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <h2 className="text-lg font-semibold text-[#333] mb-4">Add Executive Member</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Personal Information */}
+          <div className={sectionClass}>
+            <h3 className="text-sm font-medium text-[#333] mb-3">Personal Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className={labelClass}>Full Name<span className="text-[#ba2121]">*</span></label>
+                <input name="name" value={form.name} onChange={(e) => setField('name', e.target.value)} className={inputClass(errors.name)} placeholder="John Doe" />
+                {errors.name && <div className="text-xs text-[#ba2121] mt-1">{errors.name}</div>}
+              </div>
+              <div>
+                <label className={labelClass}>Date of Birth<span className="text-[#ba2121]">*</span></label>
+                <input name="dateOfBirth" type="date" value={form.dateOfBirth} onChange={(e) => setField('dateOfBirth', e.target.value)} className={inputClass(errors.dateOfBirth)} />
+                {errors.dateOfBirth && <div className="text-xs text-[#ba2121] mt-1">{errors.dateOfBirth}</div>}
+              </div>
+              <div>
+                <label className={labelClass}>Personal Email<span className="text-[#ba2121]">*</span></label>
+                <input name="personalEmail" type="email" value={form.personalEmail} onChange={(e) => setField('personalEmail', e.target.value)} className={inputClass(errors.personalEmail)} placeholder="name@example.com" />
+                {errors.personalEmail && <div className="text-xs text-[#ba2121] mt-1">{errors.personalEmail}</div>}
+              </div>
+              <div>
+                <label className={labelClass}>College Email</label>
+                <input name="collegeEmail" type="email" value={form.collegeEmail} onChange={(e) => setField('collegeEmail', e.target.value)} className={inputClass(false)} placeholder="name@college.com" />
+                <div className={hintClass}>Optional</div>
+              </div>
+              <div>
+                <label className={labelClass}>Mobile Number<span className="text-[#ba2121]">*</span></label>
+                <input name="mobileNumber" value={form.mobileNumber} onChange={(e) => setField('mobileNumber', e.target.value)} className={inputClass(errors.mobileNumber)} placeholder="10-20 digits" maxLength={20} />
+                {errors.mobileNumber && <div className="text-xs text-[#ba2121] mt-1">{errors.mobileNumber}</div>}
+              </div>
+            </div>
+          </div>
+
+          {/* Academic Information */}
+          <div className={sectionClass}>
+            <h3 className="text-sm font-medium text-[#333] mb-3">Academic Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label className={labelClass}>USN<span className="text-[#ba2121]">*</span></label>
+                <input name="usn" value={form.usn} onChange={(e) => setField('usn', e.target.value.toUpperCase())} className={inputClass(errors.usn)} placeholder="e.g., 2K21CS001" />
+                {errors.usn && <div className="text-xs text-[#ba2121] mt-1">{errors.usn}</div>}
+              </div>
+              <div>
+                <label className={labelClass}>Branch<span className="text-[#ba2121]">*</span></label>
+                <input name="branch" value={form.branch} onChange={(e) => setField('branch', e.target.value)} className={inputClass(errors.branch)} placeholder="CSE / ECE / ..." />
+                {errors.branch && <div className="text-xs text-[#ba2121] mt-1">{errors.branch}</div>}
+              </div>
+              <div>
+                <label className={labelClass}>Year of Study<span className="text-[#ba2121]">*</span></label>
+                <select name="yearOfStudy" value={form.yearOfStudy} onChange={(e) => setField('yearOfStudy', e.target.value)} className={inputClass(errors.yearOfStudy)}>
+                  <option value="">Select year</option>
+                  <option value="First">First</option>
+                  <option value="Second">Second</option>
+                  <option value="Third">Third</option>
+                  <option value="Fourth">Fourth</option>
+                  <option value="Other">Other</option>
+                </select>
+                {errors.yearOfStudy && <div className="text-xs text-[#ba2121] mt-1">{errors.yearOfStudy}</div>}
+              </div>
+            </div>
+          </div>
+
+          {/* Membership */}
+          <div className={sectionClass}>
+            <h3 className="text-sm font-medium text-[#333] mb-3">Membership Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className={labelClass}>Membership Plan (Amount)<span className="text-[#ba2121]">*</span></label>
+                <select name="membershipPlan" value={form.membershipPlan} onChange={(e) => setField('membershipPlan', e.target.value)} className={inputClass(errors.membershipPlan)}>
+                  <option value="">Select plan</option>
+                  <option value="350">350</option>
+                  <option value="650">650</option>
+                  <option value="900">900</option>
+                </select>
+                {errors.membershipPlan && <div className="text-xs text-[#ba2121] mt-1">{errors.membershipPlan}</div>}
+              </div>
+              <div>
+                <label className={labelClass}>Payment Status</label>
+                <select name="paymentStatus" value={form.paymentStatus} onChange={(e) => setField('paymentStatus', e.target.value)} className={inputClass(false)}>
+                  <option value="pending">pending</option>
+                  <option value="completed">completed</option>
+                  <option value="failed">failed</option>
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>Payment ID</label>
+                <input name="paymentId" value={form.paymentId} onChange={(e) => setField('paymentId', e.target.value)} className={inputClass(false)} placeholder="Optional" />
+              </div>
+              <div>
+                <label className={labelClass}>Order ID</label>
+                <input name="orderId" value={form.orderId} onChange={(e) => setField('orderId', e.target.value)} className={inputClass(false)} placeholder="Optional" />
+              </div>
+            </div>
+          </div>
+
+
+
+          <div className="flex justify-end gap-2 pt-1">
+            <button type="button" onClick={onClose} className="px-4 py-2 border border-[#ccc] rounded hover:bg-[#f5f5f5]">Cancel</button>
+            <button disabled={submitting} type="submit" className="px-4 py-2 bg-[#417690] text-white rounded hover:bg-[#205067]">
+              {submitting ? 'Creating...' : 'Create Member'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 // Main Component
 const AdminEMembers = () => {
   const { logAdminActivity } = useAdminAuth()
+  const location = useLocation()
   
   // State
   const [members, setMembers] = useState([])
@@ -255,6 +425,7 @@ const AdminEMembers = () => {
   const [showRemoveModal, setShowRemoveModal] = useState(false)
   const [memberToRemove, setMemberToRemove] = useState(null)
   const [editingMember, setEditingMember] = useState(null)
+  const [showAddModal, setShowAddModal] = useState(false)
 
   // Fetch executive members
   const fetchMembers = useCallback(async () => {
@@ -283,6 +454,12 @@ const AdminEMembers = () => {
   useEffect(() => {
     fetchMembers()
   }, [])
+
+  // Open add modal via query param ?modal=add
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    setShowAddModal(params.get('modal') === 'add')
+  }, [location.search])
 
   // Get unique branches
   const uniqueBranches = useMemo(() => {
@@ -399,6 +576,90 @@ const AdminEMembers = () => {
       toast.error('Failed to remove member role')
     }
   }, [memberToRemove, logAdminActivity])
+
+  const createMember = useCallback(async (payload) => {
+    try {
+      const { addDoc, collection, doc, updateDoc, setDoc, serverTimestamp, Timestamp } = await import('firebase/firestore')
+      const { db } = await import('../../config/firebase')
+      const { auth } = await import('../../config/firebase')
+      
+      // Check if user is authenticated
+      const currentUser = auth.currentUser
+      console.log('Current user:', currentUser?.uid, currentUser?.email)
+      
+      if (!currentUser) {
+        throw new Error('User not authenticated')
+      }
+      
+      // Check if admin document exists
+      const { getDoc } = await import('firebase/firestore')
+      const adminRef = doc(db, 'admins', currentUser.uid)
+      const adminDoc = await getDoc(adminRef)
+      console.log('Admin document exists:', adminDoc.exists(), adminDoc.data())
+      
+      if (!adminDoc.exists()) {
+        console.warn('Admin document does not exist in admins collection')
+      }
+      
+      // Validate date before creating timestamp
+      const birthDate = new Date(payload.dateOfBirth)
+      if (isNaN(birthDate.getTime())) {
+        throw new Error('Invalid date of birth')
+      }
+
+      // Create a new user with EXECUTIVE MEMBER role first
+      // Generate a unique ID for the user
+      const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      
+      const newUser = {
+        name: payload.name.trim(),
+        branch: payload.branch?.trim() || null,
+        usn: payload.usn?.trim() || null,
+        phone: payload.mobileNumber?.trim() || null,
+        year: payload.yearOfStudy ? Number(payload.yearOfStudy) : null,
+        role: 'EXECUTIVE MEMBER',
+        certificates: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+      
+      console.log('Creating user document with ID:', userId)
+      const userRef = doc(db, 'users', userId)
+      await setDoc(userRef, { ...newUser, email: payload.personalEmail.trim() })
+      console.log('User document created:', userId)
+
+      // Create recruit application (this should work with authenticated user)
+      const recruitDoc = {
+        name: payload.name.trim(),
+        dateOfBirth: Timestamp.fromDate(birthDate),
+        usn: payload.usn.trim(),
+        yearOfStudy: payload.yearOfStudy.trim(),
+        branch: payload.branch.trim(),
+        mobileNumber: payload.mobileNumber.trim(),
+        personalEmail: payload.personalEmail.trim(),
+        collegeEmail: payload.collegeEmail ? payload.collegeEmail.trim() : null,
+        membershipPlan: payload.membershipPlan.trim(),
+        csiIdea: 'N/A', // Default value since field is not required
+        paymentStatus: payload.paymentStatus || 'pending',
+        paymentId: payload.paymentId ? payload.paymentId.trim() : null,
+        orderId: payload.orderId ? payload.orderId.trim() : null,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      }
+      
+      console.log('Creating recruit document:', recruitDoc)
+      const recruitRef = await addDoc(collection(db, 'recruits'), recruitDoc)
+      console.log('Recruit document created:', recruitRef.id)
+
+      setMembers(prev => [{ id: userId, ...newUser, email: payload.personalEmail.trim(), position: 'Executive Member' }, ...prev])
+      toast.success('Executive member created successfully')
+      await logAdminActivity('executive_member_created', { userId: userId, recruitId: recruitRef.id })
+      setShowAddModal(false)
+    } catch (error) {
+      console.error('Error creating executive member:', error.message)
+      toast.error(`Failed to create executive member: ${error}`)
+    }
+  }, [logAdminActivity])
 
   const exportToCSV = useCallback(() => {
     const headers = ['Name', 'Email', 'USN', 'Branch', 'Year', 'Phone', 'Position', 'Joined Date']
@@ -562,6 +823,11 @@ const AdminEMembers = () => {
             setMemberToRemove(null)
           }}
         />
+      )}
+
+      {/* Add Member Modal */}
+      {showAddModal && (
+        <AddMemberModal onClose={() => setShowAddModal(false)} onCreate={createMember} />
       )}
     </div>
   )
