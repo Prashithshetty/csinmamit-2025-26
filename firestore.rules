@@ -11,6 +11,12 @@ service cloud.firestore {
       return request.auth != null;
     }
     
+    // Check for admin
+    function isAdmin() {
+      return request.auth != null 
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == "admin";
+    }
+    
     // Check if user owns the resource
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
@@ -171,7 +177,7 @@ service cloud.firestore {
       
       // Authenticated users can write event data (temporary for testing)
       // TODO: Change back to admin-only after testing
-      allow write: if isAuthenticated() && isValidEventData(request.resource.data);
+      allow write: if isAdmin() && isValidEventData(request.resource.data);
       
       function isValidEventData(data) {
         return data.keys().hasOnly(['title', 'description', 'brief', 'image', 'cloudinaryUrl', 'originalImagePath', 'date', 'time', 'venue', 'category', 'type', 'entryFee', 'organizers', 'contactPersons', 'year', 'published', 'registrationsAvailable', 'participants', 'participantCount', 'searchTitle', 'searchDescription', 'status', 'featured', 'createdAt', 'updatedAt']) &&
