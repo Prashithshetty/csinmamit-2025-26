@@ -136,14 +136,14 @@ export const AdminAuthProvider = ({ children }) => {
           
           // Only show OTP in console for development testing
           if (import.meta.env.DEV && result.otp) {
-            console.log(`🔐 Development OTP (not sent via email): ${result.otp}`)
+            // console.log(`🔐 Development OTP (not sent via email): ${result.otp}`)
             toast.info(`Dev Mode - OTP: ${result.otp} (Email not sent)`, { duration: 10000 })
           }
         } else if (result.emailError) {
           // Email sending failed but OTP generated
           toast.error('⚠️ Email sending failed! Check console for OTP.', { duration: 8000 })
           if (import.meta.env.DEV && result.otp) {
-            console.log(`🔐 Fallback OTP (email failed): ${result.otp}`)
+            // console.log(`🔐 Fallback OTP (email failed): ${result.otp}`)
             toast(`Dev Mode - OTP: ${result.otp} (Email failed)`, { 
               duration: 10000,
               icon: '⚠️'
@@ -151,13 +151,13 @@ export const AdminAuthProvider = ({ children }) => {
           }
         } else {
           // Email sent successfully
-          toast.success(`✅ OTP sent to ${email}! Check your inbox and spam folder.`, { duration: 6000 })
-          console.log(`✅ OTP email sent successfully to ${email}`)
+          // toast.success(`✅ OTP sent to ${email}! Check your inbox and spam folder.`, { duration: 6000 })
+          // console.log(`✅ OTP email sent successfully to ${email}`)
           
           // Don't show OTP in production when email is sent
           if (import.meta.env.DEV && result.otp) {
             // In dev mode, optionally show OTP for debugging even when email is sent
-            console.log(`🔐 Dev Mode - OTP sent via email: ${result.otp}`)
+            // console.log(`🔐 Dev Mode - OTP sent via email: ${result.otp}`)
           }
         }
       }
