@@ -202,7 +202,7 @@ const EventList = ({ events, onEdit, onDelete, onTogglePublished, onToggleFeatur
       </div>
 
       {/* Events Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white border border-[#ddd] rounded overflow-hidden">
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
@@ -215,30 +215,30 @@ const EventList = ({ events, onEdit, onDelete, onTogglePublished, onToggleFeatur
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-700">
+            <table className="w-full django-table">
+              <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-[#666]">
                     Event
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-[#666]">
                     Date & Year
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-[#666]">
                     Category
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-[#666]">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-[#666]">
                     Visibility
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-[#666]">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody>
                 <AnimatePresence>
                   {sortedEvents.map((event) => (
                     <React.Fragment key={event.id}>
@@ -246,9 +246,9 @@ const EventList = ({ events, onEdit, onDelete, onTogglePublished, onToggleFeatur
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        className="hover:bg-[#f5f5f5] transition-colors"
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-4 py-3">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10">
                               {event.image ? (
@@ -264,34 +264,34 @@ const EventList = ({ events, onEdit, onDelete, onTogglePublished, onToggleFeatur
                               )}
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              <div className="text-sm font-medium text-[#333]">
                                 {event.title}
                               </div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                              <div className="text-sm text-gray-500">
                                 {event.venue}
                               </div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 dark:text-white">
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-[#333]">
                             {event.date ? new Date(event.date).toLocaleDateString() : 'N/A'}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                          <div className="text-sm text-gray-500">
                             Year: {event.year}
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 py-3">
                           <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getCategoryColor(event.category)}`}>
                             {event.category}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 py-3">
                           <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(event.status)}`}>
                             {event.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 py-3">
                           <div className="flex items-center space-x-2">
                             <button
                               onClick={() => onTogglePublished(event.id, !event.published)}
@@ -309,25 +309,25 @@ const EventList = ({ events, onEdit, onDelete, onTogglePublished, onToggleFeatur
                             </button>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-right text-sm font-medium">
+                        <td className="px-4 py-3 text-right text-sm font-medium">
                           <div className="flex items-center justify-end space-x-2">
                             <button
                               onClick={() => toggleRowExpansion(event.id)}
-                              className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                              className="text-gray-600 hover:text-gray-900"
                               title="View Details"
                             >
                               {expandedRows.includes(event.id) ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                             </button>
                             <button
                               onClick={() => onEdit(event)}
-                              className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
+                              className="text-[#417690] hover:text-[#205067]"
                               title="Edit Event"
                             >
                               <Edit size={18} />
                             </button>
                             <button
                               onClick={() => handleDelete(event.id)}
-                              className={`${deleteConfirm === event.id ? 'text-red-600' : 'text-gray-600'} hover:text-red-900 dark:hover:text-red-400`}
+                              className={`${deleteConfirm === event.id ? 'text-red-600' : 'text-gray-600'} hover:text-red-900`}
                               title={deleteConfirm === event.id ? 'Click again to confirm' : 'Delete Event'}
                             >
                               <Trash2 size={18} />
@@ -337,7 +337,7 @@ const EventList = ({ events, onEdit, onDelete, onTogglePublished, onToggleFeatur
                                 href={event.cloudinaryUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                                className="text-gray-600 hover:text-gray-900"
                                 title="View Image"
                               >
                                 <ExternalLink size={18} />
@@ -355,51 +355,51 @@ const EventList = ({ events, onEdit, onDelete, onTogglePublished, onToggleFeatur
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                           >
-                            <td colSpan="6" className="px-6 py-4 bg-gray-50 dark:bg-gray-700">
+                            <td colSpan="6" className="px-4 py-3 bg-[#f5f5f5]">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Description</h4>
-                                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  <h4 className="font-semibold text-[#333] mb-2">Description</h4>
+                                  <p className="text-sm text-gray-600">
                                     {event.description || 'No description available'}
                                   </p>
                                 </div>
                                 <div>
-                                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Event Details</h4>
+                                  <h4 className="font-semibold text-[#333] mb-2">Event Details</h4>
                                   <dl className="text-sm space-y-1">
                                     <div className="flex">
-                                      <dt className="font-medium text-gray-600 dark:text-gray-400 w-32">Type:</dt>
-                                      <dd className="text-gray-900 dark:text-white">{event.type}</dd>
+                                      <dt className="font-medium text-gray-600 w-32">Type:</dt>
+                                      <dd className="text-[#333]">{event.type}</dd>
                                     </div>
                                     <div className="flex">
-                                      <dt className="font-medium text-gray-600 dark:text-gray-400 w-32">Time:</dt>
-                                      <dd className="text-gray-900 dark:text-white">{event.time || 'N/A'}</dd>
+                                      <dt className="font-medium text-gray-600 w-32">Time:</dt>
+                                      <dd className="text-[#333]">{event.time || 'N/A'}</dd>
                                     </div>
                                     <div className="flex">
-                                      <dt className="font-medium text-gray-600 dark:text-gray-400 w-32">Entry Fee:</dt>
-                                      <dd className="text-gray-900 dark:text-white">₹{event.entryFee || 0}</dd>
+                                      <dt className="font-medium text-gray-600 w-32">Entry Fee:</dt>
+                                      <dd className="text-[#333]">₹{event.entryFee || 0}</dd>
                                     </div>
                                     <div className="flex">
-                                      <dt className="font-medium text-gray-600 dark:text-gray-400 w-32">Organizers:</dt>
-                                      <dd className="text-gray-900 dark:text-white">{event.organizers || 'CSI NMAMIT'}</dd>
+                                      <dt className="font-medium text-gray-600 w-32">Organizers:</dt>
+                                      <dd className="text-[#333]">{event.organizers || 'CSI NMAMIT'}</dd>
                                     </div>
                                     <div className="flex">
-                                      <dt className="font-medium text-gray-600 dark:text-gray-400 w-32">Registrations:</dt>
-                                      <dd className="text-gray-900 dark:text-white">
+                                      <dt className="font-medium text-gray-600 w-32">Registrations:</dt>
+                                      <dd className="text-[#333]">
                                         {event.registrationsAvailable ? 'Open' : 'Closed'}
                                       </dd>
                                     </div>
                                     <div className="flex">
-                                      <dt className="font-medium text-gray-600 dark:text-gray-400 w-32">Participants:</dt>
-                                      <dd className="text-gray-900 dark:text-white">{event.participantCount || 0}</dd>
+                                      <dt className="font-medium text-gray-600 w-32">Participants:</dt>
+                                      <dd className="text-[#333]">{event.participantCount || 0}</dd>
                                     </div>
                                   </dl>
                                 </div>
                                 {event.contactPersons && event.contactPersons.length > 0 && (
                                   <div className="md:col-span-2">
-                                    <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Contact Persons</h4>
+                                    <h4 className="font-semibold text-[#333] mb-2">Contact Persons</h4>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                       {event.contactPersons.map((person, index) => (
-                                        <div key={index} className="text-sm text-gray-600 dark:text-gray-400">
+                                        <div key={index} className="text-sm text-gray-600">
                                           {person.name} - {person.phone} - {person.email}
                                         </div>
                                       ))}

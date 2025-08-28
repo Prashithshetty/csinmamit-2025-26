@@ -27,7 +27,7 @@ import {
 import toast from 'react-hot-toast'
 
 const AdminLayout = () => {
-  const { adminUser, logoutAdmin, sessionExpiry } = useAdminAuth()
+  const { adminUser, logoutAdmin, sessionExpiry, updateSessionTimeout } = useAdminAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -105,7 +105,7 @@ const AdminLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="django-admin min-h-screen bg-white flex flex-col">
       {/* Django-style Header */}
       <header className="bg-[#417690] text-white">
         {/* Top bar */}
@@ -121,6 +121,12 @@ const AdminLayout = () => {
           </div>
           <div className="flex items-center space-x-4 text-sm">
             <span>Welcome, <strong>{adminUser?.name}</strong></span>
+            {sessionExpiry && (
+              <div className="hidden sm:flex items-center space-x-2">
+                <span className="opacity-80">Session ends in:</span>
+                <span className="px-2 py-0.5 bg-[#79aec8] text-white rounded text-xs">{sessionTimeLeft}</span>
+              </div>
+            )}
             <a href="/" className="hover:underline">View site</a>
             <button onClick={() => navigate('/admin/settings')} className="hover:underline">
               Change password
@@ -132,17 +138,34 @@ const AdminLayout = () => {
         </div>
 
         {/* Breadcrumb */}
-        <div className="px-4 py-2 text-sm">
+        <div className="px-4 py-2 text-sm flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center space-x-2">
-            <NavLink to="/admin/dashboard" className="hover:underline">Home</NavLink>
+            <NavLink to="/admin/dashboard" className="hover:underline text-white hover:text-gray-300">
+            <p className='cursor-pointer text-white hover:underline hover:text-gray-400'>Home</p></NavLink>
             {getBreadcrumb().slice(1).map((crumb, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <ChevronRight className="w-4 h-4" />
-                <NavLink to={crumb.path} className="hover:underline">
+                <h6 to={crumb.path} className="cursor-pointer hover:underline text-white hover:text-gray-300">
                   {crumb.label}
-                </NavLink>
+                </h6>
               </div>
             ))}
+          </div>
+          {/* Session controls */}
+          <div className="flex items-center gap-2">
+            <label className="text-xs opacity-80">Extend session:</label>
+            <button
+              onClick={() => updateSessionTimeout(30 * 60 * 1000)}
+              className="px-2 py-1 text-xs border border-[#ddd] rounded hover:bg-[#f5f5f5]"
+            >
+              +30m
+            </button>
+            <button
+              onClick={() => updateSessionTimeout(60 * 60 * 1000)}
+              className="px-2 py-1 text-xs border border-[#ddd] rounded hover:bg-[#f5f5f5]"
+            >
+              +1h
+            </button>
           </div>
         </div>
       </header>
@@ -217,7 +240,7 @@ const AdminLayout = () => {
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 bg-white">
+        <main className="flex-1 bg-white p-4 md:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

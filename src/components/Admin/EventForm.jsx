@@ -173,15 +173,15 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
       exit={{ opacity: 0, scale: 0.95 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto"
     >
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-[#ddd]">
         {/* Header */}
-        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="sticky top-0 bg-white border-b border-[#ddd] p-6 flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-[#333]">
             {event ? 'Edit Event' : 'Create New Event'}
           </h2>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X size={24} />
           </button>
@@ -190,16 +190,16 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Image Upload */}
-          <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="bg-[#f8f8f8] p-4 rounded-lg border border-[#eee]">
+            <label className="block text-sm font-medium text-[#333] mb-2">
               Step 1: Upload Event Poster * (Required before filling form)
             </label>
             <div className="flex items-start space-x-4">
               <div className="flex-1">
                 <label className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer ${
                   imageUploaded 
-                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
-                    : 'border-gray-300 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-800'
+                    ? 'border-green-500 bg-green-50' 
+                    : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
                 }`}>
                   {imagePreview ? (
                     <div className="relative w-full h-full">
@@ -213,10 +213,10 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                   ) : (
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <Upload className="w-10 h-10 mb-3 text-gray-400" />
-                      <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                      <p className="mb-2 text-sm text-gray-500">
                         <span className="font-semibold">Click to select image</span> or drag and drop
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-500">
                         PNG, JPG or JPEG (MAX. 5MB)
                       </p>
                     </div>
@@ -236,7 +236,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                     type="button"
                     onClick={handleImageUpload}
                     disabled={imageUploading}
-                    className="mt-3 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                    className="mt-3 w-full django-btn django-btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {imageUploading ? (
                       <>
@@ -254,8 +254,8 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 
                 {/* Success Message */}
                 {imageUploaded && (
-                  <div className="mt-3 p-3 bg-green-100 dark:bg-green-900/30 border border-green-500 rounded-lg">
-                    <p className="text-sm text-green-700 dark:text-green-300 flex items-center">
+                  <div className="mt-3 p-3 bg-green-100 border border-green-500 rounded-lg">
+                    <p className="text-sm text-green-700 flex items-center">
                       <CheckCircle className="mr-2" size={16} />
                       Image uploaded successfully! You can now fill in the event details.
                     </p>
@@ -269,8 +269,8 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
           {/* Form Fields Section - Disabled until image is uploaded */}
           <div className={`space-y-6 ${!imageUploaded ? 'opacity-50 pointer-events-none' : ''}`}>
             {!imageUploaded && (
-              <div className="p-4 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-500 rounded-lg">
-                <p className="text-sm text-yellow-700 dark:text-yellow-300">
+              <div className="p-4 bg-yellow-100 border border-yellow-500 rounded-lg">
+                <p className="text-sm text-yellow-700">
                   Please upload the event poster first to enable the form fields.
                 </p>
               </div>
@@ -279,7 +279,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="django-form-label mb-2">
                 <FileText className="inline w-4 h-4 mr-1" />
                 Event Title *
               </label>
@@ -288,14 +288,14 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="django-form-input"
                 placeholder="Enter event title"
               />
               {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="django-form-label mb-2">
                 <Tag className="inline w-4 h-4 mr-1" />
                 Category *
               </label>
@@ -303,7 +303,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="django-form-input"
               >
                 {categories.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
@@ -314,7 +314,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
 
             {/* Description */}
             <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="django-form-label mb-2">
               Description *
             </label>
             <textarea
@@ -322,7 +322,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
               value={formData.description}
               onChange={handleInputChange}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="django-form-input"
               placeholder="Enter detailed event description"
             />
             {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
@@ -330,7 +330,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
 
             {/* Brief */}
             <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="django-form-label mb-2">
               Brief Summary
             </label>
             <input
@@ -338,7 +338,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
               name="brief"
               value={formData.brief}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="django-form-input"
               placeholder="Short summary of the event"
             />
             </div>
@@ -346,7 +346,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
             {/* Date, Time, Year */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="django-form-label mb-2">
                 <Calendar className="inline w-4 h-4 mr-1" />
                 Date *
               </label>
@@ -355,13 +355,13 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 name="date"
                 value={formData.date}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="django-form-input"
               />
               {errors.date && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="django-form-label mb-2">
                 <Clock className="inline w-4 h-4 mr-1" />
                 Time
               </label>
@@ -370,12 +370,12 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 name="time"
                 value={formData.time}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="django-form-input"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="django-form-label mb-2">
                 Year *
               </label>
               <input
@@ -385,7 +385,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 onChange={handleInputChange}
                 min="2019"
                 max="2030"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="django-form-input"
               />
               {errors.year && <p className="mt-1 text-sm text-red-600">{errors.year}</p>}
             </div>
@@ -394,7 +394,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
             {/* Venue, Type, Status */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="django-form-label mb-2">
                 <MapPin className="inline w-4 h-4 mr-1" />
                 Venue *
               </label>
@@ -403,21 +403,21 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 name="venue"
                 value={formData.venue}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="django-form-input"
                 placeholder="Event venue"
               />
               {errors.venue && <p className="mt-1 text-sm text-red-600">{errors.venue}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="django-form-label mb-2">
                 Type
               </label>
               <select
                 name="type"
                 value={formData.type}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="django-form-input"
               >
                 {types.map(type => (
                   <option key={type} value={type}>{type}</option>
@@ -426,14 +426,14 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="django-form-label mb-2">
                 Status
               </label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="django-form-input"
               >
                 {statuses.map(status => (
                   <option key={status} value={status}>{status}</option>
@@ -445,7 +445,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
             {/* Organizers and Entry Fee */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="django-form-label mb-2">
                 <Users className="inline w-4 h-4 mr-1" />
                 Organizers
               </label>
@@ -454,13 +454,13 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 name="organizers"
                 value={formData.organizers}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="django-form-input"
                 placeholder="Event organizers"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="django-form-label mb-2">
                 <DollarSign className="inline w-4 h-4 mr-1" />
                 Entry Fee (₹)
               </label>
@@ -470,14 +470,14 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 value={formData.entryFee}
                 onChange={handleInputChange}
                 min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="django-form-input"
               />
             </div>
             </div>
 
             {/* Contact Persons */}
             <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="django-form-label mb-2">
               <User className="inline w-4 h-4 mr-1" />
               Contact Persons
             </label>
@@ -488,26 +488,26 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                   placeholder="Name"
                   value={contactPerson.name}
                   onChange={(e) => setContactPerson(prev => ({ ...prev, name: e.target.value }))}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="flex-1 django-form-input"
                 />
                 <input
                   type="tel"
                   placeholder="Phone"
                   value={contactPerson.phone}
                   onChange={(e) => setContactPerson(prev => ({ ...prev, phone: e.target.value }))}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="flex-1 django-form-input"
                 />
                 <input
                   type="email"
                   placeholder="Email"
                   value={contactPerson.email}
                   onChange={(e) => setContactPerson(prev => ({ ...prev, email: e.target.value }))}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="flex-1 django-form-input"
                 />
                 <button
                   type="button"
                   onClick={addContactPerson}
-                  className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                  className="django-btn django-btn-primary"
                 >
                   Add
                 </button>
@@ -520,7 +520,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                   <button
                     type="button"
                     onClick={() => removeContactPerson(index)}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-600 hover:text-red-700"
                   >
                     <X size={16} />
                   </button>
@@ -537,9 +537,9 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 name="registrationsAvailable"
                 checked={formData.registrationsAvailable}
                 onChange={handleInputChange}
-                className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-2"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Registrations Available</span>
+              <span className="text-sm text-[#333]">Registrations Available</span>
             </label>
 
             <label className="flex items-center space-x-2">
@@ -548,9 +548,9 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 name="published"
                 checked={formData.published}
                 onChange={handleInputChange}
-                className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-2"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Published</span>
+              <span className="text-sm text-[#333]">Published</span>
             </label>
 
             <label className="flex items-center space-x-2">
@@ -559,26 +559,26 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
                 name="featured"
                 checked={formData.featured}
                 onChange={handleInputChange}
-                className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-2"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Featured Event</span>
+              <span className="text-sm text-[#333]">Featured Event</span>
             </label>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex justify-end space-x-3 pt-4 border-t border-[#ddd]">
             <button
               type="button"
               onClick={onCancel}
-              className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="django-btn django-btn-default"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              className="django-btn django-btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {loading ? (
                 <>

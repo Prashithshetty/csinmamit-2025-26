@@ -168,75 +168,55 @@ export default function AdminEvents() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-                  <Calendar className="mr-3" size={32} />
-                  Event Management
-                </h1>
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                  Manage all CSI events, workshops, and competitions
-                </p>
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  onClick={loadEvents}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center space-x-2"
-                >
-                  <RefreshCw size={20} />
-                  <span>Refresh</span>
-                </button>
-                <button
-                  onClick={handleExportEvents}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center space-x-2"
-                >
-                  <Download size={20} />
-                  <span>Export</span>
-                </button>
-                <label className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center space-x-2 cursor-pointer">
-                  <Upload size={20} />
-                  <span>Import</span>
-                  <input
-                    type="file"
-                    accept=".json"
-                    onChange={handleImportEvents}
-                    className="hidden"
-                  />
-                </label>
-                <button
-                  onClick={handleCreateEvent}
-                  className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors flex items-center space-x-2"
-                >
-                  <Plus size={20} />
-                  <span>Create Event</span>
-                </button>
-              </div>
-            </div>
+    <div className="">
+      {/* Header - Django style */}
+      <div className="django-module">
+        <div className="django-module-header flex items-center justify-between">
+          <div className="flex items-center">
+            <Calendar className="mr-2" size={18} />
+            Event management
           </div>
+          <div className="flex flex-wrap gap-2">
+            <button onClick={loadEvents} className="django-btn django-btn-default flex items-center gap-2">
+              <RefreshCw size={16} />
+              Refresh
+            </button>
+            <button onClick={handleExportEvents} className="django-btn django-btn-default flex items-center gap-2">
+              <Download size={16} />
+              Export
+            </button>
+            <label className="django-btn django-btn-default flex items-center gap-2 cursor-pointer">
+              <Upload size={16} />
+              <span>Import</span>
+              <input type="file" accept=".json" onChange={handleImportEvents} className="hidden" />
+            </label>
+            <button onClick={handleCreateEvent} className="django-btn django-btn-primary flex items-center gap-2">
+              <Plus size={16} />
+              Create event
+            </button>
+          </div>
+        </div>
+        <div className="django-module-content">
+          <p className="text-sm text-[#666]">Manage all CSI events, workshops, and competitions</p>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="py-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6"
+            className="bg-white border border-[#ddd] rounded p-4"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Events</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.total}</p>
+                <p className="text-sm font-medium text-[#666]">Total events</p>
+                <p className="text-3xl font-bold text-[#333] mt-2">{stats.total}</p>
               </div>
-              <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <Calendar className="text-blue-600 dark:text-blue-300" size={24} />
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <Calendar className="text-blue-600" size={24} />
               </div>
             </div>
           </motion.div>
@@ -245,15 +225,15 @@ export default function AdminEvents() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6"
+            className="bg-white border border-[#ddd] rounded p-4"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.published}</p>
+                <p className="text-sm font-medium text-[#666]">Published</p>
+                <p className="text-3xl font-bold text-[#333] mt-2">{stats.published}</p>
               </div>
-              <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
-                <Calendar className="text-green-600 dark:text-green-300" size={24} />
+              <div className="p-3 bg-green-100 rounded-lg">
+                <Calendar className="text-green-600" size={24} />
               </div>
             </div>
           </motion.div>
@@ -262,15 +242,15 @@ export default function AdminEvents() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6"
+            className="bg-white border border-[#ddd] rounded p-4"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Upcoming</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.upcoming}</p>
+                <p className="text-sm font-medium text-[#666]">Upcoming</p>
+                <p className="text-3xl font-bold text-[#333] mt-2">{stats.upcoming}</p>
               </div>
-              <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                <Calendar className="text-purple-600 dark:text-purple-300" size={24} />
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <Calendar className="text-purple-600" size={24} />
               </div>
             </div>
           </motion.div>
@@ -279,15 +259,15 @@ export default function AdminEvents() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6"
+            className="bg-white border border-[#ddd] rounded p-4"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Previous</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.previous}</p>
+                <p className="text-sm font-medium text-[#666]">Previous</p>
+                <p className="text-3xl font-bold text-[#333] mt-2">{stats.previous}</p>
               </div>
-              <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                <Calendar className="text-gray-600 dark:text-gray-300" size={24} />
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <Calendar className="text-gray-600" size={24} />
               </div>
             </div>
           </motion.div>
@@ -295,7 +275,7 @@ export default function AdminEvents() {
       </div>
 
       {/* Events List */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
+      <div className="pb-6">
         <EventList
           events={events}
           onEdit={handleEditEvent}
