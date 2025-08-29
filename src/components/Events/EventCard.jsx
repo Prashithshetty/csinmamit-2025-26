@@ -1,18 +1,19 @@
-import { motion } from 'framer-motion'
-import { Calendar, Clock, MapPin, Users } from 'lucide-react'
-import { getEventTypeColor, formatEventDate } from '../../utils/eventUtils'
+import { motion } from "framer-motion";
+import { Calendar, Clock, MapPin, Users } from "lucide-react";
+import { getEventTypeColor, formatEventDate } from "../../utils/eventUtils";
+import { Link } from "react-router-dom";
 
 const EventCard = ({ event, index }) => {
   const handleRegister = () => {
     // Handle registration logic
-    console.log('Register for event:', event.id)
-  }
+    console.log("Register for event:", event.id);
+  };
 
   return (
     <motion.div
       variants={{
         hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0 }
+        visible: { opacity: 1, y: 0 },
       }}
       whileHover={{ y: -5 }}
       className="group -mt-10"
@@ -26,14 +27,18 @@ const EventCard = ({ event, index }) => {
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          
+
           {/* Event Type Badge */}
-          <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-white text-xs font-medium bg-gradient-to-r ${getEventTypeColor(event.type)}`}>
+          <div
+            className={`absolute top-4 right-4 px-3 py-1 rounded-full text-white text-xs font-medium bg-gradient-to-r ${getEventTypeColor(
+              event.type
+            )}`}
+          >
             {event.type.charAt(0).toUpperCase() + event.type.slice(1)}
           </div>
-          
+
           {/* Status Badge */}
-          {event.status === 'upcoming' && (
+          {event.status === "upcoming" && (
             <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-green-500 text-white text-xs font-medium">
               Upcoming
             </div>
@@ -70,16 +75,17 @@ const EventCard = ({ event, index }) => {
           </div>
 
           {/* Action Button */}
-          <button 
-            onClick={handleRegister}
-            className="w-full mt-4 btn-primary text-sm"
+          {/* Action Link */}
+          <Link
+            to="/event-registration"
+            className="w-full text-center block mt-4 btn-primary text-sm"
           >
-            {event.status === 'upcoming' ? 'Register Now' : 'View Details'}
-          </button>
+            {event.status === "upcoming" ? "Register Now" : "View Details"}
+          </Link>
         </div>
       </div>
     </motion.div>
-  )
-}
+  );
+};
 
-export default EventCard
+export default EventCard;
