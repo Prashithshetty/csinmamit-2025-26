@@ -7,6 +7,7 @@ import {
 } from 'firebase/auth'
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, googleProvider, db } from '../config/firebase'
+import { isCoreMember, getRoleByEmail, isNMAMITEmail, hasPermission, CORE_MEMBERS } from '../constants/coreMembers'
 import toast from 'react-hot-toast'
 
 const AuthContext = createContext({})
@@ -23,25 +24,67 @@ export const AuthProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     setAuthLoading(true)
     try {
+      console.log('🔐 Starting Google sign-in...')
       const result = await signInWithPopup(auth, googleProvider)
       const user = result.user
+      
+      console.log('👤 Firebase user:', user.email)
       
       // Check if user exists in Firestore
       const userRef = doc(db, 'users', user.uid)
       const userSnap = await getDoc(userRef)
       
+      // Check if user is a core member
+      const coreRoleData = getRoleByEmail(user.email)
+      const isCore = isCoreMember(user.email)
+      
+      console.log('🔍 Core member check:', {
+        email: user.email,
+        isCore,
+        coreRoleData
+      })
+      
+      let finalUserData = null
+      
       if (!userSnap.exists()) {
+        console.log('📝 Creating new user document...')
+        // Determine the role based on email
+        let userRole = 'member'
+        let roleDetails = null
+        
+        if (isCore && coreRoleData) {
+          userRole = 'coreMember'
+          roleDetails = {
+            position: coreRoleData.role,
+            permissions: coreRoleData.permissions,
+            level: coreRoleData.level,
+            isNMAMIT: isNMAMITEmail(user.email)
+          }
+          console.log('✨ Setting up core member:', roleDetails)
+          toast.success(`Welcome ${coreRoleData.role} - ${user.displayName}!`, {
+            duration: 4000,
+            icon: '🎉'
+          })
+        } else if (isNMAMITEmail(user.email)) {
+          // NMAMIT email but not a core member
+          toast.success(`Welcome NMAMIT student - ${user.displayName}!`)
+        } else {
+          toast.success('Welcome to CSI NMAMIT!')
+        }
+        
         // Create new user document
-        await setDoc(userRef, {
+        const newUserData = {
           uid: user.uid,
           email: user.email,
           name: user.displayName,
           photoURL: user.photoURL,
-          role: 'member',
+          role: userRole,
+          ...(roleDetails && { roleDetails }),
+          isCoreMember: isCore,
           joinedAt: serverTimestamp(),
           membership: {
-            status: 'inactive',
-            type: null,
+            status: isCore ? 'active' : 'inactive',
+            type: isCore ? 'core' : null,
             expiresAt: null
           },
           profile: {
@@ -51,15 +94,73 @@ export const AuthProvider = ({ children }) => {
             year: '',
             bio: ''
           }
-        })
-        toast.success('Welcome to CSI NMAMIT!')
+        }
+        
+        await setDoc(userRef, newUserData)
+        finalUserData = newUserData
       } else {
-        toast.success(`Welcome back, ${user.displayName}!`)
+        console.log('👤 Existing user found, checking role...')
+        // Existing user - check if role needs update
+        const existingData = userSnap.data()
+        
+        // Update role if user is a core member but doesn't have the role set
+        if (isCore && coreRoleData && existingData.role !== 'coreMember') {
+          console.log('🔄 Updating user role to core member...')
+          const updatedData = {
+            role: 'coreMember',
+            roleDetails: {
+              position: coreRoleData.role,
+              permissions: coreRoleData.permissions,
+              level: coreRoleData.level,
+              isNMAMIT: isNMAMITEmail(user.email)
+            },
+            isCoreMember: true,
+            membership: {
+              ...existingData.membership,
+              status: 'active',
+              type: 'core'
+            }
+          }
+          
+          await setDoc(userRef, updatedData, { merge: true })
+          finalUserData = { ...existingData, ...updatedData }
+          
+          toast.success(`Role updated: ${coreRoleData.role}`, {
+            duration: 4000,
+            icon: '✨'
+          })
+        } else {
+          finalUserData = existingData
+          if (isCore) {
+            toast.success(`Welcome back, ${coreRoleData.role}!`, {
+              duration: 3000,
+              icon: '👋'
+            })
+          } else {
+            toast.success(`Welcome back, ${user.displayName}!`)
+          }
+        }
       }
+      
+      // Immediately update the user state with complete data
+      const completeUserData = {
+        uid: user.uid,
+        email: user.email,
+        name: user.displayName,
+        photoURL: user.photoURL,
+        ...finalUserData,
+        isCoreMember: isCore
+      }
+      
+      console.log('✅ Final user data:', completeUserData)
+      console.log('🎯 Is core member?', completeUserData.role === 'coreMember')
+      
+      // Set user state immediately to ensure navbar gets updated data
+      setUser(completeUserData)
       
       return user
     } catch (error) {
-      console.error('Error signing in:', error)
+      console.error('❌ Error signing in:', error)
       toast.error('Failed to sign in. Please try again.')
       throw error
     } finally {
@@ -162,6 +263,27 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  // Check user permissions
+  const checkPermission = (permission) => {
+    if (!user || !user.roleDetails) return false
+    return hasPermission(user.roleDetails?.position, permission)
+  }
+
+  // Get user's role display name
+  const getUserRoleDisplay = () => {
+    if (!user) return null
+    if (user.role === 'coreMember' && user.roleDetails) {
+      return user.roleDetails.position
+    }
+    if (user.role === 'admin') return 'Administrator'
+    return 'Member'
+  }
+
+  // Check if user is a core member
+  const isUserCoreMember = () => {
+    return user?.role === 'coreMember'
+  }
+
   // Listen to auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -178,12 +300,40 @@ export const AuthProvider = ({ children }) => {
           return
         }
         
+        // Check if user is a core member and assign role
+        const coreRoleData = getRoleByEmail(firebaseUser.email)
+        let roleDetails = null
+        let userRole = userData?.role || 'member'
+        
+        if (coreRoleData) {
+          // Set core member details
+          roleDetails = {
+            position: coreRoleData.role,
+            permissions: coreRoleData.permissions || [],
+            level: coreRoleData.level || 'member'
+          }
+          userRole = 'coreMember'
+          
+          // Update Firestore with core member role if not already set
+          if (userData?.role !== 'coreMember' || userData?.roleDetails?.position !== coreRoleData.role) {
+            const userRef = doc(db, 'users', firebaseUser.uid)
+            await setDoc(userRef, { 
+              role: 'coreMember',
+              roleDetails,
+              isCoreMember: true 
+            }, { merge: true })
+          }
+        }
+        
         const fullUserData = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           name: firebaseUser.displayName,
           photoURL: firebaseUser.photoURL,
-          ...userData
+          ...userData,
+          role: userRole,
+          roleDetails: roleDetails || userData?.roleDetails,
+          isCoreMember: !!coreRoleData
         }
         
         setUser(fullUserData)
@@ -209,7 +359,10 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateUserProfile,
     getUserData,
-    checkProfileCompletion
+    checkProfileCompletion,
+    checkPermission,
+    getUserRoleDisplay,
+    isUserCoreMember
   }
 
   return (

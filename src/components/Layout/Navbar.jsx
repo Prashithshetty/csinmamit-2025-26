@@ -28,9 +28,25 @@ const Navbar = () => {
   const [touchEnd, setTouchEnd] = useState(null);
   
   const location = useLocation();
-  const { user, signInWithGoogle, logout, authLoading } = useAuth();
+  const { user, signInWithGoogle, logout, authLoading, getUserRoleDisplay, isUserCoreMember } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const dropdownRef = useRef(null);
+
+  // Enhanced debug logging
+  useEffect(() => {
+    if (user) {
+      console.log('🔍 === Navbar Debug Info ===');
+      console.log('👤 User:', user);
+      console.log('📧 User Email:', user.email);
+      console.log('🎭 User Role:', user.role);
+      console.log('⭐ Is Core Member (function):', isUserCoreMember());
+      console.log('🏷️ Role Display:', getUserRoleDisplay());
+      console.log('🔗 Profile Link Should Be:', isUserCoreMember() ? "/core-profile" : "/profile");
+      console.log('========================');
+    } else {
+      console.log('❌ No user in navbar');
+    }
+  }, [user, isUserCoreMember, getUserRoleDisplay]);
 
   // Enhanced scroll detection with throttling
   useEffect(() => {
@@ -273,13 +289,24 @@ const Navbar = () => {
                       <img
                         src={user.photoURL || "/default-avatar.png"}
                         alt={user.name}
-                        className="h-8 w-8 xl:h-9 xl:w-9 rounded-full border-2 border-cyber-blue group-hover:border-cyber-purple transition-colors duration-300"
+                        className={`h-8 w-8 xl:h-9 xl:w-9 rounded-full border-2 ${
+                          isUserCoreMember() 
+                            ? 'border-yellow-500 group-hover:border-yellow-400' 
+                            : 'border-cyber-blue group-hover:border-cyber-purple'
+                        } transition-colors duration-300`}
                       />
                       <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
                     </div>
-                    <span className="font-medium text-sm xl:text-base max-w-[100px] xl:max-w-[120px] truncate">
-                      {user.name?.split(" ")[0]}
-                    </span>
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium text-sm xl:text-base max-w-[100px] xl:max-w-[120px] truncate">
+                        {user.name?.split(" ")[0]}
+                      </span>
+                      {isUserCoreMember() && (
+                        <span className="text-xs text-yellow-500 dark:text-yellow-400 font-medium">
+                          {getUserRoleDisplay()}
+                        </span>
+                      )}
+                    </div>
                     <ChevronDown
                       size={16}
                       className={`${profileDropdown ? "rotate-180" : ""} transition-transform duration-300`}
@@ -299,16 +326,36 @@ const Navbar = () => {
                         <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                           <p className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</p>
                           <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+                          {isUserCoreMember() && (
+                            <div className="mt-1 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                              <Sparkles size={12} className="mr-1" />
+                              {getUserRoleDisplay()}
+                            </div>
+                          )}
                         </div>
                         
                         <Link
-                          to="/profile"
+                          to={isUserCoreMember() ? "/core-profile" : "/profile"}
                           className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                          onClick={() => setProfileDropdown(false)}
+                          onClick={() => {
+                            console.log('🔗 Profile link clicked, navigating to:', isUserCoreMember() ? "/core-profile" : "/profile");
+                            setProfileDropdown(false);
+                          }}
                         >
                           <User size={18} className="text-gray-600 dark:text-gray-400" />
                           <span>My Profile</span>
                         </Link>
+                        
+                        {isUserCoreMember() && (
+                          <Link
+                            to="/dashboard"
+                            className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            onClick={() => setProfileDropdown(false)}
+                          >
+                            <Settings size={18} className="text-gray-600 dark:text-gray-400" />
+                            <span>Core Dashboard</span>
+                          </Link>
+                        )}
                         
                         <Link
                           to="/settings"
@@ -370,7 +417,9 @@ const Navbar = () => {
                   <img
                     src={user.photoURL || "/default-avatar.png"}
                     alt={user.name}
-                    className="h-7 w-7 sm:h-8 sm:w-8 rounded-full border-2 border-cyber-blue"
+                    className={`h-7 w-7 sm:h-8 sm:w-8 rounded-full border-2 ${
+                      isUserCoreMember() ? 'border-yellow-500' : 'border-cyber-blue'
+                    }`}
                   />
                 </div>
               )}
@@ -460,16 +509,28 @@ const Navbar = () => {
               {user && (
                 <motion.div 
                   variants={mobileItemVariants}
-                  className="flex items-center space-x-3 p-4 bg-gradient-to-r from-cyber-blue/10 to-cyber-purple/10 rounded-lg border border-cyber-blue/20"
+                  className={`flex items-center space-x-3 p-4 rounded-lg border ${
+                    isUserCoreMember()
+                      ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/20'
+                      : 'bg-gradient-to-r from-cyber-blue/10 to-cyber-purple/10 border-cyber-blue/20'
+                  }`}
                 >
                   <img
                     src={user.photoURL || "/default-avatar.png"}
                     alt={user.name}
-                    className="h-12 w-12 rounded-full border-2 border-cyber-blue"
+                    className={`h-12 w-12 rounded-full border-2 ${
+                      isUserCoreMember() ? 'border-yellow-500' : 'border-cyber-blue'
+                    }`}
                   />
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 dark:text-white truncate">{user.name}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
+                    {isUserCoreMember() && (
+                      <div className="mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                        <Sparkles size={10} className="mr-1" />
+                        {getUserRoleDisplay()}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -517,13 +578,26 @@ const Navbar = () => {
                 {user ? (
                   <div className="space-y-2">
                     <Link
-                      to="/profile"
-                      onClick={() => setIsOpen(false)}
+                      to={isUserCoreMember() ? "/core-profile" : "/profile"}
+                      onClick={() => {
+                        console.log('📱 Mobile profile link clicked, navigating to:', isUserCoreMember() ? "/core-profile" : "/profile");
+                        setIsOpen(false);
+                      }}
                       className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     >
                       <User size={20} />
                       <span>My Profile</span>
                     </Link>
+                    {isUserCoreMember() && (
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        <Settings size={20} />
+                        <span>Core Dashboard</span>
+                      </Link>
+                    )}
                     <Link
                       to="/settings"
                       onClick={() => setIsOpen(false)}

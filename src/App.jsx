@@ -15,6 +15,9 @@ import ProfileCompletionModal from './components/Profile/ProfileCompletionModal'
 import Layout from './components/Layout/Layout'
 import UserGuard from './components/Layout/UserGuard'
 
+// Guards
+import CoreMemberGuard from './components/Guards/CoreMemberGuard'
+
 // Pages
 import Home from './pages/Home'
 import Events from './pages/Events-new'
@@ -22,6 +25,8 @@ import Team from './pages/Team-new'
 import Profile from './pages/Profile-new'
 import Recruit from './pages/Recruit-new'
 import NotFound from './pages/NotFound'
+import CoreDashboard from './pages/CoreDashboard'
+import CoreMemberProfile from './pages/CoreMemberProfile'
 
 // Admin Components - Lazy loaded for security and performance
 const AdminLayout = lazy(() => import('./components/Admin/AdminLayout'))
@@ -41,7 +46,7 @@ const AdminLoading = () => (
 
 // Wrapper component to handle profile completion modal
 function AppContent() {
-  const { user, isProfileIncomplete, checkProfileCompletion } = useAuth()
+  const { user, isProfileIncomplete, checkProfileCompletion, isUserCoreMember } = useAuth()
   const [showProfileModal, setShowProfileModal] = useState(false)
 
   // Show modal when user is logged in and profile is incomplete
@@ -52,6 +57,18 @@ function AppContent() {
       setShowProfileModal(false)
     }
   }, [user, isProfileIncomplete])
+
+  // Debug logging for user state changes
+  useEffect(() => {
+    if (user) {
+      console.log('🔍 === App Debug Info ===');
+      console.log('👤 User in App:', user);
+      console.log('🎭 User Role:', user.role);
+      console.log('⭐ Is Core Member:', isUserCoreMember());
+      console.log('🔗 Should redirect to:', isUserCoreMember() ? "/core-profile" : "/profile");
+      console.log('========================');
+    }
+  }, [user, isUserCoreMember]);
 
   // Handle profile completion
   const handleProfileComplete = async () => {
@@ -69,7 +86,7 @@ function AppContent() {
 
       <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors duration-300">
         <Toaster
-          position="top-right"
+          position="bottom-right"
           toastOptions={{
             duration: 2000,
             style: {
@@ -110,6 +127,24 @@ function AppContent() {
             </UserGuard>
           }>
             <Route index element={<Profile />} />
+          </Route>
+
+          {/* Protected Core Member Routes */}
+          <Route path="/dashboard" element={
+            <CoreMemberGuard>
+              <Layout />
+            </CoreMemberGuard>
+          }>
+            <Route index element={<CoreDashboard />} />
+          </Route>
+
+          {/* Core Member Profile Route */}
+          <Route path="/core-profile" element={
+            <CoreMemberGuard>
+              <Layout />
+            </CoreMemberGuard>
+          }>
+            <Route index element={<CoreMemberProfile />} />
           </Route>
 
           {/* Admin Login - Public admin route */}

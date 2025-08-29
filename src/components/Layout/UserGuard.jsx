@@ -1,15 +1,8 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { useAdminAuth } from '../../contexts/AdminAuthContext'
 
 const UserGuard = ({ children }) => {
   const { user, loading } = useAuth()
-  const { adminUser } = useAdminAuth()
-  
-  // If user is an admin, redirect to admin dashboard
-  if (adminUser) {
-    return <Navigate to="/admin/dashboard" replace />
-  }
   
   // If not loading and no user, redirect to home
   if (!loading && !user) {
