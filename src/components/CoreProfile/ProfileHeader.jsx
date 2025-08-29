@@ -14,11 +14,11 @@ const ProfileHeader = () => {
           Core Member Profile
         </h1>
         <Link
-          to="/dashboard"
+          to="/"
           className="btn-secondary flex items-center space-x-2"
         >
           <Shield size={18} />
-          <span>Back to Dashboard</span>
+          <span>Back to Home</span>
         </Link>
       </div>
     </motion.div>

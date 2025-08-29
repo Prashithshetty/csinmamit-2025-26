@@ -25,7 +25,7 @@ import Team from './pages/Team-new'
 import Profile from './pages/Profile-new'
 import Recruit from './pages/Recruit-new'
 import NotFound from './pages/NotFound'
-import CoreDashboard from './pages/CoreDashboard'
+// import CoreDashboard from './pages/CoreDashboard'
 import CoreMemberProfile from './pages/CoreMemberProfile'
 
 // Admin Components - Lazy loaded for security and performance
@@ -57,18 +57,6 @@ function AppContent() {
       setShowProfileModal(false)
     }
   }, [user, isProfileIncomplete])
-
-  // Debug logging for user state changes
-  useEffect(() => {
-    if (user) {
-      console.log('🔍 === App Debug Info ===');
-      console.log('👤 User in App:', user);
-      console.log('🎭 User Role:', user.role);
-      console.log('⭐ Is Core Member:', isUserCoreMember());
-      console.log('🔗 Should redirect to:', isUserCoreMember() ? "/core-profile" : "/profile");
-      console.log('========================');
-    }
-  }, [user, isUserCoreMember]);
 
   // Handle profile completion
   const handleProfileComplete = async () => {
@@ -130,13 +118,13 @@ function AppContent() {
           </Route>
 
           {/* Protected Core Member Routes */}
-          <Route path="/dashboard" element={
+          {/* <Route path="/dashboard" element={
             <CoreMemberGuard>
               <Layout />
             </CoreMemberGuard>
           }>
             <Route index element={<CoreDashboard />} />
-          </Route>
+          </Route> */}
 
           {/* Core Member Profile Route */}
           <Route path="/core-profile" element={
