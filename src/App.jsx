@@ -9,7 +9,7 @@ import { AdminAuthProvider } from './contexts/AdminAuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import SecurityHeaders from './middleware/SecurityHeaders'
 import { lazy, Suspense, useEffect, useState } from 'react'
-import ProfileCompletionModal from './components/Profile/ProfileCompletionModal'
+// import ProfileCompletionModal from './components/Profile/ProfileCompletionModal'
 
 // Layout
 import Layout from './components/Layout/Layout'
@@ -59,18 +59,18 @@ function AppContent() {
   }, [user, isProfileIncomplete])
 
   // Handle profile completion
-  const handleProfileComplete = async () => {
-    await checkProfileCompletion()
-    setShowProfileModal(false)
-  }
+  // const handleProfileComplete = async () => {
+  //   await checkProfileCompletion()
+  //   setShowProfileModal(false)
+  // }
 
   return (
     <>
       {/* Profile Completion Modal */}
-      <ProfileCompletionModal 
+      {/* <ProfileCompletionModal 
         isOpen={showProfileModal}
         onComplete={handleProfileComplete}
-      />
+      /> */}
 
       <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors duration-300">
         <Toaster

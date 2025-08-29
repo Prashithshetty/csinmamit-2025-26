@@ -252,17 +252,6 @@ const Navbar = () => {
 
             {/* Desktop Right Actions */}
             <div className="hidden lg:flex items-center space-x-3">
-              {/* Notifications */}
-              {user && (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 relative group"
-                >
-                  <Bell size={20} className="text-gray-600 dark:text-gray-400" />
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-900"></div>
-                </motion.button>
-              )}
 
               {/* Theme Toggle */}
               <motion.button
@@ -378,7 +367,7 @@ const Navbar = () => {
                             <ChevronRight size={16} className="ml-auto text-gray-400 group-hover:text-cyber-blue transition-colors" />
                           </Link>
                           
-                          <Link
+                          {/* <Link
                             to="/settings"
                             className="flex items-center space-x-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"
                             onClick={() => setProfileDropdown(false)}
@@ -386,7 +375,7 @@ const Navbar = () => {
                             <Settings size={18} className="text-gray-500 group-hover:text-cyber-blue transition-colors" />
                             <span className="group-hover:text-cyber-blue transition-colors">Settings</span>
                             <ChevronRight size={16} className="ml-auto text-gray-400 group-hover:text-cyber-blue transition-colors" />
-                          </Link>
+                          </Link> */}
                         </div>
                         
                         <div className="border-t border-gray-200 dark:border-gray-700 py-2">
@@ -610,14 +599,14 @@ const Navbar = () => {
                     <User size={20} />
                     <span>My Profile</span>
                   </Link>
-                  <Link
+                  {/* <Link
                     to="/settings"
                     onClick={() => setIsOpen(false)}
                     className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   >
                     <Settings size={20} />
                     <span>Settings</span>
-                  </Link>
+                  </Link> */}
                 </motion.div>
               )}
 
