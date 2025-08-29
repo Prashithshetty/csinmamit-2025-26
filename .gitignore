@@ -12,6 +12,19 @@ dist
 dist-ssr
 *.local
 
+# Environment variables (SECURITY: Never commit these)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Security files
+*.key
+*.pem
+*.p12
+*.pfx
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -23,10 +36,29 @@ dist-ssr
 *.sln
 *.sw?
 
-TODO.md
-SECURITY.md
-.env
-.env.test
-.env.production
-.env.local
-/src/utils/emailDiagnostics.js
+# OS generated files
+Thumbs.db
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Build artifacts
+build/
+coverage/
+.nyc_output/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
