@@ -1,116 +1,89 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  User, 
-  Phone, 
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom"; // Added useLocation
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  User,
+  Phone,
   BookOpen,
   GraduationCap,
   CreditCard,
   AlertCircle,
   Loader,
-  CheckCircle
-} from 'lucide-react'
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '../../config/firebase'
-import { useAuth } from '../../contexts/AuthContext'
-import toast from 'react-hot-toast'
+  CheckCircle,
+} from "lucide-react";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../../config/firebase";
+import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
-const ProfileCompletionModal = ({ isOpen, onComplete }) => {
-  const { user, checkProfileCompletion } = useAuth()
-  const [loading, setLoading] = useState(false)
+const ProfileCompletionModal = ({ isOpen, onComplete, onClose }) => {
+  const { user, checkProfileCompletion } = useAuth();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    branch: '',
-    year: '',
-    usn: ''
-  })
-  const [errors, setErrors] = useState({})
+    name: "",
+    phone: "",
+    branch: "",
+    year: "",
+    usn: "",
+  });
+  const [errors, setErrors] = useState({});
+  const location = useLocation(); // Correctly call the hook
 
   if (location.pathname.startsWith("/admin")) {
-    return null
+    return null;
   }
 
-  // Initialize form with existing user data
+  // (The rest of the logic remains the same...)
   useEffect(() => {
     if (user) {
       setFormData({
-        name: user.name || user.displayName || '',
-        phone: user.phone || user.profile?.phone || '',
-        branch: user.branch || user.profile?.branch || '',
-        year: user.year || user.profile?.year || '',
-        usn: user.usn || ''
-      })
+        name: user.name || user.displayName || "",
+        phone: user.phone || user.profile?.phone || "",
+        branch: user.branch || user.profile?.branch || "",
+        year: user.year || user.profile?.year || "",
+        usn: user.usn || "",
+      });
     }
-  }, [user])
+  }, [user]);
 
-  // Validate form
   const validateForm = () => {
-    const newErrors = {}
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
-    }
-    
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = "Name is required";
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required'
-    } else if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/\D/g, ''))) {
-      newErrors.phone = 'Please enter a valid 10-digit phone number'
+      newErrors.phone = "Phone number is required";
+    } else if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/\D/g, ""))) {
+      newErrors.phone = "Please enter a valid 10-digit phone number";
     }
-    
-    if (!formData.branch) {
-      newErrors.branch = 'Branch is required'
-    }
-    
-    if (!formData.year) {
-      newErrors.year = 'Year is required'
-    }
-    
+    if (!formData.branch) newErrors.branch = "Branch is required";
+    if (!formData.year) newErrors.year = "Year is required";
     if (!formData.usn.trim()) {
-      newErrors.usn = 'USN is required'
-    } else if (!/^NNM\d{2}[A-Z]{2}\d{3}$/i.test(formData.usn.toUpperCase())) {
-      newErrors.usn = 'Please enter a valid USN (e.g., 4NM21CS001)'
+      newErrors.usn = "USN is required";
+    } else if (!/^4NM\d{2}[A-Z]{2}\d{3}$/i.test(formData.usn.toUpperCase())) {
+      newErrors.usn = "Please enter a valid USN (e.g., 4NM21CS001)";
     }
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  // Handle input change
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-    // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }))
-    }
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
     if (!validateForm()) {
-      toast.error('Please fill in all required fields correctly')
-      return
+      toast.error("Please fill in all required fields correctly");
+      return;
     }
-    
     if (!user?.uid) {
-      toast.error('User not authenticated')
-      return
+      toast.error("User not authenticated");
+      return;
     }
-    
-    setLoading(true)
+    setLoading(true);
     try {
-      const userRef = doc(db, 'users', user.uid)
-      
-      // Prepare update data
+      const userRef = doc(db, "users", user.uid);
       const updateData = {
         name: formData.name.trim(),
         phone: formData.phone.trim(),
@@ -118,54 +91,39 @@ const ProfileCompletionModal = ({ isOpen, onComplete }) => {
         year: formData.year,
         usn: formData.usn.toUpperCase().trim(),
         profileCompleted: true,
-        
-        // Update nested profile object for backward compatibility
         profile: {
           phone: formData.phone.trim(),
-          college: 'NMAMIT',
+          college: "NMAMIT",
           branch: formData.branch,
           year: formData.year,
-          bio: user.profile?.bio || ''
+          bio: user.profile?.bio || "",
         },
-        
-        // Timestamps
-        updatedAt: serverTimestamp()
-      }
-      
-      // Update Firestore
-      await setDoc(userRef, updateData, { merge: true })
-      
-      // Update profile completion status in context
-      await checkProfileCompletion()
-      
-      toast.success('Profile completed successfully! Welcome to CSI NMAMIT!')
-      
-      // Call onComplete callback
-      if (onComplete) {
-        onComplete()
-      }
+        updatedAt: serverTimestamp(),
+      };
+      await setDoc(userRef, updateData, { merge: true });
+      await checkProfileCompletion();
+      toast.success("Profile completed successfully! Welcome to CSI NMAMIT!");
+      if (onComplete) onComplete();
     } catch (error) {
-      console.error('Error completing profile:', error)
-      toast.error('Failed to complete profile. Please try again.')
+      console.error("Error completing profile:", error);
+      toast.error("Failed to complete profile. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-        {/* Backdrop - not clickable to close */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          onClick={onClose} // Allow closing by clicking the background
         />
-        
-        {/* Modal */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -181,29 +139,36 @@ const ProfileCompletionModal = ({ isOpen, onComplete }) => {
               </div>
               <div>
                 <h2 className="text-2xl font-bold">Complete Your Profile</h2>
-                <p className="text-blue-100 mt-1">Please fill in your details to continue</p>
+                <p className="text-blue-100 mt-1">
+                  Please fill in your details to continue
+                </p>
               </div>
             </div>
           </div>
-          
+
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto flex-1">
-            {/* Success Message */}
+          <form
+            onSubmit={handleSubmit}
+            className="p-6 space-y-4 overflow-y-auto flex-1"
+          >
+            {/* Form fields... */}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <CheckCircle className="text-blue-600 dark:text-blue-400 mt-0.5" size={20} />
+                <CheckCircle
+                  className="text-blue-600 dark:text-blue-400 mt-0.5"
+                  size={20}
+                />
                 <div className="flex-1">
                   <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
                     Welcome to CSI NMAMIT!
                   </p>
                   <p className="text-sm text-blue-600 dark:text-blue-300 mt-1">
-                    Complete your profile to access all features and join our community.
+                    Complete your profile to access all features and join our
+                    community.
                   </p>
                 </div>
               </div>
             </div>
-            
-            {/* Name Field */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <User size={16} />
@@ -216,17 +181,15 @@ const ProfileCompletionModal = ({ isOpen, onComplete }) => {
                 onChange={handleInputChange}
                 placeholder="Enter your full name"
                 className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.name 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 dark:border-gray-700 focus:ring-blue-500'
+                  errors.name
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 dark:border-gray-700 focus:ring-blue-500"
                 } bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all`}
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-500">{errors.name}</p>
               )}
             </div>
-            
-            {/* Phone Field */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Phone size={16} />
@@ -239,17 +202,15 @@ const ProfileCompletionModal = ({ isOpen, onComplete }) => {
                 onChange={handleInputChange}
                 placeholder="Enter your 10-digit phone number"
                 className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.phone 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 dark:border-gray-700 focus:ring-blue-500'
+                  errors.phone
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 dark:border-gray-700 focus:ring-blue-500"
                 } bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all`}
               />
               {errors.phone && (
                 <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
               )}
             </div>
-            
-            {/* Branch Field */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <BookOpen size={16} />
@@ -260,27 +221,33 @@ const ProfileCompletionModal = ({ isOpen, onComplete }) => {
                 value={formData.branch}
                 onChange={handleInputChange}
                 className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.branch 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 dark:border-gray-700 focus:ring-blue-500'
+                  errors.branch
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 dark:border-gray-700 focus:ring-blue-500"
                 } bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all`}
               >
                 <option value="">Select your branch</option>
                 <option value="Computer Science">Computer Science</option>
                 <option value="Information Science">Information Science</option>
-                <option value="Electronics & Communication">Electronics & Communication</option>
+                <option value="Electronics & Communication">
+                  Electronics & Communication
+                </option>
                 <option value="Mechanical">Mechanical</option>
                 <option value="Civil">Civil</option>
-                <option value="Electrical & Electronics">Electrical & Electronics</option>
-                <option value="Artificial Intelligence & Machine Learning">AI & ML</option>
-                <option value="Artificial Intelligence & Data Science">AI & DS</option>
+                <option value="Electrical & Electronics">
+                  Electrical & Electronics
+                </option>
+                <option value="Artificial Intelligence & Machine Learning">
+                  AI & ML
+                </option>
+                <option value="Artificial Intelligence & Data Science">
+                  AI & DS
+                </option>
               </select>
               {errors.branch && (
                 <p className="mt-1 text-sm text-red-500">{errors.branch}</p>
               )}
             </div>
-            
-            {/* Year Field */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <GraduationCap size={16} />
@@ -291,9 +258,9 @@ const ProfileCompletionModal = ({ isOpen, onComplete }) => {
                 value={formData.year}
                 onChange={handleInputChange}
                 className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.year 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 dark:border-gray-700 focus:ring-blue-500'
+                  errors.year
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 dark:border-gray-700 focus:ring-blue-500"
                 } bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all`}
               >
                 <option value="">Select your year</option>
@@ -306,8 +273,6 @@ const ProfileCompletionModal = ({ isOpen, onComplete }) => {
                 <p className="mt-1 text-sm text-red-500">{errors.year}</p>
               )}
             </div>
-            
-            {/* USN Field */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <CreditCard size={16} />
@@ -320,47 +285,48 @@ const ProfileCompletionModal = ({ isOpen, onComplete }) => {
                 onChange={handleInputChange}
                 placeholder="e.g., 4NM21CS001"
                 className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.usn 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 dark:border-gray-700 focus:ring-blue-500'
+                  errors.usn
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 dark:border-gray-700 focus:ring-blue-500"
                 } bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all uppercase`}
               />
               {errors.usn && (
                 <p className="mt-1 text-sm text-red-500">{errors.usn}</p>
               )}
             </div>
-            
-            {/* Note */}
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                <strong>Note:</strong> You must complete your profile to access all features. 
-                This information helps us provide you with a better experience.
-              </p>
+
+            {/* Buttons Section */}
+            <div className="!mt-8 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-end items-center gap-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full sm:w-auto px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+              >
+                Skip for now
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full sm:w-auto py-2 px-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader className="animate-spin" size={20} />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle size={20} />
+                    <span>Complete Profile</span>
+                  </>
+                )}
+              </button>
             </div>
-            
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <Loader className="animate-spin" size={20} />
-                  Completing Profile...
-                </>
-              ) : (
-                <>
-                  <CheckCircle size={20} />
-                  Complete Profile
-                </>
-              )}
-            </button>
           </form>
         </motion.div>
       </div>
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default ProfileCompletionModal
+export default ProfileCompletionModal;

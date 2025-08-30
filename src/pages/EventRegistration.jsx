@@ -1,232 +1,122 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { motion } from "framer-motion";
+import { useParams, Link } from "react-router-dom";
+import { getEventById } from "../services/eventService";
+import { Calendar, Clock, MapPin, Ticket } from "lucide-react";
+import toast from "react-hot-toast";
+import EventRegistrationForm from "./EventRegistration"; // We will rename the form component
 
-const EventRegistration = () => {
-  const { user, signInWithGoogle } = useAuth();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    usn: "",
-    branch: "",
-    year: "",
-  });
+const EventDetailPage = () => {
+  const { eventId } = useParams();
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showRegistrationForm, setShowRegistrationForm] = useState(false);
 
-  // Effect to pre-fill form when user data is available
   useEffect(() => {
-    if (user) {
-      setFormData((prevData) => ({
-        ...prevData,
-        name: user.name || "",
-        email: user.email || "",
-      }));
+    const fetchEvent = async () => {
+      setLoading(true);
+      try {
+        const eventData = await getEventById(eventId);
+        setEvent(eventData);
+      } catch (error) {
+        toast.error("Could not load event details.");
+        console.error("Failed to fetch event:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (eventId) {
+      fetchEvent();
     }
-  }, [user]);
+  }, [eventId]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleRegistrationSuccess = () => {
+    // Hide the form and show a success message
+    setShowRegistrationForm(false);
+    toast.success(`You are now registered for ${event.title}!`);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Here you would handle the form submission,
-    // for example, sending the data to your database (Firestore).
-    console.log("Form Submitted:", formData);
-    alert("Thank you for registering! (Check console for data)");
-  };
-
-  // Render a login prompt if the user is not signed in
-  if (!user) {
+  if (loading) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h2 className="text-3xl font-bold mb-4">Please Log In</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            You need to be logged in to register for an event.
-          </p>
-          <button onClick={signInWithGoogle} className="btn-primary px-8 py-3">
-            Log In with Google
-          </button>
-        </motion.div>
+        <p>Loading event details...</p>
       </div>
     );
   }
 
-  // Render the form if the user is logged in
+  if (!event) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <h2 className="text-2xl font-bold">Event Not Found</h2>
+        <p className="mt-4">The event you are looking for does not exist.</p>
+        <Link to="/events" className="mt-6 inline-block btn-primary">
+          Back to Events
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-20">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-2xl mx-auto"
-      >
-        <h1 className="text-4xl font-bold text-center mb-8 gradient-text-animated">
-          Event Registration
-        </h1>
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6 bg-white dark:bg-gray-800/50 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"
-        >
-          {/* Name Field */}
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="mt-1 block w-full input-field"
-              required
-            />
+      <div className="max-w-4xl mx-auto">
+        {/* Event Header */}
+        <div>
+          <img
+            src={event.image}
+            alt={event.title}
+            className="w-full h-64 md:h-96 object-cover rounded-2xl shadow-lg"
+          />
+          <h1 className="text-4xl md:text-5xl font-bold mt-8">{event.title}</h1>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-600 dark:text-gray-400 mt-4">
+            <div className="flex items-center gap-2">
+              <Calendar size={18} />
+              <span>
+                {new Date(event.date).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock size={18} />
+              <span>{event.time}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin size={18} />
+              <span>{event.location}</span>
+            </div>
           </div>
+        </div>
 
-          {/* Email Field */}
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              className="mt-1 block w-full input-field bg-gray-100 dark:bg-gray-700"
-              readOnly // Email is not editable
-            />
-          </div>
+        {/* Event Description */}
+        <div className="prose dark:prose-invert max-w-none mt-12">
+          <p>{event.description}</p>
+        </div>
 
-          {/* Phone Number Field */}
-          <div>
-            <label
-              htmlFor="phone"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        {/* Conditional Rendering for Registration */}
+        {!showRegistrationForm ? (
+          <div className="text-center mt-12">
+            <button
+              onClick={() => setShowRegistrationForm(true)}
+              className="btn-primary px-10 py-4 text-lg group"
             >
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="mt-1 block w-full input-field"
-              required
-            />
-          </div>
-
-          {/* USN Field */}
-          <div>
-            <label
-              htmlFor="usn"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              USN / College ID
-            </label>
-            <input
-              type="text"
-              id="usn"
-              name="usn"
-              value={formData.usn}
-              onChange={handleChange}
-              className="mt-1 block w-full input-field"
-              required
-            />
-          </div>
-
-          {/* Branch Field */}
-          <div>
-            <label
-              htmlFor="branch"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Branch / Department
-            </label>
-            <select
-              id="branch"
-              name="branch"
-              value={formData.branch}
-              onChange={handleChange}
-              className="mt-1 block w-full input-field"
-              required
-            >
-              <option value="" disabled>
-                Select your branch
-              </option>
-              <option value="Computer Science">
-                Computer Science & Engineering
-              </option>
-              <option value="Information Science">
-                Information Science & Engineering
-              </option>
-              <option value="AI & ML">
-                Artificial Intelligence & Machine Learning
-              </option>
-              <option value="Electronics & Communication">
-                Electronics & Communication
-              </option>
-              <option value="Mechanical">Mechanical Engineering</option>
-              <option value="Civil">Civil Engineering</option>
-              <option value="AI & DS">
-                Aritifical intelligence and Data science
-              </option>
-            </select>
-          </div>
-
-          {/* Year of Study Field */}
-          <div>
-            <label
-              htmlFor="year"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Year of Study
-            </label>
-            <select
-              id="year"
-              name="year"
-              value={formData.year}
-              onChange={handleChange}
-              className="mt-1 block w-full input-field"
-              required
-            >
-              <option value="" disabled>
-                Select your year
-              </option>
-              <option value="1">1st Year</option>
-              <option value="2">2nd Year</option>
-              <option value="3">3rd Year</option>
-              <option value="4">4th Year</option>
-            </select>
-          </div>
-
-          {/* Submit Button */}
-          <div>
-            <button type="submit" className="w-full btn-primary py-3 px-4">
-              Submit Registration
+              <span className="flex items-center gap-2">
+                <Ticket />
+                Register for this Event
+              </span>
             </button>
           </div>
-        </form>
-      </motion.div>
+        ) : (
+          <EventRegistrationForm
+            event={event}
+            onSuccess={handleRegistrationSuccess}
+            onCancel={() => setShowRegistrationForm(false)}
+          />
+        )}
+      </div>
     </div>
   );
 };
 
-export default EventRegistration;
+export default EventDetailPage;
