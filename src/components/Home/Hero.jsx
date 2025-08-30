@@ -98,7 +98,7 @@ const Hero = () => {
             <button
               onClick={signInWithGoogle}
               disabled={authLoading}
-              className="btn-primary group"
+              className="btn-primary group flex"
             >
               <span>{authLoading ? 'Signing in...' : 'Get Started'}</span>
               <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
