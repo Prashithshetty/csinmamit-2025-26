@@ -168,12 +168,10 @@ service cloud.firestore {
       allow read: if true;
 
       // CREATE: require full valid payload
-      allow create: if request.auth != null &&
-        isValidEventData(request.resource.data);
+      allow create: if request.auth != null && isValidEventData(request.resource.data);
 
       // UPDATE: allow partial updates (only selected fields), keep createdAt immutable
-      allow update: if request.auth != null &&
-        isValidEventUpdate(request.resource.data, resource.data);
+      allow update: if request.auth != null && isValidEventUpdate(request.resource.data, resource.data);
 
       // DELETE: allow signed-in (tighten to isAdmin() for prod)
       allow delete: if request.auth != null;
