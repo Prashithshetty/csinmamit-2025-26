@@ -28,6 +28,9 @@ import NotFound from './pages/NotFound'
 // import CoreDashboard from './pages/CoreDashboard'
 import CoreMemberProfile from './pages/CoreMemberProfile'
 
+// UI Demo Pages (only in development)
+// import GlitchTextDemo from './components/UI/GlitchTextDemo'
+
 // Admin Components - Lazy loaded for security and performance
 const AdminLayout = lazy(() => import('./components/Admin/AdminLayout'))
 const AdminGuard = lazy(() => import('./components/Admin/AdminGuard'))
@@ -47,16 +50,16 @@ const AdminLoading = () => (
 // Wrapper component to handle profile completion modal
 function AppContent() {
   const { user, isProfileIncomplete, checkProfileCompletion, isUserCoreMember } = useAuth()
-  const [showProfileModal, setShowProfileModal] = useState(false)
+  // const [showProfileModal, setShowProfileModal] = useState(false)
 
   // Show modal when user is logged in and profile is incomplete
-  useEffect(() => {
-    if (user && isProfileIncomplete) {
-      setShowProfileModal(true)
-    } else {
-      setShowProfileModal(false)
-    }
-  }, [user, isProfileIncomplete])
+  // useEffect(() => {
+  //   if (user && isProfileIncomplete) {
+  //     setShowProfileModal(true)
+  //   } else {
+  //     setShowProfileModal(false)
+  //   }
+  // }, [user, isProfileIncomplete])
 
   // Handle profile completion
   // const handleProfileComplete = async () => {
@@ -105,6 +108,12 @@ function AppContent() {
             <Route path="events" element={<Events />} />
             <Route path="team" element={<Team />} />
             <Route path="recruit" element={<Recruit />} />
+            
+            {/* Demo Routes (only in development) */}
+            {/* {import.meta.env.DEV && (
+              <Route path="demo/glitch-text" element={<GlitchTextDemo />} />
+            )} */}
+            
             <Route path="*" element={<NotFound />} />
           </Route>
 
