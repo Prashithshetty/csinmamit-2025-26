@@ -9,6 +9,8 @@ import {
   LogIn,
   Sun,
   Moon,
+  Sparkle,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -23,8 +25,7 @@ const MobileNavbar = () => {
     { path: "/", label: "Home", icon: Home },
     { path: "/team", label: "Team", icon: Users },
     { path: "/events", label: "Events", icon: Calendar },
-    { path: "/blogs", label: "Blogs", icon: BookOpen },
-    { path: "/leaderboard", label: "Leaderboard", icon: Trophy },
+    { path: "/recruit", label: "Join CSI", icon: Sparkles },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -66,7 +67,7 @@ const MobileNavbar = () => {
                   <img
                     src={user.photoURL || "/default-avatar.png"}
                     alt={user.name}
-                    className="h-8 w-8 rounded-full border-2 border-cyber-blue shadow-md"
+                    className="h-12 w-12 rounded-full border-2 border-cyber-blue shadow-md"
                   />
                 </div>
               )}

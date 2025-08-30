@@ -58,7 +58,7 @@ const Features = () => {
   ]
 
   return (
-    <section className="section-padding relative bg-gray-50 dark:bg-gray-900/50" ref={ref}>
+    <section className="py-8 md:py-12 lg:py-16 relative bg-gray-50 dark:bg-gray-900/50" ref={ref}>
       <div className="container-custom">
         {/* Section Header */}
         <motion.div
