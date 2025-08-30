@@ -117,7 +117,7 @@ const Highlights = () => {
   }
 
   return (
-    <section className="section-padding relative" ref={ref}>
+    <section className="lg:py-1 relative" ref={ref}>
       <div className="container-custom">
         {/* Section Header */}
         <motion.div
