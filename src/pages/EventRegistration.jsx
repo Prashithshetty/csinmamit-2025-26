@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { getEventById } from "../services/eventService";
 import { Calendar, Clock, MapPin, Ticket } from "lucide-react";
 import toast from "react-hot-toast";
-import EventRegistrationForm from "./EventRegistration"; // We will rename the form component
+import EventRegistrationForm from "./EventRegistration";
 
 const EventDetailPage = () => {
   const { eventId } = useParams();
