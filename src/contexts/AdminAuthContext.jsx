@@ -381,7 +381,7 @@ export const AdminAuthProvider = ({ children }) => {
     })
 
     return unsubscribe
-  }, [adminUser])
+  }, [])
 
   // Activity logging
   const logAdminActivity = async (action, details = {}) => {
