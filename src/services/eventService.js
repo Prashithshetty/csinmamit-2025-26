@@ -12,9 +12,10 @@ import {
   serverTimestamp 
 } from 'firebase/firestore'
 import { db } from '../config/firebase'
+import { isCloudinaryConfigured, getCloudinaryStatus } from '../config/cloudinary'
 
-// Cloudinary configuration
-const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'your-cloud-name'
+// Cloudinary configuration - Updated with proper cloud name
+const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dqnlrrcgb'
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'csi-events'
 
 /**
@@ -25,24 +26,51 @@ const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET |
  */
 export const uploadToCloudinary = async (file, folder = 'csi-events') => {
   try {
+    // Check configuration before attempting upload
+    if (!isCloudinaryConfigured()) {
+      const status = getCloudinaryStatus();
+      console.error('Cloudinary configuration status:', status);
+      throw new Error(`Cloudinary is not properly configured. Cloud name: ${status.cloudName}`);
+    }
+
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET)
+    
+    // Only add preset if it's configured
+    if (CLOUDINARY_UPLOAD_PRESET && CLOUDINARY_UPLOAD_PRESET !== '') {
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET)
+    }
+    
     formData.append('folder', folder)
 
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-      {
-        method: 'POST',
-        body: formData
-      }
-    )
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+    console.log('Uploading to Cloudinary:', uploadUrl);
+
+    const response = await fetch(uploadUrl, {
+      method: 'POST',
+      body: formData
+    })
 
     if (!response.ok) {
-      throw new Error('Failed to upload image to Cloudinary')
+      const errorText = await response.text();
+      console.error('Cloudinary response error:', errorText);
+      
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.error?.message?.includes('preset')) {
+          throw new Error('Upload preset "csi-events" not found in Cloudinary. Please create it or configure unsigned uploads.');
+        }
+        throw new Error(errorData.error?.message || 'Failed to upload image to Cloudinary');
+      } catch (parseError) {
+        if (parseError.message.includes('preset') || parseError.message.includes('Failed')) {
+          throw parseError;
+        }
+        throw new Error(`Failed to upload image. Status: ${response.status}`);
+      }
     }
 
     const data = await response.json()
+    console.log('Upload successful:', data.secure_url);
     return data.secure_url
   } catch (error) {
     console.error('Cloudinary upload error:', error)
