@@ -7,7 +7,8 @@ import {
 } from 'firebase/auth'
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, googleProvider, db } from '../config/firebase'
-import { isCoreMember, getRoleByEmail, isNMAMITEmail, hasPermission } from '../utils/secureCoreMembersUtils'
+import { isCoreMember as isCoreMemberSecure, getRoleByEmail as getRoleByEmailSecure, isNMAMITEmail, hasPermission } from '../utils/secureCoreMembersUtils'
+import { CORE_MEMBERS } from '../constants/coreMembers'
 import toast from 'react-hot-toast'
 
 const AuthContext = createContext({})
@@ -20,15 +21,41 @@ export const AuthProvider = ({ children }) => {
   const [authLoading, setAuthLoading] = useState(false)
   const [isProfileIncomplete, setIsProfileIncomplete] = useState(false)
 
+  // Helper function to check if user is a core member with fallback
+  const isCoreMember = (email) => {
+    if (!email) return false;
+    
+    // First try secure method (env variables)
+    const secureCheck = isCoreMemberSecure(email);
+    if (secureCheck) {
+      return true;
+    }
+    
+    // Fallback to constants file
+    const constantsCheck = CORE_MEMBERS.hasOwnProperty(email.toLowerCase());
+    return constantsCheck;
+  };
+
+  // Helper function to get role by email with fallback
+  const getRoleByEmail = (email) => {
+    if (!email) return null;
+    
+    // First try secure method (env variables)
+    const secureRole = getRoleByEmailSecure(email);
+    if (secureRole) {
+      return secureRole;
+    }
+    
+    // Fallback to constants file
+    return CORE_MEMBERS[email.toLowerCase()] || null;
+  };
+
   // Sign in with Google
   const signInWithGoogle = async () => {
     setAuthLoading(true)
     try {
-      // console.log('🔐 Starting Google sign-in...')
       const result = await signInWithPopup(auth, googleProvider)
       const user = result.user
-      
-      // console.log('👤 Firebase user:', user.email)
       
       // Check if user exists in Firestore
       const userRef = doc(db, 'users', user.uid)
@@ -37,12 +64,6 @@ export const AuthProvider = ({ children }) => {
       // Check if user is a core member
       const coreRoleData = getRoleByEmail(user.email)
       const isCore = isCoreMember(user.email)
-      
-      // console.log('🔍 Core member check:', {
-      //   email: user.email,
-      //   isCore,
-      //   coreRoleData
-      // })
       
       let finalUserData = null
       
