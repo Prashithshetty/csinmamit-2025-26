@@ -5,7 +5,7 @@ import { getEventTypeColor, formatEventDate } from '../../utils/eventUtils'
 const EventCard = ({ event, index }) => {
   const handleRegister = () => {
     // Handle registration logic
-    console.log('Register for event:', event.id)
+    // console.log('Register for event:', event.id)
   }
 
   return (

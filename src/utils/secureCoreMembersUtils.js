@@ -8,7 +8,7 @@ const encodeData = (data) => {
   try {
     return btoa(JSON.stringify(data));
   } catch (error) {
-    console.error('Error encoding data:', error);
+    // console.error('Error encoding data:', error);
     return null;
   }
 };
@@ -17,7 +17,7 @@ const decodeData = (encodedData) => {
   try {
     return JSON.parse(atob(encodedData));
   } catch (error) {
-    console.error('Error decoding data:', error);
+    // console.error('Error decoding data:', error);
     return {};
   }
 };
@@ -27,7 +27,7 @@ const getCoreMembersData = () => {
   const encodedData = import.meta.env.VITE_CORE_MEMBERS_DATA;
   
   if (!encodedData) {
-    console.warn('Core members data not found in environment variables');
+    // console.warn('Core members data not found in environment variables');
     return {};
   }
   
@@ -40,7 +40,7 @@ const validateSecurity = () => {
   const env = import.meta.env.VITE_APP_ENV;
   
   if (env === 'production' && !salt) {
-    console.error('Security salt not configured for production');
+    // console.error('Security salt not configured for production');
     return false;
   }
   
@@ -293,8 +293,8 @@ export const generateEncodedData = () => {
   };
   
   const encoded = encodeCoreMembersData(coreMembersData);
-  console.log('Encoded Core Members Data for .env file:');
-  console.log(`VITE_CORE_MEMBERS_DATA=${encoded}`);
+  // console.log('Encoded Core Members Data for .env file:');
+  // console.log(`VITE_CORE_MEMBERS_DATA=${encoded}`);
   return encoded;
 };
 

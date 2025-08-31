@@ -109,7 +109,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
     // Check Cloudinary configuration before attempting upload
     if (!isCloudinaryConfigured()) {
       const status = getCloudinaryStatus();
-      console.error('Cloudinary configuration:', status);
+      // console.error('Cloudinary configuration:', status);
       toast.error(`Cloudinary is not properly configured. Cloud name: ${status.cloudName}`);
       setErrors(prev => ({ 
         ...prev, 
@@ -127,7 +127,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
       toast.success('Image uploaded successfully! You can now fill in the event details.')
       setErrors(prev => ({ ...prev, image: '' }))
     } catch (error) {
-      console.error('Error uploading image:', error)
+      // console.error('Error uploading image:', error)
       
       // Provide more specific error messages
       let errorMessage = 'Failed to upload image. ';
@@ -188,7 +188,7 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
         entryFee: Number(formData.entryFee) || 0,
         year: Number(formData.year) || new Date().getFullYear()
       }
-      console.log(submitData)
+      // console.log(submitData)
       onSubmit(submitData, null) // No need to pass imageFile since it's already uploaded
     }
   }

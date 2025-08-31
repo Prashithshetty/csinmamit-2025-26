@@ -71,7 +71,7 @@ const AdminEMembers = () => {
       setMembers(membersData)
       await logAdminActivity('executive_members_viewed', { count: membersData.length })
     } catch (error) {
-      console.error('Error fetching executive members:', error)
+      // console.error('Error fetching executive members:', error)
       toast.error('Failed to fetch executive members')
     } finally {
       setLoading(false)
@@ -178,7 +178,7 @@ const AdminEMembers = () => {
       await logAdminActivity('executive_member_updated', { memberId, updates })
       setEditingMember(null)
     } catch (error) {
-      console.error('Error updating member:', error)
+      // console.error('Error updating member:', error)
       toast.error('Failed to update member')
     }
   }, [logAdminActivity])
@@ -204,7 +204,7 @@ const AdminEMembers = () => {
       setShowRemoveModal(false)
       setMemberToRemove(null)
     } catch (error) {
-      console.error('Error removing member role:', error)
+      // console.error('Error removing member role:', error)
       toast.error('Failed to remove member role')
     }
   }, [memberToRemove, logAdminActivity])
@@ -268,7 +268,7 @@ const AdminEMembers = () => {
       await logAdminActivity('executive_member_created', { userId })
       setShowAddModal(false)
     } catch (error) {
-      console.error('Error creating executive member:', error)
+      // console.error('Error creating executive member:', error)
       toast.error(`Failed to create executive member: ${error.message}`)
     }
   }, [logAdminActivity])
@@ -276,7 +276,7 @@ const AdminEMembers = () => {
   const handleExportCSV = useCallback(() => {
     // Debug: Log the first member to see the actual data structure
     if (filteredMembers.length > 0) {
-      console.log('Member data structure:', filteredMembers[0])
+      // console.log('Member data structure:', filteredMembers[0])
     }
     exportMembersToCSV(filteredMembers)
     toast.success('Executive members exported to CSV with all details')

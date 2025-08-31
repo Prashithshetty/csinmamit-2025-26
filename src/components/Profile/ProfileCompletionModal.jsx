@@ -145,7 +145,7 @@ const ProfileCompletionModal = ({ isOpen, onComplete }) => {
         onComplete()
       }
     } catch (error) {
-      console.error('Error completing profile:', error)
+      // console.error('Error completing profile:', error)
       toast.error('Failed to complete profile. Please try again.')
     } finally {
       setLoading(false)

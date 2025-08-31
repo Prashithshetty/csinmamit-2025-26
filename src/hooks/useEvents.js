@@ -42,7 +42,7 @@ export const useEvents = (initialYear = '2024') => {
           setFilteredEvents(eventsData)
         } catch (firestoreError) {
           // If Firestore query fails (e.g., index not created), try without orderBy
-          console.warn('Firestore query with orderBy failed, trying without ordering:', firestoreError)
+          // console.warn('Firestore query with orderBy failed, trying without ordering:', firestoreError)
           
           const simpleQuery = query(
             eventsRef,
@@ -69,13 +69,13 @@ export const useEvents = (initialYear = '2024') => {
         
         // If no events in Firestore, fallback to mock data
         if (events.length === 0 && mockEvents[selectedYear]) {
-          console.log('No events in Firestore, using mock data')
+          // console.log('No events in Firestore, using mock data')
           const yearEvents = mockEvents[selectedYear] || []
           setEvents(yearEvents)
           setFilteredEvents(yearEvents)
         }
       } catch (err) {
-        console.error('Error loading events:', err)
+        // console.error('Error loading events:', err)
         setError('Failed to load events')
         
         // Fallback to mock data on error

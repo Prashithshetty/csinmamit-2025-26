@@ -49,7 +49,7 @@ export const uploadToCloudinary = async (file, folder = 'csi-events') => {
   // Check if Cloudinary is properly configured
   if (!isCloudinaryConfigured()) {
     const errorMsg = `Cloudinary is not properly configured. Cloud name: ${cloudinaryConfig.cloudName}`;
-    console.error(errorMsg);
+    // console.error(errorMsg);
     throw new Error('Cloudinary configuration error: Please check your cloud name settings');
   }
 
@@ -65,7 +65,7 @@ export const uploadToCloudinary = async (file, folder = 'csi-events') => {
 
   try {
     const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`;
-    console.log('Uploading to Cloudinary:', uploadUrl);
+    // console.log('Uploading to Cloudinary:', uploadUrl);
     
     const response = await fetch(uploadUrl, {
       method: 'POST',
@@ -74,7 +74,7 @@ export const uploadToCloudinary = async (file, folder = 'csi-events') => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Cloudinary response error:', errorText);
+      // console.error('Cloudinary response error:', errorText);
       
       // Parse error for better user feedback
       try {
@@ -89,10 +89,10 @@ export const uploadToCloudinary = async (file, folder = 'csi-events') => {
     }
 
     const data = await response.json();
-    console.log('Cloudinary upload successful:', data.secure_url);
+    // console.log('Cloudinary upload successful:', data.secure_url);
     return data;
   } catch (error) {
-    console.error('Cloudinary upload error:', error);
+    // console.error('Cloudinary upload error:', error);
     throw error;
   }
 };
@@ -105,7 +105,7 @@ export const uploadToCloudinary = async (file, folder = 'csi-events') => {
 export const deleteFromCloudinary = async (publicId) => {
   // Note: This requires server-side implementation for security
   // as it needs API secret which should not be exposed in frontend
-  console.warn('Image deletion should be handled server-side for security');
+  // console.warn('Image deletion should be handled server-side for security');
   return { success: false, message: 'Server-side implementation required' };
 };
 

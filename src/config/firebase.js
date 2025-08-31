@@ -11,7 +11,7 @@ let auth, googleProvider, db, storage, isDemoMode, app
 
 if (hasFirebaseConfig) {
   // Use real Firebase configuration
-  console.log('🔥 Using Firebase configuration')
+  // console.log('🔥 Using Firebase configuration')
   
   const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -38,11 +38,11 @@ if (hasFirebaseConfig) {
     prompt: 'select_account'
   })
   
-  console.log('✅ Firebase initialized successfully')
+  // console.log('✅ Firebase initialized successfully')
 } else {
   // Firebase configuration is required
-  console.error('⚠️ Firebase configuration not found.')
-  console.info('📖 To configure Firebase, see FIREBASE_SETUP_GUIDE.md')
+  // console.error('⚠️ Firebase configuration not found.')
+  // console.info('📖 To configure Firebase, see FIREBASE_SETUP_GUIDE.md')
   
   throw new Error('Firebase configuration is required. Please set up your Firebase environment variables.')
 }

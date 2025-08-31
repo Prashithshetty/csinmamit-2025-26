@@ -38,7 +38,7 @@ export const getRowClassName = (index, isSelected) => {
 
 // CSV export utility with ALL details - properly handling all fields
 export const exportMembersToCSV = (members) => {
-  console.log('Exporting members to CSV. Sample member:', members[0])
+  // console.log('Exporting members to CSV. Sample member:', members[0])
   
   // Comprehensive headers including all fields
   const headers = [
@@ -76,7 +76,7 @@ export const exportMembersToCSV = (members) => {
   
   members.forEach(member => {
     // Log to debug data structure
-    console.log('Processing member:', member.name, 'Payment Details:', member.paymentDetails)
+    // console.log('Processing member:', member.name, 'Payment Details:', member.paymentDetails)
     
     // Build row data - ensure every field is extracted properly
     const rowData = []
@@ -152,7 +152,7 @@ export const exportMembersToCSV = (members) => {
   })
   
   // Log final CSV for debugging
-  console.log('CSV Content (first 500 chars):', csvContent.substring(0, 500))
+  // console.log('CSV Content (first 500 chars):', csvContent.substring(0, 500))
   
   // Create and download file
   const BOM = '\uFEFF' // UTF-8 BOM for Excel

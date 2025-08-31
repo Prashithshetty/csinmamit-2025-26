@@ -623,7 +623,7 @@ const AdminEMembers = () => {
       setMembers(membersData)
       await logAdminActivity('executive_members_viewed', { count: membersData.length })
     } catch (error) {
-      console.error('Error fetching executive members:', error)
+      // console.error('Error fetching executive members:', error)
       toast.error('Failed to fetch executive members')
     } finally {
       setLoading(false)
@@ -730,7 +730,7 @@ const AdminEMembers = () => {
       await logAdminActivity('executive_member_updated', { memberId, updates })
       setEditingMember(null)
     } catch (error) {
-      console.error('Error updating member:', error)
+      // console.error('Error updating member:', error)
       toast.error('Failed to update member')
     }
   }, [logAdminActivity])
@@ -756,7 +756,7 @@ const AdminEMembers = () => {
       setShowRemoveModal(false)
       setMemberToRemove(null)
     } catch (error) {
-      console.error('Error removing member role:', error)
+      // console.error('Error removing member role:', error)
       toast.error('Failed to remove member role')
     }
   }, [memberToRemove, logAdminActivity])
@@ -769,7 +769,7 @@ const AdminEMembers = () => {
       
       // Check if user is authenticated
       const currentUser = auth.currentUser
-      console.log('Current user:', currentUser?.uid, currentUser?.email)
+      // console.log('Current user:', currentUser?.uid, currentUser?.email)
       
       if (!currentUser) {
         throw new Error('User not authenticated')
@@ -779,10 +779,10 @@ const AdminEMembers = () => {
       const { getDoc } = await import('firebase/firestore')
       const adminRef = doc(db, 'admins', currentUser.uid)
       const adminDoc = await getDoc(adminRef)
-      console.log('Admin document exists:', adminDoc.exists(), adminDoc.data())
+      // console.log('Admin document exists:', adminDoc.exists(), adminDoc.data())
       
       if (!adminDoc.exists()) {
-        console.warn('Admin document does not exist in admins collection')
+        // console.warn('Admin document does not exist in admins collection')
       }
       
       // Validate date before creating timestamp
@@ -807,10 +807,10 @@ const AdminEMembers = () => {
         updatedAt: new Date()
       }
       
-      console.log('Creating user document with ID:', userId)
+      // console.log('Creating user document with ID:', userId)
       const userRef = doc(db, 'users', userId)
       await setDoc(userRef, { ...newUser, email: payload.personalEmail.trim() })
-      console.log('User document created:', userId)
+      // console.log('User document created:', userId)
 
       // Create recruit application (this should work with authenticated user)
       const recruitDoc = {
@@ -831,16 +831,16 @@ const AdminEMembers = () => {
         updatedAt: Timestamp.now()
       }
       
-      console.log('Creating recruit document:', recruitDoc)
+      // console.log('Creating recruit document:', recruitDoc)
       const recruitRef = await addDoc(collection(db, 'recruits'), recruitDoc)
-      console.log('Recruit document created:', recruitRef.id)
+      // console.log('Recruit document created:', recruitRef.id)
 
       setMembers(prev => [{ id: userId, ...newUser, email: payload.personalEmail.trim(), position: 'Executive Member' }, ...prev])
       toast.success('Executive member created successfully')
       await logAdminActivity('executive_member_created', { userId: userId, recruitId: recruitRef.id })
       setShowAddModal(false)
     } catch (error) {
-      console.error('Error creating executive member:', error.message)
+      // console.error('Error creating executive member:', error.message)
       toast.error(`Failed to create executive member: ${error}`)
     }
   }, [logAdminActivity])

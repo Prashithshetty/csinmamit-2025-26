@@ -136,7 +136,7 @@ class PaymentService {
         transactionId
       }
     } catch (error) {
-      console.error('Order creation error:', error)
+      // console.error('Order creation error:', error)
       throw error
     }
   }
@@ -192,7 +192,7 @@ class PaymentService {
       const razorpay = new window.Razorpay(options)
       razorpay.open()
     } catch (error) {
-      console.error('Payment initialization error:', error)
+      // console.error('Payment initialization error:', error)
       onFailure(error.message)
     }
   }
@@ -229,14 +229,14 @@ class PaymentService {
           throw new Error('Payment verification failed')
         }
       } else {
-        console.warn('Payment verification should be done on backend')
+        // console.warn('Payment verification should be done on backend')
         onSuccess({
           paymentId: paymentResponse.razorpay_payment_id,
           transactionId
         })
       }
     } catch (error) {
-      console.error('Payment verification error:', error)
+      // console.error('Payment verification error:', error)
       throw error
     }
   }

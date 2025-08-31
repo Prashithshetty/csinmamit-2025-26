@@ -50,7 +50,7 @@ export default function AdminEvents() {
       const eventsData = await getAllEvents()
       setEvents(eventsData)
     } catch (error) {
-      console.error('Error loading events:', error)
+      // console.error('Error loading events:', error)
       toast.error('Failed to load events')
     } finally {
       setLoading(false)
@@ -81,7 +81,7 @@ export default function AdminEvents() {
       setSelectedEvent(null)
       loadEvents()
     } catch (error) {
-      console.error('Error saving event:', error?.message || error)
+      // console.error('Error saving event:', error?.message || error)
       toast.error(selectedEvent ? 'Failed to update event' : 'Failed to create event')
     } finally {
       setFormLoading(false)
@@ -105,7 +105,7 @@ export default function AdminEvents() {
       setDeleteTitle('')
       loadEvents()
     } catch (error) {
-      console.error('Error deleting event:', error)
+      // console.error('Error deleting event:', error)
       toast.error('Failed to delete event')
     }
   }
@@ -122,7 +122,7 @@ export default function AdminEvents() {
       toast.success(`Event ${published ? 'published' : 'unpublished'} successfully!`)
       loadEvents()
     } catch (error) {
-      console.error('Error toggling event published status:', error)
+      // console.error('Error toggling event published status:', error)
       toast.error('Failed to update event status')
     }
   }
@@ -133,7 +133,7 @@ export default function AdminEvents() {
       toast.success(`Event ${featured ? 'featured' : 'unfeatured'} successfully!`)
       loadEvents()
     } catch (error) {
-      console.error('Error toggling event featured status:', error)
+      // console.error('Error toggling event featured status:', error)
       toast.error('Failed to update event status')
     }
   }

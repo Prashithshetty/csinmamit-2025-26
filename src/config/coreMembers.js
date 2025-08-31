@@ -57,7 +57,7 @@ export const validateCoreMember = async (email) => {
     const data = await response.json();
     return data.isCoreMember ? data.memberData : null;
   } catch (error) {
-    console.error('Error validating core member:', error);
+    // console.error('Error validating core member:', error);
     return null;
   }
 };
@@ -102,7 +102,7 @@ export const hasPermission = async (userRole, permission) => {
     const data = await response.json();
     return data.hasPermission;
   } catch (error) {
-    console.error('Error checking permission:', error);
+    // console.error('Error checking permission:', error);
     return false;
   }
 };
@@ -128,7 +128,7 @@ export const getRoleLevel = async (role) => {
     const data = await response.json();
     return data.level || 999;
   } catch (error) {
-    console.error('Error getting role level:', error);
+    // console.error('Error getting role level:', error);
     return 999;
   }
 };

@@ -27,6 +27,7 @@ import Recruit from './pages/Recruit-new'
 import NotFound from './pages/NotFound'
 // import CoreDashboard from './pages/CoreDashboard'
 import CoreMemberProfile from './pages/CoreMemberProfile'
+import AdminPayments from './pages/Admin/Payments/AdminPayments'
 
 // UI Demo Pages (only in development)
 // import GlitchTextDemo from './components/UI/GlitchTextDemo'
@@ -170,7 +171,7 @@ function AppContent() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="events" element={<AdminEvents />} />
             <Route path="members" element={<AdminEMembers/>} />
-            <Route path="payments" element={<div className="p-6"><h1 className="text-3xl font-bold text-white">Payments Management</h1><p className="text-gray-400 mt-2">Coming soon...</p></div>} />
+            <Route path="payments" element={<AdminPayments/>} />
             <Route path="content" element={<div className="p-6"><h1 className="text-3xl font-bold text-white">Content Management</h1><p className="text-gray-400 mt-2">Coming soon...</p></div>} />
             <Route path="analytics" element={<div className="p-6"><h1 className="text-3xl font-bold text-white">Analytics</h1><p className="text-gray-400 mt-2">Coming soon...</p></div>} />
             <Route path="messages" element={<div className="p-6"><h1 className="text-3xl font-bold text-white">Messages</h1><p className="text-gray-400 mt-2">Coming soon...</p></div>} />

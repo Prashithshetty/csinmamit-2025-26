@@ -107,7 +107,7 @@ export const AdminAuthProvider = ({ children }) => {
       
       return user
     } catch (error) {
-      console.error('Error signing in:', error)
+      // console.error('Error signing in:', error)
       toast.error('Failed to sign in. Please try again.')
       throw error
     } finally {
@@ -126,22 +126,22 @@ export const AdminAuthProvider = ({ children }) => {
         if (result.emailSkipped) {
           // EmailJS not configured - development mode
           toast.error('⚠️ Email service not configured! Check console for setup instructions.', { duration: 8000 })
-          console.warn('📧 EmailJS is not configured. The OTP was not sent via email.')
-          console.warn('To enable email sending:')
-          console.warn('1. Sign up at https://www.emailjs.com/')
-          console.warn('2. Follow the instructions in EMAILJS_SETUP.md')
-          console.warn('3. Add credentials to .env.local file')
+          // console.warn('📧 EmailJS is not configured. The OTP was not sent via email.')
+          // console.warn('To enable email sending:')
+          // console.warn('1. Sign up at https://www.emailjs.com/')
+          // console.warn('2. Follow the instructions in EMAILJS_SETUP.md')
+          // console.warn('3. Add credentials to .env.local file')
           
           // Only show OTP in console for development testing
           if (import.meta.env.DEV && result.otp) {
-            console.log(`🔐 Development OTP (not sent via email): ${result.otp}`)
+            // console.log(`🔐 Development OTP (not sent via email): ${result.otp}`)
             toast.info(`Dev Mode - OTP: ${result.otp} (Email not sent)`, { duration: 10000 })
           }
         } else if (result.emailError) {
           // Email sending failed but OTP generated
           toast.error('⚠️ Email sending failed! Check console for OTP.', { duration: 8000 })
           if (import.meta.env.DEV && result.otp) {
-            console.log(`🔐 Fallback OTP (email failed): ${result.otp}`)
+            // console.log(`🔐 Fallback OTP (email failed): ${result.otp}`)
             toast(`Dev Mode - OTP: ${result.otp} (Email failed)`, { 
               duration: 10000,
               icon: '⚠️'
@@ -150,12 +150,12 @@ export const AdminAuthProvider = ({ children }) => {
         } else {
           // Email sent successfully
           toast.success(`✅ OTP sent to ${email}! Check your inbox and spam folder.`, { duration: 6000 })
-          console.log(`✅ OTP email sent successfully to ${email}`)
+          // console.log(`✅ OTP email sent successfully to ${email}`)
           
           // Don't show OTP in production when email is sent
           if (import.meta.env.DEV && result.otp) {
             // In dev mode, optionally show OTP for debugging even when email is sent
-            console.log(`🔐 Dev Mode - OTP sent via email: ${result.otp}`)
+            // console.log(`🔐 Dev Mode - OTP sent via email: ${result.otp}`)
           }
         }
       }
@@ -169,7 +169,7 @@ export const AdminAuthProvider = ({ children }) => {
       
       return true
     } catch (error) {
-      console.error('❌ Error sending OTP:', error)
+      // console.error('❌ Error sending OTP:', error)
       toast.error(error.message || 'Failed to send OTP. Please try again.')
       return false
     }
@@ -245,7 +245,7 @@ export const AdminAuthProvider = ({ children }) => {
       toast.success('Admin login successful!')
       return true
     } catch (error) {
-      console.error('Error verifying OTP:', error)
+      // console.error('Error verifying OTP:', error)
       toast.error('Failed to verify OTP')
       return false
     } finally {
@@ -276,7 +276,7 @@ export const AdminAuthProvider = ({ children }) => {
       localStorage.removeItem('adminSession')
       toast.success('Admin logged out successfully')
     } catch (error) {
-      console.error('Error logging out:', error)
+      // console.error('Error logging out:', error)
       toast.error('Failed to logout')
     } finally {
       setAuthLoading(false)
@@ -294,7 +294,7 @@ export const AdminAuthProvider = ({ children }) => {
       }
       return null
     } catch (error) {
-      console.error('Error checking admin status:', error)
+      // console.error('Error checking admin status:', error)
       return null
     }
   }
@@ -375,7 +375,7 @@ export const AdminAuthProvider = ({ children }) => {
         if (adminData) {
           // This is an admin user, but we don't have admin session
           // Don't set admin user without proper session
-          console.log('Admin user detected but no active session')
+          // console.log('Admin user detected but no active session')
         }
       }
     })
@@ -398,7 +398,7 @@ export const AdminAuthProvider = ({ children }) => {
         ip: window.location.hostname // In production, get actual IP
       })
     } catch (error) {
-      console.error('Error logging activity:', error)
+      // console.error('Error logging activity:', error)
     }
   }
 

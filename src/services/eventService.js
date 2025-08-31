@@ -29,7 +29,7 @@ export const uploadToCloudinary = async (file, folder = 'csi-events') => {
     // Check configuration before attempting upload
     if (!isCloudinaryConfigured()) {
       const status = getCloudinaryStatus();
-      console.error('Cloudinary configuration status:', status);
+      // console.error('Cloudinary configuration status:', status);
       throw new Error(`Cloudinary is not properly configured. Cloud name: ${status.cloudName}`);
     }
 
@@ -44,7 +44,7 @@ export const uploadToCloudinary = async (file, folder = 'csi-events') => {
     formData.append('folder', folder)
 
     const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
-    console.log('Uploading to Cloudinary:', uploadUrl);
+    // console.log('Uploading to Cloudinary:', uploadUrl);
 
     const response = await fetch(uploadUrl, {
       method: 'POST',
@@ -53,7 +53,7 @@ export const uploadToCloudinary = async (file, folder = 'csi-events') => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Cloudinary response error:', errorText);
+      // console.error('Cloudinary response error:', errorText);
       
       try {
         const errorData = JSON.parse(errorText);
@@ -70,10 +70,10 @@ export const uploadToCloudinary = async (file, folder = 'csi-events') => {
     }
 
     const data = await response.json()
-    console.log('Upload successful:', data.secure_url);
+    // console.log('Upload successful:', data.secure_url);
     return data.secure_url
   } catch (error) {
-    console.error('Cloudinary upload error:', error)
+    // console.error('Cloudinary upload error:', error)
     throw error
   }
 }
@@ -118,15 +118,15 @@ export const createEvent = async (eventData, imageFile) => {
     // // Remove the cloudinaryUrl from eventDoc if it was passed in eventData
     // delete eventDoc.cloudinaryUrl
 
-    console.log('Creating event with data:', eventDoc)
+    // console.log('Creating event with data:', eventDoc)
 
     // Add to Firestore
     const docRef = await addDoc(collection(db, 'events'), eventDoc)
-    console.log(docRef, 'Document written with ID: ', docRef.id)
+    // console.log(docRef, 'Document written with ID: ', docRef.id)
     return docRef.id
   } catch (error) {
-    console.error('Error creating event:', error.message)
-    console.log('Error creating event:', error.message)
+    // console.error('Error creating event:', error.message)
+    // console.log('Error creating event:', error.message)
     throw error
   }
 }
@@ -166,7 +166,7 @@ export const updateEvent = async (eventId, eventData, imageFile) => {
     const eventRef = doc(db, 'events', eventId)
     await updateDoc(eventRef, updateData)
   } catch (error) {
-    console.error('Error updating event:', error)
+    // console.error('Error updating event:', error)
     throw error
   }
 }
@@ -181,7 +181,7 @@ export const deleteEvent = async (eventId) => {
     const eventRef = doc(db, 'events', eventId)
     await deleteDoc(eventRef)
   } catch (error) {
-    console.error('Error deleting event:', error)
+    // console.error('Error deleting event:', error)
     throw error
   }
 }
@@ -227,7 +227,7 @@ export const getAllEvents = async (filters = {}) => {
     
     return events
   } catch (error) {
-    console.error('Error fetching events:', error)
+    // console.error('Error fetching events:', error)
     throw error
   }
 }
@@ -251,7 +251,7 @@ export const getEventById = async (eventId) => {
       throw new Error('Event not found')
     }
   } catch (error) {
-    console.error('Error fetching event:', error)
+    // console.error('Error fetching event:', error)
     throw error
   }
 }
@@ -270,7 +270,7 @@ export const toggleEventPublished = async (eventId, published) => {
       updatedAt: serverTimestamp()
     })
   } catch (error) {
-    console.error('Error toggling event published status:', error)
+    // console.error('Error toggling event published status:', error)
     throw error
   }
 }
@@ -301,7 +301,7 @@ export const getEventsByYear = async (year) => {
     
     return events
   } catch (error) {
-    console.error('Error fetching events by year:', error)
+    // console.error('Error fetching events by year:', error)
     throw error
   }
 }
