@@ -10,6 +10,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import SecurityHeaders from "./middleware/SecurityHeaders";
 import { lazy, Suspense, useEffect, useState } from "react";
 import ProfileCompletionModal from "./components/Profile/ProfileCompletionModal"; // Make sure this component exists
+import EventPage from "./pages/EventPage"; //for whatsapp link sharing, shows only a single event
 
 // Layout
 import Layout from "./components/Layout/Layout";
@@ -85,6 +86,7 @@ function AppContent() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="events" element={<Events />} />
+            <Route path="events/:id" element={<EventPage />} /> {/* <-- ID FOR EACH EVENT */}
             <Route path="team" element={<Team />} />
             <Route path="recruit" element={<Recruit />} />
             <Route path="event-registration" element={<EventRegistration />} />
