@@ -3,6 +3,7 @@ import Navbar from './Navbar'
 import Footer from './Footer'
 import ScrollToTop from '../UI/ScrollToTop'
 import ParticlesBackground from '../UI/ParticlesBackground'
+import GlitchText from '../Background'
 
 const Layout = () => {
   const location = useLocation()
@@ -19,6 +20,21 @@ const Layout = () => {
       {/* Animated Background */}
       <ParticlesBackground />
       
+      {/* GlitchText Background - Only on non-404 pages */}
+      {/* {!isNotFoundPage && (
+        <div className="fixed inset-0 hidden md:flex items-center justify-center pointer-events-none z-0">
+          <GlitchText
+            speed={3}
+            enableShadows={true}
+            enableOnHover={false}
+            className="opacity-10 scale-[3] md:scale-[4] lg:scale-[5] select-none"
+          >
+            CSI
+          </GlitchText>
+        </div>
+      )} */}
+
+      
       {/* Navigation - Hidden on 404 */}
       {!isNotFoundPage && <Navbar />}
       
@@ -26,12 +42,13 @@ const Layout = () => {
       <main className={`flex-grow relative z-10 ${isNotFoundPage ? '' : ''}`}>
         <Outlet />
       </main>
-      
+
       {/* Footer - Hidden on 404 */}
       {!isNotFoundPage && <Footer />}
-      
-      {/* Scroll to Top Button - Hidden on 404 */}
-      {!isNotFoundPage && <ScrollToTop />}
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
+
     </div>
   )
 }

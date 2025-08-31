@@ -1,13 +1,30 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { getEventTypeColor, formatEventDate } from "../../utils/eventUtils";
-import { Link } from "react-router-dom";
 
-const EventCard = ({ event, index }) => {
-  const handleRegister = () => {
-    // Handle registration logic
-    console.log("Register for event:", event.id);
-  };
+const EventCard = ({ event, index, onViewDetails }) => {
+  const buttonText =
+    event.category === "ONGOING" ? "Register Now" : "View Details";
+
+  // If the event is for viewing details (PREVIOUS or UPCOMING), we render a button that triggers the modal.
+  // If it's for registration (ONGOING), we render a Link to the full page.
+  const ActionComponent =
+    event.category === "PREVIOUS" || event.category === "UPCOMING" ? (
+      <button
+        onClick={() => onViewDetails(event)}
+        className="w-full text-center block mt-4 btn-primary text-sm"
+      >
+        {buttonText}
+      </button>
+    ) : (
+      <Link
+        to={`/events/${event.id}`}
+        className="w-full text-center block mt-4 btn-primary text-sm"
+      >
+        {buttonText}
+      </Link>
+    );
 
   return (
     <motion.div
@@ -16,9 +33,9 @@ const EventCard = ({ event, index }) => {
         visible: { opacity: 1, y: 0 },
       }}
       whileHover={{ y: -5 }}
-      className="group -mt-10"
+      className="group"
     >
-      <div className="h-full glass-card rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+      <div className="h-full glass-card rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col">
         {/* Event Image */}
         <div className="relative h-48 overflow-hidden">
           <img
@@ -28,34 +45,31 @@ const EventCard = ({ event, index }) => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
-          {/* Event Type Badge */}
           <div
             className={`absolute top-4 right-4 px-3 py-1 rounded-full text-white text-xs font-medium bg-gradient-to-r ${getEventTypeColor(
               event.type
             )}`}
           >
-            {event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+            {event.type}
           </div>
 
-          {/* Status Badge */}
-          {event.status === "upcoming" && (
+          {event.category && event.category !== "PREVIOUS" && (
             <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-green-500 text-white text-xs font-medium">
-              Upcoming
+              {event.category}
             </div>
           )}
         </div>
 
         {/* Event Details */}
-        <div className="p-6">
+        <div className="p-6 flex flex-col flex-grow">
           <h3 className="text-xl font-bold mb-2 group-hover:text-primary-500 transition-colors">
             {event.title}
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+          <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2 flex-grow">
             {event.description}
           </p>
 
-          {/* Event Meta Information */}
-          <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mt-auto">
             <div className="flex items-center gap-2">
               <Calendar size={16} />
               <span>{formatEventDate(event.date)}</span>
@@ -66,22 +80,16 @@ const EventCard = ({ event, index }) => {
             </div>
             <div className="flex items-center gap-2">
               <MapPin size={16} />
-              <span>{event.location}</span>
+              <span>{event.location || "Online"}</span>
             </div>
             <div className="flex items-center gap-2">
               <Users size={16} />
-              <span>{event.participants} Participants</span>
+              <span>{event.participants || 0} Participants</span>
             </div>
           </div>
 
-          {/* Action Button */}
-          {/* Action Link */}
-          <Link
-            to="/event-registration"
-            className="w-full text-center block mt-4 btn-primary text-sm"
-          >
-            {event.status === "upcoming" ? "Register Now" : "View Details"}
-          </Link>
+          {/* This will now render either a button or a link based on the event's category */}
+          {ActionComponent}
         </div>
       </div>
     </motion.div>

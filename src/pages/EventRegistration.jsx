@@ -1,9 +1,16 @@
 import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { motion } from "framer-motion";
 
 const EventRegistration = () => {
   const { user, signInWithGoogle } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Get the specific event data passed from the modal link
+  const event = location.state?.event;
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -13,7 +20,7 @@ const EventRegistration = () => {
     year: "",
   });
 
-  // Effect to pre-fill form when user data is available
+  // Pre-fill form if user is logged in
   useEffect(() => {
     if (user) {
       setFormData((prevData) => ({
@@ -23,6 +30,14 @@ const EventRegistration = () => {
       }));
     }
   }, [user]);
+
+  // Handle cases where a user lands on this page directly without event data
+  useEffect(() => {
+    if (!event) {
+      // Redirect back to the main events page if no event is selected
+      navigate("/events");
+    }
+  }, [event, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,13 +49,19 @@ const EventRegistration = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you would handle the form submission,
-    // for example, sending the data to your database (Firestore).
+    console.log("Registering for event:", event.title);
     console.log("Form Submitted:", formData);
     alert("Thank you for registering! (Check console for data)");
   };
 
-  // Render a login prompt if the user is not signed in
+  if (!event) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
@@ -61,7 +82,6 @@ const EventRegistration = () => {
     );
   }
 
-  // Render the form if the user is logged in
   return (
     <div className="container mx-auto px-4 py-20">
       <motion.div
@@ -70,14 +90,19 @@ const EventRegistration = () => {
         transition={{ duration: 0.5 }}
         className="max-w-2xl mx-auto"
       >
-        <h1 className="text-4xl font-bold text-center mb-8 gradient-text-animated">
+        <h1 className="text-4xl font-bold text-center mb-2 gradient-text-animated">
           Event Registration
         </h1>
+        {/* This title is now dynamic */}
+        <p className="text-center text-xl text-gray-600 dark:text-gray-400 mb-8">
+          For: {event.title}
+        </p>
+
         <form
           onSubmit={handleSubmit}
           className="space-y-6 bg-white dark:bg-gray-800/50 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"
         >
-          {/* Name Field */}
+          {/* Form fields remain the same... */}
           <div>
             <label
               htmlFor="name"
@@ -96,7 +121,6 @@ const EventRegistration = () => {
             />
           </div>
 
-          {/* Email Field */}
           <div>
             <label
               htmlFor="email"
@@ -110,11 +134,10 @@ const EventRegistration = () => {
               name="email"
               value={formData.email}
               className="mt-1 block w-full input-field bg-gray-100 dark:bg-gray-700"
-              readOnly // Email is not editable
+              readOnly
             />
           </div>
 
-          {/* Phone Number Field */}
           <div>
             <label
               htmlFor="phone"
@@ -133,7 +156,6 @@ const EventRegistration = () => {
             />
           </div>
 
-          {/* USN Field */}
           <div>
             <label
               htmlFor="usn"
@@ -152,7 +174,6 @@ const EventRegistration = () => {
             />
           </div>
 
-          {/* Branch Field */}
           <div>
             <label
               htmlFor="branch"
@@ -185,13 +206,10 @@ const EventRegistration = () => {
               </option>
               <option value="Mechanical">Mechanical Engineering</option>
               <option value="Civil">Civil Engineering</option>
-              <option value="AI & DS">
-                Aritifical intelligence and Data science
-              </option>
+              <option value="Other">Other</option>
             </select>
           </div>
 
-          {/* Year of Study Field */}
           <div>
             <label
               htmlFor="year"
@@ -217,7 +235,6 @@ const EventRegistration = () => {
             </select>
           </div>
 
-          {/* Submit Button */}
           <div>
             <button type="submit" className="w-full btn-primary py-3 px-4">
               Submit Registration

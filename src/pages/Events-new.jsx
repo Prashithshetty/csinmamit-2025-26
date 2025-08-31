@@ -1,13 +1,15 @@
-import { useState } from 'react'
-import EventsHero from '../components/Events/EventsHero'
-import EventsFilter from '../components/Events/EventsFilter'
-import EventsGrid from '../components/Events/EventsGrid'
-import EventsEmpty from '../components/Events/EventsEmpty'
-import { useEvents } from '../hooks/useEvents'
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
+import EventsHero from "../components/Events/EventsHero";
+import EventsFilter from "../components/Events/EventsFilter";
+import EventsGrid from "../components/Events/EventsGrid";
+import EventsEmpty from "../components/Events/EventsEmpty";
+import EventDetailModal from "../components/Events/EventDetailModal"; // 👈 Import the new modal
+import { useEvents } from "../hooks/useEvents";
 
 const Events = () => {
-  const [showFilters, setShowFilters] = useState(false)
-  
+  const [selectedEvent, setSelectedEvent] = useState(null); // 👈 This state will manage the modal
+
   const {
     filteredEvents,
     loading,
@@ -16,15 +18,13 @@ const Events = () => {
     selectedType,
     setSelectedType,
     searchTerm,
-    setSearchTerm
-  } = useEvents('2025')
+    setSearchTerm,
+  } = useEvents("2025"); // Default year can be changed here
 
   return (
     <div className="min-h-screen pt-20">
-      {/* Hero Section */}
       <EventsHero />
 
-      {/* Filters Section */}
       <EventsFilter
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -32,22 +32,38 @@ const Events = () => {
         setSelectedYear={setSelectedYear}
         selectedType={selectedType}
         setSelectedType={setSelectedType}
-        showFilters={showFilters}
-        setShowFilters={setShowFilters}
       />
 
-      {/* Events Grid */}
       <section className="section-padding">
         <div className="container-custom">
-          {filteredEvents.length > 0 ? (
-            <EventsGrid events={filteredEvents} loading={loading} />
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="skeleton h-96 rounded-xl" />
+              ))}
+            </div>
+          ) : filteredEvents.length > 0 ? (
+            <EventsGrid
+              events={filteredEvents}
+              onViewDetails={setSelectedEvent} // 👈 Pass the function to open the modal
+            />
           ) : (
-            !loading && <EventsEmpty />
+            <EventsEmpty />
           )}
         </div>
       </section>
-    </div>
-  )
-}
 
-export default Events
+      {/* This will render the modal ONLY when an event is selected */}
+      <AnimatePresence>
+        {selectedEvent && (
+          <EventDetailModal
+            event={selectedEvent}
+            onClose={() => setSelectedEvent(null)} // 👈 Pass the function to close the modal
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default Events;

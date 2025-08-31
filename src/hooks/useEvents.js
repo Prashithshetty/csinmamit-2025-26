@@ -17,26 +17,11 @@ export const useEvents = (initialYear = "2024") => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Load events based on selected year
-  // Load events based on selected year
   useEffect(() => {
     const loadEvents = async () => {
       setLoading(true);
       setError(null);
 
-      // --- START: DEVELOPMENT MODE LOGIC ---
-      // Check if the app is in development mode
-      if (import.meta.env.DEV) {
-        console.log("DEV MODE: Loading mock events.");
-        // Directly use mock data for the selected year
-        const yearEvents = mockEvents[selectedYear] || [];
-        setEvents(yearEvents);
-        setFilteredEvents(yearEvents);
-        setLoading(false);
-        return; // Stop execution here for dev mode
-      }
-      // --- END: DEVELOPMENT MODE LOGIC ---
-
-      // --- PRODUCTION MODE LOGIC (Original Code) ---
       try {
         // Fetch from Firestore
         const eventsRef = collection(db, "events");
@@ -53,19 +38,19 @@ export const useEvents = (initialYear = "2024") => {
           ...doc.data(),
         }));
 
-        if (eventsData.length > 0) {
-          setEvents(eventsData);
-          setFilteredEvents(eventsData);
-        } else {
-          // Fallback if firestore is empty
-          console.log("No events in Firestore, using mock data as fallback");
+        setEvents(eventsData);
+        setFilteredEvents(eventsData);
+
+        // Fallback to mock data if Firestore is empty
+        if (eventsData.length === 0 && mockEvents[selectedYear]) {
+          console.log("No events in Firestore, using mock data as a fallback.");
           const yearEvents = mockEvents[selectedYear] || [];
           setEvents(yearEvents);
           setFilteredEvents(yearEvents);
         }
       } catch (err) {
         console.error("Error loading events:", err);
-        setError("Failed to load events");
+        setError("Failed to load events. Using mock data.");
 
         // Fallback to mock data on any error
         const yearEvents = mockEvents[selectedYear] || [];
