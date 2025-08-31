@@ -1,22 +1,50 @@
 import { motion } from "framer-motion";
-import { Calendar, Clock, MapPin, Users, Share2 } from "lucide-react"; // 1. Import the Share2 icon
-import { getEventTypeColor, formatEventDate } from "../../utils/eventUtils";
+import { Calendar, Clock, MapPin, Users, Share2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import toast from 'react-hot-toast'; // 2. Import toast for notifications
+import toast from 'react-hot-toast';
 
-const EventCard = ({ event, index }) => {
+// Helper functions moved inside to prevent import errors
+const getEventTypeColor = (type) => {
+  switch (type) {
+    case 'workshop':
+      return 'from-blue-500 to-blue-700';
+    case 'bootcamp':
+      return 'from-green-500 to-green-700';
+    case 'competition':
+      return 'from-red-500 to-red-700';
+    case 'seminar':
+      return 'from-purple-500 to-purple-700';
+    default:
+      return 'from-gray-500 to-gray-700';
+  }
+};
 
-  // 3. New function to handle the share button click
+const formatEventDate = (timestamp) => {
+  if (!timestamp) return 'Date not available';
+  if (timestamp.toDate) { // Check if it's a Firestore Timestamp
+    return timestamp.toDate().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+  // Fallback for regular date strings
+  return new Date(timestamp).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+const EventCard = ({ event }) => {
+
   const handleShare = (e) => {
-    // These two lines are important to stop the browser from doing anything else
     e.preventDefault(); 
     e.stopPropagation();
 
     const eventUrl = `${window.location.origin}/events/${event.id}`;
     
-    // Use the modern Navigator API to copy to clipboard
     navigator.clipboard.writeText(eventUrl).then(() => {
-      // Show a success message using the toast library already in your project
       toast.success('Event link copied!');
     }).catch(err => {
       console.error('Failed to copy link: ', err);
@@ -31,7 +59,7 @@ const EventCard = ({ event, index }) => {
         visible: { opacity: 1, y: 0 },
       }}
       whileHover={{ y: -5 }}
-      className="group -mt-10"
+      className="group"
     >
       <div className="h-full glass-card rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col">
         {/* Event Image */}
@@ -66,24 +94,22 @@ const EventCard = ({ event, index }) => {
           </p>
 
           <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-            {/* Meta info remains the same */}
             <div className="flex items-center gap-2"><Calendar size={16} /><span>{formatEventDate(event.date)}</span></div>
             <div className="flex items-center gap-2"><Clock size={16} /><span>{event.time}</span></div>
             <div className="flex items-center gap-2"><MapPin size={16} /><span>{event.location}</span></div>
-            <div className="flex items-center gap-2"><Users size={16} /><span>{event.participants} Participants</span></div>
+            <div className="flex items-center gap-2"><Users size={16} /><span>{event.participantCount || 0} Participants</span></div>
           </div>
           
           {/* Action Buttons Container */}
           <div className="mt-auto pt-4"> 
-            {/* 4. This link now goes to the registration page again */}
+            {/* THIS IS THE CORRECTED LINK */}
             <Link
-              to="/event-registration"
+              to={`/events/${event.id}`}
               className="w-full text-center block btn-primary text-sm"
             >
               {event.status === "upcoming" ? "Register Now" : "View Details"}
             </Link>
 
-            {/* 5. Our new mobile-friendly share button */}
             <button
               onClick={handleShare}
               className="w-full text-center flex items-center justify-center gap-2 mt-2 btn-secondary text-sm"
@@ -99,3 +125,4 @@ const EventCard = ({ event, index }) => {
 };
 
 export default EventCard;
+
