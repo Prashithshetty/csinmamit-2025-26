@@ -39,7 +39,7 @@ const Layout = () => {
       {!isNotFoundPage && <Navbar />}
       
       {/* Main Content */}
-      <main className={`flex-grow relative z-10 ${isNotFoundPage ? '' : ''}`}>
+      <main className={`flex-grow relative z-10 ${isNotFoundPage ? '' : 'pb-20 lg:pb-0'}`}>
         <Outlet />
       </main>
 
