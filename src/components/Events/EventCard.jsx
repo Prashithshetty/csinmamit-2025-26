@@ -1,56 +1,11 @@
 import { motion } from "framer-motion";
-import { Calendar, Clock, MapPin, Users, Share2 } from "lucide-react";
+import { Calendar, Clock, MapPin, Users } from "lucide-react"; // Removed Ticket icon from import
 import { Link } from "react-router-dom";
-import toast from 'react-hot-toast';
+import { getEventTypeColor, formatEventDate } from "../../utils/eventUtils";
 
-// Helper functions moved inside to prevent import errors
-const getEventTypeColor = (type) => {
-  switch (type) {
-    case 'workshop':
-      return 'from-blue-500 to-blue-700';
-    case 'bootcamp':
-      return 'from-green-500 to-green-700';
-    case 'competition':
-      return 'from-red-500 to-red-700';
-    case 'seminar':
-      return 'from-purple-500 to-purple-700';
-    default:
-      return 'from-gray-500 to-gray-700';
-  }
-};
-
-const formatEventDate = (timestamp) => {
-  if (!timestamp) return 'Date not available';
-  if (timestamp.toDate) { // Check if it's a Firestore Timestamp
-    return timestamp.toDate().toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  }
-  // Fallback for regular date strings
-  return new Date(timestamp).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
-
-const EventCard = ({ event }) => {
-
-  const handleShare = (e) => {
-    e.preventDefault(); 
-    e.stopPropagation();
-
-    const eventUrl = `${window.location.origin}/events/${event.id}`;
-    
-    navigator.clipboard.writeText(eventUrl).then(() => {
-      toast.success('Event link copied!');
-    }).catch(err => {
-      console.error('Failed to copy link: ', err);
-      toast.error('Could not copy link.');
-    });
-  };
+const EventCard = ({ event, onOpenModal }) => {
+  const isActionable =
+    event.status === "upcoming" || event.status === "ongoing";
 
   return (
     <motion.div
@@ -94,29 +49,41 @@ const EventCard = ({ event }) => {
           </p>
 
           <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-            <div className="flex items-center gap-2"><Calendar size={16} /><span>{formatEventDate(event.date)}</span></div>
-            <div className="flex items-center gap-2"><Clock size={16} /><span>{event.time}</span></div>
-            <div className="flex items-center gap-2"><MapPin size={16} /><span>{event.location}</span></div>
-            <div className="flex items-center gap-2"><Users size={16} /><span>{event.participantCount || 0} Participants</span></div>
+            <div className="flex items-center gap-2">
+              <Calendar size={16} />
+              <span>{formatEventDate(event.date)}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock size={16} />
+              <span>{event.time}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin size={16} />
+              <span>{event.location}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Users size={16} />
+              <span>{event.participantCount || 0} Participants</span>
+            </div>
           </div>
-          
-          {/* Action Buttons Container */}
-          <div className="mt-auto pt-4"> 
-            {/* THIS IS THE CORRECTED LINK */}
-            <Link
-              to={`/events/${event.id}`}
-              className="w-full text-center block btn-primary text-sm"
-            >
-              {event.status === "upcoming" ? "Register Now" : "View Details"}
-            </Link>
 
-            <button
-              onClick={handleShare}
-              className="w-full text-center flex items-center justify-center gap-2 mt-2 btn-secondary text-sm"
-            >
-              <Share2 size={14} />
-              Share Event
-            </button>
+          <div className="mt-auto pt-4">
+            {isActionable ? (
+              <Link
+                to={`/events/${event.id}/register`}
+                className="w-full text-center block btn-primary text-sm"
+              >
+                Register Now
+              </Link>
+            ) : (
+              // --- THIS IS THE UPDATED BUTTON WITHOUT THE ICON ---
+              <button
+                onClick={() => onOpenModal(event)}
+                className="w-full text-center block btn-primary text-sm"
+              >
+                View Details
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -125,4 +92,3 @@ const EventCard = ({ event }) => {
 };
 
 export default EventCard;
-

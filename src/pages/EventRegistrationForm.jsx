@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import { useProfile } from '../hooks/useProfile.js'; // Hook to get user profile data
+import { useProfileFirestore } from '../hooks/useProfileFirestore.js'; // Hook to get user profile data
 import { db } from '../config/firebase.js'; // Firestore instance
 import { doc, setDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
 const EventRegistrationForm = ({ event, onSuccess, onCancel }) => {
   const { user } = useAuth(); 
-  const { profile, loading: profileLoading } = useProfile(); // Get user profile data and its loading state
+  const { profileData: profile, loading: profileLoading } = useProfileFirestore(); // Get user profile data and its loading state
 
   const [formData, setFormData] = useState({
     name: '',
@@ -21,10 +21,10 @@ const EventRegistrationForm = ({ event, onSuccess, onCancel }) => {
   useEffect(() => {
     if (profile) {
       setFormData({
-        name: profile.fullName || user?.displayName || '',
+        name: profile.name || user?.displayName || '',
         email: profile.email || user?.email || '',
         usn: profile.usn || '',
-        phone: profile.phoneNumber || '',
+        phone: profile.phone || '',
       });
     }
   }, [profile, user]);

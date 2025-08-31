@@ -1,12 +1,35 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Ticket } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import { formatEventDate } from "../../utils/eventUtils";
+import { toast } from "react-hot-toast";
 
 const EventDetailModal = ({ event, onClose }) => {
   if (!event) return null;
+  
+  console.log("EventDetailModal - Event object:", event);
+
+  const navigate = useNavigate();
+  const { user } = useAuth(); // Changed from currentUser to user to match AuthContext
 
   const description = event.brief || event.description;
+
+  const handleRegister = () => {
+    console.log("Register button clicked for event:", event.id);
+    console.log("User:", user);
+    
+    if (user) {
+      // Close the modal first
+      onClose();
+      // Redirect to the EventRegistration page
+      const registrationPath = `/events/${event.id}/register`;
+      console.log("Navigating to:", registrationPath);
+      navigate(registrationPath);
+    } else {
+      toast.error("Please sign in to register for events.");
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -54,13 +77,11 @@ const EventDetailModal = ({ event, onClose }) => {
 
           {/* Right Side: Details */}
           <div className="w-full md:w-1/2 h-full overflow-y-auto p-8 flex flex-col text-gray-300">
-            {/* Mobile Heading */}
             <div className="md:hidden text-center mb-4">
               <h3 className="text-2xl font-bold text-white">{event.title}</h3>
               <p className="text-primary-300">{formatEventDate(event.date)}</p>
             </div>
 
-            {/* About Section */}
             <div className="flex-grow">
               <p className="text-lg font-semibold mb-2 text-primary-200">
                 About the Event
@@ -70,14 +91,13 @@ const EventDetailModal = ({ event, onClose }) => {
 
             {/* Action Button */}
             <div className="mt-auto pt-6">
-              <Link
-                to="/event-registration"
-                state={{ event: event }} // This line passes the event data
+              <button
+                onClick={handleRegister}
                 className="w-full text-center mt-4 btn-primary text-base inline-flex items-center justify-center gap-2"
               >
                 <Ticket size={20} />
                 Register
-              </Link>
+              </button>
             </div>
           </div>
         </motion.div>

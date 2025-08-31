@@ -21,7 +21,7 @@ import CoreMemberGuard from "./components/Guards/CoreMemberGuard";
 // Pages
 import Home from "./pages/Home";
 import Events from "./pages/Events-new";
-import EventDetailPage from "./pages/EventDetailPage"; // Import the new page
+import EventDetailPage from "./pages/EventDetailPage"; // Import the detail page
 import Team from "./pages/Team-new";
 import Profile from "./pages/Profile-new";
 import Recruit from "./pages/Recruit-new";
@@ -29,7 +29,7 @@ import NotFound from "./pages/NotFound";
 import CoreMemberProfile from "./pages/CoreMemberProfile";
 import EventRegistration from "./pages/EventRegistration";
 
-// Admin Components - Lazy loaded
+// Admin Components
 const AdminLayout = lazy(() => import("./components/Admin/AdminLayout"));
 const AdminGuard = lazy(() => import("./components/Admin/AdminGuard"));
 const AdminLogin = lazy(() => import("./pages/Admin/AdminLogin"));
@@ -86,10 +86,12 @@ function AppContent() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="events" element={<Events />} />
-            <Route path="events/:eventId" element={<EventDetailPage />} /> {/* This is the new route */}
+            {/* TWEAK: Standardized the parameter to :id */}
+            <Route path="events/:id" element={<EventDetailPage />} />
             <Route path="team" element={<Team />} />
             <Route path="recruit" element={<Recruit />} />
-            <Route path="event-registration" element={<EventRegistration />} />
+            {/* TWEAK: This is the single, correct route for registration */}
+            <Route path="events/:id/register" element={<EventRegistration />} />
             <Route path="*" element={<NotFound />} />
           </Route>
 
@@ -165,4 +167,3 @@ function App() {
 }
 
 export default App;
-

@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import EventCard from "./EventCard";
 
-const EventsGrid = ({ events, loading }) => {
+const EventsGrid = ({ events, loading, onOpenModal }) => {
+  // Accept onOpenModal
   if (loading) {
     return (
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -30,7 +31,12 @@ const EventsGrid = ({ events, loading }) => {
       }}
     >
       {events.map((event, index) => (
-        <EventCard key={event.id} event={event} index={index} />
+        <EventCard
+          key={event.id}
+          event={event}
+          index={index}
+          onOpenModal={onOpenModal}
+        /> // Pass it down
       ))}
     </motion.div>
   );

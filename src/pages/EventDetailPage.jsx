@@ -1,21 +1,22 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { getEventById } from "../services/eventService.js";
 import { Calendar, Clock, MapPin, Ticket } from "lucide-react";
 import toast from "react-hot-toast";
-import EventRegistrationForm from "./EventRegistrationForm.jsx"; // Corrected import
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 const EventDetailPage = () => {
-  const { eventId } = useParams();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showRegistrationForm, setShowRegistrationForm] = useState(false);
 
   useEffect(() => {
     const fetchEvent = async () => {
       setLoading(true);
       try {
-        const eventData = await getEventById(eventId);
+        const eventData = await getEventById(id);
         setEvent(eventData);
       } catch (error) {
         toast.error("Could not load event details.");
@@ -25,15 +26,18 @@ const EventDetailPage = () => {
       }
     };
 
-    if (eventId) {
+    if (id) {
       fetchEvent();
     }
-  }, [eventId]);
+  }, [id]);
 
-  const handleRegistrationSuccess = () => {
-    // Hide the form and show a success message
-    setShowRegistrationForm(false);
-    toast.success(`You are now registered for ${event.title}!`);
+  const handleRegister = () => {
+    if (user) {
+      // Redirect to the EventRegistration page
+      navigate(`/events/${event.id}/register`);
+    } else {
+      toast.error("Please sign in to register for events.");
+    }
   };
 
   if (loading) {
@@ -104,26 +108,18 @@ const EventDetailPage = () => {
           <p>{event.description}</p>
         </div>
 
-        {/* Conditional Rendering for Registration */}
-        { !showRegistrationForm ? (
-            <div className="text-center mt-12">
-               <button
-                  onClick={() => setShowRegistrationForm(true)}
-                  className="btn-primary px-10 py-4 text-lg group"
-                >
-                  <span className="flex items-center gap-2">
-                    <Ticket />
-                    Register for this Event
-                  </span>
-                </button>
-            </div>
-        ) : (
-            <EventRegistrationForm
-              event={event}
-              onSuccess={handleRegistrationSuccess}
-              onCancel={() => setShowRegistrationForm(false)}
-            />
-        )}
+        {/* Registration Button */}
+        <div className="text-center mt-12">
+          <button
+            onClick={handleRegister}
+            className="btn-primary px-10 py-4 text-lg group"
+          >
+            <span className="flex items-center gap-2">
+              <Ticket />
+              Register for this Event
+            </span>
+          </button>
+        </div>
 
       </div>
     </div>

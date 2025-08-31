@@ -1,9 +1,11 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { mockEvents } from '../data/eventsData';
 import NotFound from './NotFound';
 import { Calendar, Clock, MapPin, Users, ArrowLeft } from 'lucide-react';
 import { getEventTypeColor, formatEventDate } from '../utils/eventUtils';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import toast from 'react-hot-toast';
 
 const findEventById = (id) => {
   for (const year in mockEvents) {
@@ -15,6 +17,8 @@ const findEventById = (id) => {
 
 const EventPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const event = findEventById(id);
 
   if (!event) {
@@ -88,7 +92,13 @@ const EventPage = () => {
             <div className="mt-8">
               <button
                 className="w-full md:w-auto btn-primary text-base px-8 py-3"
-                onClick={() => console.log("Registering for event:", event.id)}
+                onClick={() => {
+                  if (user) {
+                    navigate(`/events/${event.id}/register`);
+                  } else {
+                    toast.error("Please sign in to register for events.");
+                  }
+                }}
               >
                 {event.status === "upcoming" ? "Register Now" : "View Details"}
               </button>
