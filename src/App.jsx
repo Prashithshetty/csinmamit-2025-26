@@ -29,6 +29,7 @@ import NotFound from "./pages/NotFound";
 import CoreMemberProfile from "./pages/CoreMemberProfile";
 import EventRegistration from "./pages/EventRegistration"; // Your new page
 
+<<<<<<< HEAD
 // Admin Components - Lazy loaded
 const AdminLayout = lazy(() => import("./components/Admin/AdminLayout"));
 const AdminGuard = lazy(() => import("./components/Admin/AdminGuard"));
@@ -37,6 +38,19 @@ const AdminDashboard = lazy(() => import("./pages/Admin/AdminDashboard"));
 const AdminUsers = lazy(() => import("./pages/Admin/AdminUsers-clean"));
 const AdminEvents = lazy(() => import("./pages/Admin/AdminEvents"));
 const AdminEMembers = lazy(() => import("./pages/Admin/AdminEMembers-clean"));
+=======
+// UI Demo Pages (only in development)
+// import GlitchTextDemo from './components/UI/GlitchTextDemo'
+
+// Admin Components - Lazy loaded for security and performance
+const AdminLayout = lazy(() => import('./components/Admin/AdminLayout'))
+const AdminGuard = lazy(() => import('./components/Admin/AdminGuard'))
+const AdminLogin = lazy(() => import('./pages/Admin/AdminLogin'))
+const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard'))
+const AdminUsers = lazy(() => import('./pages/Admin/AdminUsers-clean'))
+const AdminEvents = lazy(() => import('./pages/Admin/AdminEvents'))
+const AdminEMembers = lazy(() => import('./pages/Admin/AdminEMembers-clean'))
+>>>>>>> origin/main
 
 const AdminLoading = () => (
   <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -45,6 +59,7 @@ const AdminLoading = () => (
 );
 
 function AppContent() {
+<<<<<<< HEAD
   const { user, isProfileIncomplete, checkProfileCompletion } = useAuth();
   const [showProfileModal, setShowProfileModal] = useState(false);
 
@@ -55,6 +70,19 @@ function AppContent() {
       setShowProfileModal(false);
     }
   }, [user, isProfileIncomplete]);
+=======
+  const { user, isProfileIncomplete, checkProfileCompletion, isUserCoreMember } = useAuth()
+  // const [showProfileModal, setShowProfileModal] = useState(false)
+
+  // Show modal when user is logged in and profile is incomplete
+  // useEffect(() => {
+  //   if (user && isProfileIncomplete) {
+  //     setShowProfileModal(true)
+  //   } else {
+  //     setShowProfileModal(false)
+  //   }
+  // }, [user, isProfileIncomplete])
+>>>>>>> origin/main
 
   const handleProfileComplete = async () => {
     await checkProfileCompletion();
@@ -89,7 +117,16 @@ function AppContent() {
             <Route path="events/:id" element={<EventPage />} /> {/* <-- ID FOR EACH EVENT */}
             <Route path="team" element={<Team />} />
             <Route path="recruit" element={<Recruit />} />
+<<<<<<< HEAD
             <Route path="event-registration" element={<EventRegistration />} />
+=======
+            
+            {/* Demo Routes (only in development) */}
+            {/* {import.meta.env.DEV && (
+              <Route path="demo/glitch-text" element={<GlitchTextDemo />} />
+            )} */}
+            
+>>>>>>> origin/main
             <Route path="*" element={<NotFound />} />
           </Route>
 
