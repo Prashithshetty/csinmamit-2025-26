@@ -9,8 +9,8 @@ import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import SecurityHeaders from "./middleware/SecurityHeaders";
 import { lazy, Suspense, useEffect, useState } from "react";
-import ProfileCompletionModal from "./components/Profile/ProfileCompletionModal"; // Make sure this component exists
-import EventPage from "./pages/EventPage"; //for whatsapp link sharing, shows only a single event
+import ProfileCompletionModal from "./components/Profile/ProfileCompletionModal";
+import EventPage from "./pages/EventPage"; // Your new page for single events
 
 // Layout
 import Layout from "./components/Layout/Layout";
@@ -27,18 +27,8 @@ import Profile from "./pages/Profile-new";
 import Recruit from "./pages/Recruit-new";
 import NotFound from "./pages/NotFound";
 import CoreMemberProfile from "./pages/CoreMemberProfile";
-import EventRegistration from "./pages/EventRegistration"; // Your new page
+import EventRegistration from "./pages/EventRegistration";
 
-<<<<<<< HEAD
-// Admin Components - Lazy loaded
-const AdminLayout = lazy(() => import("./components/Admin/AdminLayout"));
-const AdminGuard = lazy(() => import("./components/Admin/AdminGuard"));
-const AdminLogin = lazy(() => import("./pages/Admin/AdminLogin"));
-const AdminDashboard = lazy(() => import("./pages/Admin/AdminDashboard"));
-const AdminUsers = lazy(() => import("./pages/Admin/AdminUsers-clean"));
-const AdminEvents = lazy(() => import("./pages/Admin/AdminEvents"));
-const AdminEMembers = lazy(() => import("./pages/Admin/AdminEMembers-clean"));
-=======
 // UI Demo Pages (only in development)
 // import GlitchTextDemo from './components/UI/GlitchTextDemo'
 
@@ -50,7 +40,6 @@ const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard'))
 const AdminUsers = lazy(() => import('./pages/Admin/AdminUsers-clean'))
 const AdminEvents = lazy(() => import('./pages/Admin/AdminEvents'))
 const AdminEMembers = lazy(() => import('./pages/Admin/AdminEMembers-clean'))
->>>>>>> origin/main
 
 const AdminLoading = () => (
   <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -59,8 +48,9 @@ const AdminLoading = () => (
 );
 
 function AppContent() {
-<<<<<<< HEAD
-  const { user, isProfileIncomplete, checkProfileCompletion } = useAuth();
+  // --- CONFLICT RESOLVED ---
+  // Kept your functional modal logic and added isUserCoreMember from the other version
+  const { user, isProfileIncomplete, checkProfileCompletion, isUserCoreMember } = useAuth();
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
@@ -70,19 +60,6 @@ function AppContent() {
       setShowProfileModal(false);
     }
   }, [user, isProfileIncomplete]);
-=======
-  const { user, isProfileIncomplete, checkProfileCompletion, isUserCoreMember } = useAuth()
-  // const [showProfileModal, setShowProfileModal] = useState(false)
-
-  // Show modal when user is logged in and profile is incomplete
-  // useEffect(() => {
-  //   if (user && isProfileIncomplete) {
-  //     setShowProfileModal(true)
-  //   } else {
-  //     setShowProfileModal(false)
-  //   }
-  // }, [user, isProfileIncomplete])
->>>>>>> origin/main
 
   const handleProfileComplete = async () => {
     await checkProfileCompletion();
@@ -114,19 +91,19 @@ function AppContent() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="events" element={<Events />} />
-            <Route path="events/:id" element={<EventPage />} /> {/* <-- ID FOR EACH EVENT */}
+            <Route path="events/:id" element={<EventPage />} />
             <Route path="team" element={<Team />} />
             <Route path="recruit" element={<Recruit />} />
-<<<<<<< HEAD
+            
+            {/* --- CONFLICT RESOLVED --- */}
+            {/* Kept both your new route and the demo route from the other version */}
             <Route path="event-registration" element={<EventRegistration />} />
-=======
             
             {/* Demo Routes (only in development) */}
             {/* {import.meta.env.DEV && (
               <Route path="demo/glitch-text" element={<GlitchTextDemo />} />
             )} */}
             
->>>>>>> origin/main
             <Route path="*" element={<NotFound />} />
           </Route>
 
@@ -202,3 +179,4 @@ function App() {
 }
 
 export default App;
+
