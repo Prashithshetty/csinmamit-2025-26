@@ -24,7 +24,9 @@ const CoreMemberProfile = () => {
   const [previewUrl, setPreviewUrl] = useState(null)
   const [formData, setFormData] = useState({
     name: user?.name || '',
+    usn: user?.profile?.usn || user?.usn || '',
     phone: user?.profile?.phone || '',
+    role: user?.profile?.role || user?.roleDetails?.position || '',
     bio: user?.profile?.bio || '',
     branch: user?.profile?.branch || '',
     year: user?.profile?.year || '',
@@ -72,7 +74,9 @@ const CoreMemberProfile = () => {
       const profileData = {
         name: formData.name,
         photoURL: user?.photoURL,
+        usn: formData.usn,
         phone: formData.phone,
+        role: formData.role,
         bio: formData.bio,
         branch: formData.branch,
         year: formData.year,
@@ -137,7 +141,9 @@ const CoreMemberProfile = () => {
     // Reset form data to original values
     setFormData({
       name: user?.name || '',
+      usn: user?.profile?.usn || user?.usn || '',
       phone: user?.profile?.phone || '',
+      role: user?.profile?.role || user?.roleDetails?.position || '',
       bio: user?.profile?.bio || '',
       branch: user?.profile?.branch || '',
       year: user?.profile?.year || '',

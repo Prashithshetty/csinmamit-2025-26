@@ -25,6 +25,20 @@ const ProfileForm = ({ formData, handleChange, handleSubmit, isUploading }) => {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            USN
+          </label>
+          <input
+            type="text"
+            name="usn"
+            value={formData.usn}
+            onChange={handleChange}
+            disabled={isUploading}
+            placeholder="e.g., NNM24CB503"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed uppercase"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Phone
           </label>
           <input
@@ -35,6 +49,41 @@ const ProfileForm = ({ formData, handleChange, handleSubmit, isUploading }) => {
             disabled={isUploading}
             className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Role/Position
+          </label>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            disabled={isUploading}
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <option value="">Select Role</option>
+            <option value="President">President</option>
+            <option value="Vice President">Vice President</option>
+            <option value="Secretary">Secretary</option>
+            <option value="Joint Secretary">Joint Secretary</option>
+            <option value="Treasurer">Treasurer</option>
+            <option value="Program Committee Head">Program Committee Head</option>
+            <option value="Program Committee Co-head">Program Committee Co-head</option>
+            <option value="Technical Lead">Technical Lead</option>
+            <option value="Technical Team">Technical Team</option>
+            <option value="Graphics Lead">Graphics Lead</option>
+            <option value="Graphics">Graphics</option>
+            <option value="Social Media Lead">Social Media Lead</option>
+            <option value="Social Media">Social Media</option>
+            <option value="Publicity Lead">Publicity Lead</option>
+            <option value="Publicity">Publicity</option>
+            <option value="Event Management Lead">Event Management Lead</option>
+            <option value="Event Management">Event Management</option>
+            <option value="MC Committee">MC Committee</option>
+            <option value="Core Member">Core Member</option>
+            <option value="Executive Member">Executive Member</option>
+            <option value="Member">Member</option>
+          </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

@@ -127,13 +127,23 @@ export const updateProfileWithImage = async (userId, profileData, imageFile = nu
       name: profileData.name,
       photoURL: photoURL,
       profile: {
+        usn: profileData.usn || '',
         phone: profileData.phone || '',
+        role: profileData.role || '',
         bio: profileData.bio || '',
         branch: profileData.branch || '',
         year: profileData.year || '',
         skills: profileData.skills || [],
         linkedin: profileData.linkedin || '',
         github: profileData.github || '',
+        updatedAt: serverTimestamp()
+      }
+    }
+    
+    // Also update roleDetails if role is provided
+    if (profileData.role) {
+      updateData.roleDetails = {
+        position: profileData.role,
         updatedAt: serverTimestamp()
       }
     }

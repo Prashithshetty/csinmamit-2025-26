@@ -272,9 +272,17 @@ export const AuthProvider = ({ children }) => {
   // Get user's role display name
   const getUserRoleDisplay = () => {
     if (!user) return null
-    if (user.role === 'coreMember' && user.roleDetails) {
+    
+    // First check if user has selected a role in their profile
+    if (user.profile?.role) {
+      return user.profile.role
+    }
+    
+    // Then check roleDetails
+    if (user.role === 'coreMember' && user.roleDetails?.position) {
       return user.roleDetails.position
     }
+    
     if (user.role === 'admin') return 'Administrator'
     return 'Member'
   }
