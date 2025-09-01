@@ -184,7 +184,7 @@ export const validateProfileData = (profileData) => {
   
   // Year validation
   if (profileData.year) {
-    const validYears = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Alumni']
+    const validYears = ['2nd year', '3rd year', '4th year', 'Alumni']
     if (!validYears.includes(profileData.year)) {
       errors.year = 'Please select a valid year'
     }
