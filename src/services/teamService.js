@@ -24,21 +24,12 @@ const getUserRole = (data) => {
  */
 export const fetchCoreMembers = async () => {
   try {
-    const usersRef = collection(db, 'users')
-    // Simplified query without orderBy to avoid index requirements
-    const q = query(
-      usersRef,
-      where('role', '==', 'coreMember')
-    )
-    
-    let querySnapshot
-    try {
-      querySnapshot = await getDocs(q)
-    } catch (permissionError) {
-      console.warn('Permission error fetching core members, trying alternative approach:', permissionError)
-      
-      // If permission fails, try fetching all users and filter client-side
+    // Try to fetch from Firestore first (only if db is available)
+    if (db) {
       try {
+        const usersRef = collection(db, 'users')
+        
+        // Fetch all users and filter for core members
         const allUsersSnapshot = await getDocs(usersRef)
         const coreMembersData = []
         
@@ -48,73 +39,116 @@ export const fetchCoreMembers = async () => {
           const email = data.email?.toLowerCase()
           const isInCoreMembers = email && CORE_MEMBERS[email]
           
-          if (data.role === 'coreMember' || data.isCoreMember || isInCoreMembers) {
-            coreMembersData.push({ id: doc.id, ...data })
+          // Include user if they are marked as core member OR their email is in CORE_MEMBERS
+          if (data.role === 'coreMember' || data.isCoreMember === true || isInCoreMembers) {
+            // If email is in CORE_MEMBERS but Firestore doesn't have the role, use CORE_MEMBERS data
+            let memberData = { id: doc.id, ...data }
+            
+            // Ensure we have the correct role from CORE_MEMBERS if available
+            if (isInCoreMembers) {
+              memberData.role = 'coreMember'
+              memberData.isCoreMember = true
+              memberData.roleDetails = memberData.roleDetails || {
+                position: CORE_MEMBERS[email].role,
+                permissions: CORE_MEMBERS[email].permissions,
+                level: CORE_MEMBERS[email].level
+              }
+            }
+            
+            coreMembersData.push(memberData)
           }
-          console.log(data.isCoreMember, data.role, 'Core Member Check')
         })
         
-        // Process the filtered data
-        const members = coreMembersData.map(data => ({
-          id: data.id,
-          name: data.name || 'Unknown',
-          role: getUserRole(data), // Use the helper function to get role
-          usn: data.profile?.usn || data.usn || '',
-          branch: data.profile?.branch || '',
-          year: data.profile?.year || '',
-          linkedin: data.profile?.linkedin || '#',
-          github: data.profile?.github || '#',
-          imageSrc: data.photoURL || '/default-avatar.png',
-          skills: data.profile?.skills || [],
-          bio: data.profile?.bio || '',
-          phone: data.profile?.phone || '',
-          email: data.email || '',
-          isCoreMember: true,
-          ...data
-        }))
-        
-        // Sort by role hierarchy
-        return sortMembersByRole(members)
-      } catch (fallbackError) {
-        console.error('Failed to fetch users, using static data:', fallbackError)
-        throw fallbackError
+        // If we found core members in Firestore, process and return them
+        if (coreMembersData.length > 0) {
+          const members = coreMembersData.map(data => ({
+            id: data.id,
+            name: data.name || 'Unknown',
+            role: getUserRole(data),
+            usn: data.profile?.usn || data.usn || '',
+            branch: data.profile?.branch || '',
+            year: data.profile?.year || '',
+            linkedin: data.profile?.linkedin || '#',
+            github: data.profile?.github || '#',
+            imageSrc: data.photoURL || '/default-avatar.png',
+            skills: data.profile?.skills || [],
+            bio: data.profile?.bio || '',
+            phone: data.profile?.phone || '',
+            email: data.email || '',
+            isCoreMember: true,
+            ...data
+          }))
+          
+          return sortMembersByRole(members)
+        }
+      } catch (firestoreError) {
+        console.warn('Firestore not available, using fallback data:', firestoreError.message)
       }
     }
     
-    const members = []
+    // If Firestore fails or no data found, use CORE_MEMBERS constant as primary source
+    console.log('Using CORE_MEMBERS constant as data source')
     
-    querySnapshot.forEach((doc) => {
-      const data = doc.data()
-      members.push({
-        id: doc.id,
-        name: data.name || 'Unknown',
-        role: getUserRole(data), // Use the helper function to get role
-        usn: data.profile?.usn || data.usn || '',
-        branch: data.profile?.branch || '',
-        year: data.profile?.year || '',
-        linkedin: data.profile?.linkedin || '#',
-        github: data.profile?.github || '#',
-        imageSrc: data.photoURL || '/default-avatar.png',
-        skills: data.profile?.skills || [],
-        bio: data.profile?.bio || '',
-        phone: data.profile?.phone || '',
-        email: data.email || '',
+    const coreMembersData = []
+    
+    // Create member objects from CORE_MEMBERS constant
+    Object.entries(CORE_MEMBERS).forEach(([email, memberInfo]) => {
+      coreMembersData.push({
+        id: email.replace(/[@.]/g, '_'), // Create a safe ID from email
+        email: email,
+        name: memberInfo.name || email.split('@')[0], // Use email prefix as fallback name
+        role: 'coreMember',
         isCoreMember: true,
-        ...data
+        roleDetails: {
+          position: memberInfo.role,
+          permissions: memberInfo.permissions,
+          level: memberInfo.level
+        },
+        photoURL: '/default-avatar.png',
+        profile: {
+          role: memberInfo.role,
+          branch: '',
+          year: '',
+          linkedin: '#',
+          github: '#',
+          skills: [],
+          bio: ''
+        }
       })
     })
     
+    // Process the data from constants
+    const members = coreMembersData.map(data => ({
+      id: data.id,
+      name: data.name || 'Unknown',
+      role: getUserRole(data),
+      usn: data.profile?.usn || data.usn || '',
+      branch: data.profile?.branch || '',
+      year: data.profile?.year || '',
+      linkedin: data.profile?.linkedin || '#',
+      github: data.profile?.github || '#',
+      imageSrc: data.photoURL || '/default-avatar.png',
+      skills: data.profile?.skills || [],
+      bio: data.profile?.bio || '',
+      phone: data.profile?.phone || '',
+      email: data.email || '',
+      isCoreMember: true,
+      ...data
+    }))
     
     // Sort by role hierarchy
     return sortMembersByRole(members)
   } catch (error) {
-    console.error('Error fetching core members:', error)
-    // Return fallback data from JSON if Firestore fails
+    console.error('Error in fetchCoreMembers:', error)
+    
+    // Final fallback to JSON data
     try {
       const { studentTeamData } = await import('../data/teamData.json')
       return studentTeamData || []
     } catch (importError) {
-      console.error('Failed to import fallback data:', importError)
+      console.error('Failed to import fallback JSON data:', importError)
+      
+      // Return empty array as last resort
       return []
     }
   }
@@ -138,15 +172,18 @@ const sortMembersByRole = (members) => {
     'Technical (Lead)': 8,
     'Technical Team': 9,
     'Graphics Lead': 10,
+    'Graphics Team': 11,
     'Graphics': 11,
     'Social Media Lead': 12,
     'Social Media': 13,
     'Publicity Lead': 14,
+    'Publicity Core Team': 15,
     'Publicity (Lead)': 14,
-    'Publicity': 15,
-    'Event Management Lead': 16,
-    'Event Management': 17,
-    'MC Committee': 18,
+    'Publicity Team': 16,
+    'Publicity': 16,
+    'Event Management Lead': 17,
+    'Event Management': 18,
+    'MC Committee': 19,
     'Member': 99
   }
   

@@ -44,7 +44,7 @@ const Team = () => {
         )
       }
     } catch (err) {
-      console.error('Error fetching team data:', err)
+      console.log('Error fetching team data:', err.message)
       setError('Failed to load team data. Please try again.')
       toast.error('Failed to load team data')
       
