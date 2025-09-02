@@ -1,100 +1,92 @@
-import { useState, useEffect } from 'react'
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore'
-import { db } from '../config/firebase'
-import { mockEvents } from '../data/eventsData'
-import { filterEvents } from '../utils/eventUtils'
+import { useState, useEffect } from "react";
+import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import { db } from "../config/firebase";
+import { mockEvents } from "../data/eventsData";
+import { filterEvents } from "../utils/eventUtils";
 
 /**
  * Custom hook for managing events data and filtering
  */
-export const useEvents = (initialYear = '2024') => {
-  const [events, setEvents] = useState([])
-  const [filteredEvents, setFilteredEvents] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [selectedYear, setSelectedYear] = useState(initialYear)
-  const [selectedType, setSelectedType] = useState('all')
-  const [searchTerm, setSearchTerm] = useState('')
+export const useEvents = (initialYear = "2024") => {
+  const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(initialYear);
+  const [selectedType, setSelectedType] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Load events based on selected year
+  // Effect to load events from Firestore or fall back to mock data
   useEffect(() => {
     const loadEvents = async () => {
-      setLoading(true)
-      setError(null)
-      
+      setLoading(true);
+      setError(null);
+      let eventsData = [];
+
       try {
-        // Fetch from Firestore
-        const eventsRef = collection(db, 'events')
-        const q = query(
-          eventsRef,
-          where('year', '==', parseInt(selectedYear)),
-          where('published', '==', true),
-          orderBy('date', 'desc')
-        )
-        
+        const eventsRef = collection(db, "events");
+
         try {
-          const snapshot = await getDocs(q)
-          const eventsData = snapshot.docs.map(doc => ({
+          // First, try the optimized query with ordering
+          const orderedQuery = query(
+            eventsRef,
+            where("year", "==", parseInt(selectedYear)),
+            where("published", "==", true),
+            orderBy("date", "desc")
+          );
+          const snapshot = await getDocs(orderedQuery);
+          eventsData = snapshot.docs.map((doc) => ({
             id: doc.id,
-            ...doc.data()
-          }))
-          setEvents(eventsData)
-          setFilteredEvents(eventsData)
+            ...doc.data(),
+          }));
         } catch (firestoreError) {
-          // If Firestore query fails (e.g., index not created), try without orderBy
-          // console.warn('Firestore query with orderBy failed, trying without ordering:', firestoreError)
-          
+          // If the ordered query fails (e.g., missing index), fallback to a simple query
+          console.warn(
+            "Firestore query with ordering failed. Falling back to a simpler query."
+          );
           const simpleQuery = query(
             eventsRef,
-            where('year', '==', parseInt(selectedYear)),
-            where('published', '==', true)
-          )
-          
-          const snapshot = await getDocs(simpleQuery)
-          const eventsData = snapshot.docs.map(doc => ({
+            where("year", "==", parseInt(selectedYear)),
+            where("published", "==", true)
+          );
+          const snapshot = await getDocs(simpleQuery);
+          const unsortedData = snapshot.docs.map((doc) => ({
             id: doc.id,
-            ...doc.data()
-          }))
-          
-          // Sort manually if orderBy failed
-          eventsData.sort((a, b) => {
-            const dateA = new Date(a.date || a.createdAt)
-            const dateB = new Date(b.date || b.createdAt)
-            return dateB - dateA
-          })
-          
-          setEvents(eventsData)
-          setFilteredEvents(eventsData)
+            ...doc.data(),
+          }));
+
+          // Manually sort the data since the query couldn't
+          unsortedData.sort((a, b) => new Date(b.date) - new Date(a.date));
+          eventsData = unsortedData;
         }
-        
-        // If no events in Firestore, fallback to mock data
-        if (events.length === 0 && mockEvents[selectedYear]) {
-          // console.log('No events in Firestore, using mock data')
-          const yearEvents = mockEvents[selectedYear] || []
-          setEvents(yearEvents)
-          setFilteredEvents(yearEvents)
+
+        // If Firestore returns no events, use the mock data as a fallback
+        if (eventsData.length === 0) {
+          console.log(
+            "No events found in Firestore for this year. Using mock data."
+          );
+          eventsData = mockEvents[selectedYear] || [];
         }
       } catch (err) {
-        // console.error('Error loading events:', err)
-        setError('Failed to load events')
-        
-        // Fallback to mock data on error
-        const yearEvents = mockEvents[selectedYear] || []
-        setEvents(yearEvents)
-        setFilteredEvents(yearEvents)
+        // If any other error occurs, log it and use mock data
+        console.error("An error occurred while fetching events:", err);
+        setError("Failed to load events. Displaying mock data.");
+        eventsData = mockEvents[selectedYear] || [];
       } finally {
-        setLoading(false)
+        setEvents(eventsData);
+        setFilteredEvents(eventsData); // Initially, filtered events are all events
+        setLoading(false);
       }
-    }
+    };
 
-    loadEvents()
-  }, [selectedYear])
+    loadEvents();
+  }, [selectedYear]);
 
-  // Filter events when search term or type changes
+  // Effect to filter events whenever the filters or the base event list change
   useEffect(() => {
-    const filtered = filterEvents(events, searchTerm, selectedType)
-    setFilteredEvents(filtered)
-  }, [searchTerm, selectedType, events])
+    const filtered = filterEvents(events, searchTerm, selectedType);
+    setFilteredEvents(filtered);
+  }, [searchTerm, selectedType, events]);
 
   return {
     events,
@@ -106,6 +98,6 @@ export const useEvents = (initialYear = '2024') => {
     selectedType,
     setSelectedType,
     searchTerm,
-    setSearchTerm
-  }
-}
+    setSearchTerm,
+  };
+};
