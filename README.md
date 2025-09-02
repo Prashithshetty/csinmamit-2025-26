@@ -172,3 +172,65 @@ Developed by the CSI NMAMIT Tech Team with ❤️
 ---
 
 **Note**: This is version 2.0 of the CSI NMAMIT website, featuring a complete redesign with modern technologies and enhanced user experience.
+
+## 🔧 Console Statement Cleanup
+
+All console statements have been commented out for production. The following files were modified:
+
+### Modified Files (36 total):
+
+#### Hooks (5 files)
+- `src/hooks/useEvents.js`
+- `src/hooks/useRecruit.js`
+- `src/hooks/useProfileFirestore.js`
+- `src/hooks/useProfile.js`
+- `src/hooks/useSecureRecruit.js`
+
+#### Contexts (2 files)
+- `src/contexts/AuthContext.jsx`
+- `src/contexts/AdminAuthContext.jsx`
+
+#### Config (5 files)
+- `src/config/emailjs.js`
+- `src/config/coreMembers.js`
+- `src/config/cloudinary.js`
+- `src/config/firebase.js`
+- `src/config/firebase-secure.js`
+
+#### Services (3 files)
+- `src/services/paymentService.js`
+- `src/services/eventService.js`
+- `src/services/emailService.js`
+
+#### Pages - Admin (10 files)
+- `src/pages/NotFound.jsx`
+- `src/pages/Admin/Payments/AdminPayments.jsx`
+- `src/pages/Admin/Payments/services/paymentDataService.js`
+- `src/pages/Admin/Payments/components/OTPModal.jsx`
+- `src/pages/Admin/Members/utils/helpers.js`
+- `src/pages/Admin/Members/AdminEMembers.jsx`
+- `src/pages/Admin/AdminUsers-clean.jsx`
+- `src/pages/Admin/AdminLogin.jsx`
+- `src/pages/Admin/AdminEvents.jsx`
+- `src/pages/Admin/AdminDashboard.jsx`
+- `src/pages/Admin/AdminEMembers-clean.jsx`
+
+#### Components (5 files)
+- `src/components/Layout/Navbar.jsx`
+- `src/components/Events/EventCard.jsx`
+- `src/components/Admin/EventForm.jsx`
+- `src/components/Profile/QuickActions.jsx`
+- `src/components/Profile/ProfileCompletionModal.jsx`
+
+#### Utils (4 files)
+- `src/utils/emailDiagnostics.js`
+- `src/utils/secureCoreMembersUtils.js`
+- `src/utils/securityUtils.js`
+- `src/utils/testCoreMembers.js`
+
+#### Main (1 file)
+- `src/main.jsx`
+
+**Total console statements commented**: 271 statements across 36 files
+
+To re-enable console statements for development, uncomment the relevant lines in the files listed above.

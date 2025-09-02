@@ -317,7 +317,7 @@ const AdminUsers = () => {
       setUsers(usersData)
       await logAdminActivity('users_viewed', { count: usersData.length })
     } catch (error) {
-      console.error('Error fetching users:', error.message)
+      // console.error('Error fetching users:', error.message)
       toast.error('Failed to fetch users')
     } finally {
       setLoading(false)
@@ -417,7 +417,7 @@ const AdminUsers = () => {
       await logAdminActivity('user_updated', { userId, updates })
       setEditingUser(null)
     } catch (error) {
-      console.error('Error updating user:', error)
+      // console.error('Error updating user:', error)
       toast.error('Failed to update user')
     }
   }, [logAdminActivity])
@@ -435,7 +435,7 @@ const AdminUsers = () => {
       setShowDeleteModal(false)
       setUserToDelete(null)
     } catch (error) {
-      console.error('Error deleting user:', error)
+      // console.error('Error deleting user:', error)
       toast.error('Failed to delete user')
     }
   }, [userToDelete, logAdminActivity])

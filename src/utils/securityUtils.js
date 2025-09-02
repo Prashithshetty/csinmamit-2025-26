@@ -49,7 +49,7 @@ export const encodeData = (data) => {
   try {
     return btoa(JSON.stringify(data));
   } catch (error) {
-    console.error('Encoding error:', error);
+    // console.error('Encoding error:', error);
     return null;
   }
 };
@@ -59,7 +59,7 @@ export const decodeData = (encodedData) => {
   try {
     return JSON.parse(atob(encodedData));
   } catch (error) {
-    console.error('Decoding error:', error);
+    // console.error('Decoding error:', error);
     return null;
   }
 };

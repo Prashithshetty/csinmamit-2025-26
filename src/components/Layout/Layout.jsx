@@ -21,8 +21,8 @@ const Layout = () => {
       <ParticlesBackground />
       
       {/* GlitchText Background - Only on non-404 pages */}
-      {!isNotFoundPage && (
-        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0">
+      {/* {!isNotFoundPage && (
+        <div className="fixed inset-0 hidden md:flex items-center justify-center pointer-events-none z-0">
           <GlitchText
             speed={3}
             enableShadows={true}
@@ -32,7 +32,8 @@ const Layout = () => {
             CSI
           </GlitchText>
         </div>
-      )}
+      )} */}
+
       
       {/* Navigation - Hidden on 404 */}
       {!isNotFoundPage && <Navbar />}

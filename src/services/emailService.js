@@ -52,24 +52,24 @@ class EmailService {
   async sendOTPEmail(email, name) {
     try {
       // Debug: Log configuration status
-      console.log('📧 EmailJS Configuration Check:')
-      console.log('SERVICE_ID:', EMAILJS_CONFIG.SERVICE_ID ? '✅ Set' : '❌ Missing')
-      console.log('OTP_TEMPLATE_ID:', EMAILJS_CONFIG.OTP_TEMPLATE_ID ? '✅ Set' : '❌ Missing')
-      console.log('PUBLIC_KEY:', EMAILJS_CONFIG.PUBLIC_KEY ? '✅ Set' : '❌ Missing')
-      console.log('Is Configured:', this.isConfigured)
+      // console.log('📧 EmailJS Configuration Check:')
+      // console.log('SERVICE_ID:', EMAILJS_CONFIG.SERVICE_ID ? '✅ Set' : '❌ Missing')
+      // console.log('OTP_TEMPLATE_ID:', EMAILJS_CONFIG.OTP_TEMPLATE_ID ? '✅ Set' : '❌ Missing')
+      // console.log('PUBLIC_KEY:', EMAILJS_CONFIG.PUBLIC_KEY ? '✅ Set' : '❌ Missing')
+      // console.log('Is Configured:', this.isConfigured)
       
       // Check if EmailJS is configured
       if (!this.isConfigured) {
-        console.warn('⚠️ EmailJS not configured. Please set up environment variables.')
-        console.warn('Missing configuration:', {
-          SERVICE_ID: !EMAILJS_CONFIG.SERVICE_ID,
-          OTP_TEMPLATE_ID: !EMAILJS_CONFIG.OTP_TEMPLATE_ID,
-          PUBLIC_KEY: !EMAILJS_CONFIG.PUBLIC_KEY
-        })
-        console.warn('Please check your .env.local file has these variables:')
-        console.warn('VITE_EMAILJS_SERVICE_ID=your_service_id')
-        console.warn('VITE_EMAILJS_OTP_TEMPLATE_ID=your_template_id')
-        console.warn('VITE_EMAILJS_PUBLIC_KEY=your_public_key')
+        // console.warn('⚠️ EmailJS not configured. Please set up environment variables.')
+        // console.warn('Missing configuration:', {
+        //   SERVICE_ID: !EMAILJS_CONFIG.SERVICE_ID,
+        //   OTP_TEMPLATE_ID: !EMAILJS_CONFIG.OTP_TEMPLATE_ID,
+        //   PUBLIC_KEY: !EMAILJS_CONFIG.PUBLIC_KEY
+        // })
+        // console.warn('Please check your .env.local file has these variables:')
+        // console.warn('VITE_EMAILJS_SERVICE_ID=your_service_id')
+        // console.warn('VITE_EMAILJS_OTP_TEMPLATE_ID=your_template_id')
+        // console.warn('VITE_EMAILJS_PUBLIC_KEY=your_public_key')
         
         // In development, still generate and return OTP for testing
         if (import.meta.env.DEV) {
@@ -88,7 +88,7 @@ class EmailService {
             attempts: 0
           })
           
-          console.log(`🔐 Development OTP for ${email}: ${otp}`)
+          // console.log(`🔐 Development OTP for ${email}: ${otp}`)
           return { success: true, otp: otp, emailSkipped: true }
         }
         
@@ -100,9 +100,9 @@ class EmailService {
       const hashedOTP = this.hashOTP(otp)
       const expiryTime = Date.now() + this.otpExpiryTime
 
-      console.log('📧 Attempting to send OTP email to:', email)
-      console.log('Using EmailJS Service ID:', EMAILJS_CONFIG.SERVICE_ID)
-      console.log('Using Template ID:', EMAILJS_CONFIG.OTP_TEMPLATE_ID)
+      // console.log('📧 Attempting to send OTP email to:', email)
+      // console.log('Using EmailJS Service ID:', EMAILJS_CONFIG.SERVICE_ID)
+      // console.log('Using Template ID:', EMAILJS_CONFIG.OTP_TEMPLATE_ID)
 
       // Store OTP in Firestore (hashed for security)
       const otpRef = doc(db, this.otpCollection, email)
@@ -114,34 +114,34 @@ class EmailService {
         createdAt: serverTimestamp(),
         attempts: 0
       })
-      console.log('✅ OTP stored in Firestore')
+      // console.log('✅ OTP stored in Firestore')
 
       // Prepare email parameters for EmailJS template
       const templateParams = createOTPEmailParams(email, name, otp)
-      console.log('📧 Template parameters prepared:')
-      console.log('  Email fields:', {
-        to_email: templateParams.to_email,
-        user_email: templateParams.user_email,
-        email: templateParams.email,
-        recipient_email: templateParams.recipient_email
-      })
-      console.log('  Name:', templateParams.to_name)
-      console.log('  OTP: ******')
-      console.log('  Full params:', { ...templateParams, otp_code: '******', otp: '******', code: '******' })
+      // console.log('📧 Template parameters prepared:')
+      // console.log('  Email fields:', {
+      //   to_email: templateParams.to_email,
+      //   user_email: templateParams.user_email,
+      //   email: templateParams.email,
+      //   recipient_email: templateParams.recipient_email
+      // })
+      // console.log('  Name:', templateParams.to_name)
+      // console.log('  OTP: ******')
+      // console.log('  Full params:', { ...templateParams, otp_code: '******', otp: '******', code: '******' })
 
       // Send email using EmailJS
-      console.log('📧 Sending email via EmailJS...')
+      // console.log('📧 Sending email via EmailJS...')
       const response = await emailjs.send(
         EMAILJS_CONFIG.SERVICE_ID,
         EMAILJS_CONFIG.OTP_TEMPLATE_ID,
         templateParams
       )
 
-      console.log('📧 EmailJS Response:', response)
+      // console.log('📧 EmailJS Response:', response)
 
       if (response.status === 200) {
-        console.log(`✅ OTP email sent successfully to ${email}`)
-        console.log('Check your email inbox and spam folder')
+        // console.log(`✅ OTP email sent successfully to ${email}`)
+        // console.log('Check your email inbox and spam folder')
         
         // Return success without OTP in production
         if (import.meta.env.PROD) {
@@ -149,33 +149,33 @@ class EmailService {
         }
         
         // In development, also return the OTP for testing
-        console.log(`🔐 Development OTP for ${email}: ${otp}`)
+        // console.log(`🔐 Development OTP for ${email}: ${otp}`)
         return { success: true, otp: import.meta.env.DEV ? otp : undefined }
       } else {
         throw new Error(`EmailJS failed with status: ${response.status}`)
       }
     } catch (error) {
-      console.error('❌ Error sending OTP email:', error)
-      console.error('Error details:', {
-        message: error.message,
-        text: error.text,
-        status: error.status
-      })
+      // console.error('❌ Error sending OTP email:', error)
+      // console.error('Error details:', {
+      //   message: error.message,
+      //   text: error.text,
+      //   status: error.status
+      // })
       
       // Check for common EmailJS errors
       if (error.text?.includes('The Public Key is invalid')) {
-        console.error('❌ Invalid EmailJS Public Key. Please check your VITE_EMAILJS_PUBLIC_KEY in .env.local')
+        // console.error('❌ Invalid EmailJS Public Key. Please check your VITE_EMAILJS_PUBLIC_KEY in .env.local')
       } else if (error.text?.includes('The Service ID is invalid')) {
-        console.error('❌ Invalid EmailJS Service ID. Please check your VITE_EMAILJS_SERVICE_ID in .env.local')
+        // console.error('❌ Invalid EmailJS Service ID. Please check your VITE_EMAILJS_SERVICE_ID in .env.local')
       } else if (error.text?.includes('The Template ID is invalid')) {
-        console.error('❌ Invalid EmailJS Template ID. Please check your VITE_EMAILJS_OTP_TEMPLATE_ID in .env.local')
+        // console.error('❌ Invalid EmailJS Template ID. Please check your VITE_EMAILJS_OTP_TEMPLATE_ID in .env.local')
       } else if (error.text?.includes('The daily quota')) {
-        console.error('❌ EmailJS daily quota exceeded. Please upgrade your plan or wait until tomorrow.')
+        // console.error('❌ EmailJS daily quota exceeded. Please upgrade your plan or wait until tomorrow.')
       }
       
       // If EmailJS fails in development, still return OTP for testing
       if (import.meta.env.DEV) {
-        console.warn('⚠️ Email sending failed, but returning OTP for development testing')
+        // console.warn('⚠️ Email sending failed, but returning OTP for development testing')
         const otp = this.generateOTP()
         const hashedOTP = this.hashOTP(otp)
         const expiryTime = Date.now() + this.otpExpiryTime
@@ -191,7 +191,7 @@ class EmailService {
           attempts: 0
         })
         
-        console.log(`🔐 Development OTP for ${email}: ${otp}`)
+        // console.log(`🔐 Development OTP for ${email}: ${otp}`)
         return { success: true, otp: otp, emailError: true }
       }
       
@@ -220,7 +220,7 @@ class EmailService {
         response: response
       }
     } catch (error) {
-      console.error('Error sending custom email:', error)
+      // console.error('Error sending custom email:', error)
       throw error
     }
   }
@@ -290,7 +290,7 @@ class EmailService {
         message: 'OTP verified successfully'
       }
     } catch (error) {
-      console.error('Error verifying OTP:', error)
+      // console.error('Error verifying OTP:', error)
       throw error
     }
   }

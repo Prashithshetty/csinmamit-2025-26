@@ -22,7 +22,7 @@ const validateEnvVariables = () => {
   const missing = required.filter(key => !import.meta.env[key])
   
   if (missing.length > 0) {
-    console.error('Missing required environment variables:', missing)
+    // console.error('Missing required environment variables:', missing)
     throw new Error('Firebase configuration is incomplete. Please check your .env file.')
   }
 }
@@ -58,7 +58,7 @@ try {
     analytics = getAnalytics(app)
   }
 } catch (error) {
-  console.error('Firebase initialization error:', error)
+  // console.error('Firebase initialization error:', error)
   throw error
 }
 
@@ -75,7 +75,7 @@ export const securityRules = {
       const adminDoc = await db.collection('admins').doc(uid).get()
       return adminDoc.exists
     } catch (error) {
-      console.error('Admin check error:', error)
+      // console.error('Admin check error:', error)
       return false
     }
   },

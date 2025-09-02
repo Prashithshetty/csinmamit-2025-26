@@ -1,11 +1,42 @@
 import { motion } from "framer-motion";
-import { Calendar, Clock, MapPin, Users } from "lucide-react"; // Removed Ticket icon from import
+import { Calendar, Clock, MapPin, Users, Share2 } from "lucide-react"; // Added Share2 icon
 import { Link } from "react-router-dom";
 import { getEventTypeColor, formatEventDate } from "../../utils/eventUtils";
+import { toast } from "react-hot-toast";
 
 const EventCard = ({ event, onOpenModal }) => {
+  // A boolean to determine if the event is still open for registration.
   const isActionable =
     event.status === "upcoming" || event.status === "ongoing";
+
+  // --- SHARE FUNCTION LOGIC ---
+  const handleShare = async (eventToShare) => {
+    // Construct a shareable URL for the event.
+    const eventUrl = `${window.location.origin}/events/${eventToShare.id}`;
+    const shareData = {
+      title: eventToShare.title,
+      text: `Check out this event from CSI-NMAMIT: ${eventToShare.title}`,
+      url: eventUrl,
+    };
+
+    // Use the modern Web Share API if available (on mobile).
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // This can happen if the user closes the share dialog.
+        console.error("Share error:", err);
+      }
+    } else {
+      // Fallback for desktop browsers: copy the link to the clipboard.
+      try {
+        await navigator.clipboard.writeText(eventUrl);
+        toast.success("Event link copied to clipboard!");
+      } catch (err) {
+        toast.error("Could not copy link.");
+      }
+    }
+  };
 
   return (
     <motion.div
@@ -63,27 +94,40 @@ const EventCard = ({ event, onOpenModal }) => {
             </div>
             <div className="flex items-center gap-2">
               <Users size={16} />
+              {/* Using event.participantCount for clarity. */}
               <span>{event.participantCount || 0} Participants</span>
             </div>
           </div>
 
-          <div className="mt-auto pt-4">
-            {isActionable ? (
-              <Link
-                to={`/events/${event.id}/register`}
-                className="w-full text-center block btn-primary text-sm"
-              >
-                Register Now
-              </Link>
-            ) : (
-              // --- THIS IS THE UPDATED BUTTON WITHOUT THE ICON ---
-              <button
-                onClick={() => onOpenModal(event)}
-                className="w-full text-center block btn-primary text-sm"
-              >
-                View Details
-              </button>
-            )}
+          {/* --- RESOLVED ACTION BUTTONS CONTAINER --- */}
+          <div className="mt-auto pt-4 flex items-center gap-2">
+            {/* Main Action Button */}
+            <div className="flex-grow">
+              {isActionable ? (
+                <Link
+                  to={`/events/${event.id}/register`}
+                  className="w-full text-center block btn-primary text-sm"
+                >
+                  Register Now
+                </Link>
+              ) : (
+                <button
+                  onClick={() => onOpenModal(event)}
+                  className="w-full text-center block btn-primary text-sm"
+                >
+                  View Details
+                </button>
+              )}
+            </div>
+
+            {/* Share Button */}
+            <button
+              onClick={() => handleShare(event)}
+              className="p-2.5 btn-secondary" // Adjusted padding for better size
+              aria-label="Share event"
+            >
+              <Share2 size={16} />
+            </button>
           </div>
         </div>
       </div>

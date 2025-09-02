@@ -9,7 +9,7 @@ const QuickActions = () => {
 
   const manageMembership = () => {
     // Implement membership management logic
-    console.log('Manage membership')
+    // console.log('Manage membership')
   }
 
   return (

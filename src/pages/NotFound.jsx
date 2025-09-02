@@ -20,7 +20,7 @@ const NotFound = () => {
   ]
 
   const handleNavigation = (path) => {
-    console.log('Navigate to:', path)
+    // console.log('Navigate to:', path)
   }
 
   const handleGoBack = () => {

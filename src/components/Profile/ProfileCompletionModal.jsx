@@ -105,7 +105,7 @@ const ProfileCompletionModal = ({ isOpen, onComplete, onClose }) => {
       toast.success("Profile completed successfully! Welcome to CSI NMAMIT!");
       if (onComplete) onComplete();
     } catch (error) {
-      console.error("Error completing profile:", error);
+      // console.error('Error completing profile:', error)
       toast.error("Failed to complete profile. Please try again.");
     } finally {
       setLoading(false);

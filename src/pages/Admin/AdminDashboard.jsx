@@ -88,7 +88,7 @@ const AdminDashboard = () => {
       await logAdminActivity('dashboard_viewed', { timestamp: new Date() })
       
     } catch (error) {
-      console.error('Error fetching dashboard data:', error)
+      // console.error('Error fetching dashboard data:', error)
     } finally {
       setLoading(false)
     }

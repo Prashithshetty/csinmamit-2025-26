@@ -73,8 +73,12 @@ service cloud.firestore {
     }
     
     match /users/{userId} {
-      // Owners and admins access
-      allow read: if isOwner(userId) || isAdmin();
+      // Allow public read for core members (team page display)
+      // Otherwise, only owners and admins can read
+      allow read: if resource.data.role == 'coreMember' || 
+                     resource.data.isCoreMember == true ||
+                     isOwner(userId) || 
+                     isAdmin();
       allow create: if isAuthenticated() && isValidUserData(request.resource.data);
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isOwner(userId) || isAdmin();
@@ -168,12 +172,10 @@ service cloud.firestore {
       allow read: if true;
 
       // CREATE: require full valid payload
-      allow create: if request.auth != null &&
-        isValidEventData(request.resource.data);
+      allow create: if request.auth != null && isValidEventData(request.resource.data);
 
       // UPDATE: allow partial updates (only selected fields), keep createdAt immutable
-      allow update: if request.auth != null &&
-        isValidEventUpdate(request.resource.data, resource.data);
+      allow update: if request.auth != null && isValidEventUpdate(request.resource.data, resource.data);
 
       // DELETE: allow signed-in (tighten to isAdmin() for prod)
       allow delete: if request.auth != null;
