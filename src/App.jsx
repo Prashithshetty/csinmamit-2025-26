@@ -10,6 +10,9 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import SecurityHeaders from "./middleware/SecurityHeaders";
 import { lazy, Suspense, useEffect, useState } from "react";
 import ProfileCompletionModal from "./components/Profile/ProfileCompletionModal"; // Make sure this component exists
+import EventRegistration from "./pages/EventRegistration";
+
+// Components
 
 // Layout
 import Layout from "./components/Layout/Layout";
