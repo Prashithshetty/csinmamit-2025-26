@@ -358,7 +358,7 @@ const Navbar = () => {
                             to={isUserCoreMember() ? "/core-profile" : "/profile"}
                             className="flex items-center space-x-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"
                             onClick={() => {
-                              console.log('🔗 Profile link clicked, navigating to:', isUserCoreMember() ? "/core-profile" : "/profile");
+                              // console.log('🔗 Profile link clicked, navigating to:', isUserCoreMember() ? "/core-profile" : "/profile");
                               setProfileDropdown(false);
                             }}
                           >
@@ -591,7 +591,7 @@ const Navbar = () => {
                   <Link
                     to={isUserCoreMember() ? "/core-profile" : "/profile"}
                     onClick={() => {
-                      console.log('📱 Mobile profile link clicked, navigating to:', isUserCoreMember() ? "/core-profile" : "/profile");
+                      // console.log('📱 Mobile profile link clicked, navigating to:', isUserCoreMember() ? "/core-profile" : "/profile");
                       setIsOpen(false);
                     }}
                     className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"

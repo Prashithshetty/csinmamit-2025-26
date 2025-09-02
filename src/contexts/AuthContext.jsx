@@ -7,7 +7,8 @@ import {
 } from 'firebase/auth'
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, googleProvider, db } from '../config/firebase'
-import { isCoreMember, getRoleByEmail, isNMAMITEmail, hasPermission } from '../utils/secureCoreMembersUtils'
+import { isCoreMember as isCoreMemberSecure, getRoleByEmail as getRoleByEmailSecure, isNMAMITEmail, hasPermission } from '../utils/secureCoreMembersUtils'
+import { CORE_MEMBERS } from '../constants/coreMembers'
 import toast from 'react-hot-toast'
 
 const AuthContext = createContext({})
@@ -20,15 +21,41 @@ export const AuthProvider = ({ children }) => {
   const [authLoading, setAuthLoading] = useState(false)
   const [isProfileIncomplete, setIsProfileIncomplete] = useState(false)
 
+  // Helper function to check if user is a core member with fallback
+  const isCoreMember = (email) => {
+    if (!email) return false;
+    
+    // First try secure method (env variables)
+    const secureCheck = isCoreMemberSecure(email);
+    if (secureCheck) {
+      return true;
+    }
+    
+    // Fallback to constants file
+    const constantsCheck = CORE_MEMBERS.hasOwnProperty(email.toLowerCase());
+    return constantsCheck;
+  };
+
+  // Helper function to get role by email with fallback
+  const getRoleByEmail = (email) => {
+    if (!email) return null;
+    
+    // First try secure method (env variables)
+    const secureRole = getRoleByEmailSecure(email);
+    if (secureRole) {
+      return secureRole;
+    }
+    
+    // Fallback to constants file
+    return CORE_MEMBERS[email.toLowerCase()] || null;
+  };
+
   // Sign in with Google
   const signInWithGoogle = async () => {
     setAuthLoading(true)
     try {
-      console.log('🔐 Starting Google sign-in...')
       const result = await signInWithPopup(auth, googleProvider)
       const user = result.user
-      
-      console.log('👤 Firebase user:', user.email)
       
       // Check if user exists in Firestore
       const userRef = doc(db, 'users', user.uid)
@@ -38,16 +65,10 @@ export const AuthProvider = ({ children }) => {
       const coreRoleData = getRoleByEmail(user.email)
       const isCore = isCoreMember(user.email)
       
-      console.log('🔍 Core member check:', {
-        email: user.email,
-        isCore,
-        coreRoleData
-      })
-      
       let finalUserData = null
       
       if (!userSnap.exists()) {
-        console.log('📝 Creating new user document...')
+        // console.log('📝 Creating new user document...')
         // Determine the role based on email
         let userRole = 'member'
         let roleDetails = null
@@ -60,7 +81,7 @@ export const AuthProvider = ({ children }) => {
             level: coreRoleData.level,
             isNMAMIT: isNMAMITEmail(user.email)
           }
-          console.log('✨ Setting up core member:', roleDetails)
+          // console.log('✨ Setting up core member:', roleDetails)
           toast.success(`Welcome ${coreRoleData.role} - ${user.displayName}!`, {
             duration: 4000,
             icon: '🎉'
@@ -99,13 +120,13 @@ export const AuthProvider = ({ children }) => {
         await setDoc(userRef, newUserData)
         finalUserData = newUserData
       } else {
-        console.log('👤 Existing user found, checking role...')
+        // console.log('👤 Existing user found, checking role...')
         // Existing user - check if role needs update
         const existingData = userSnap.data()
         
         // Update role if user is a core member but doesn't have the role set
         if (isCore && coreRoleData && existingData.role !== 'coreMember') {
-          console.log('🔄 Updating user role to core member...')
+          // console.log('🔄 Updating user role to core member...')
           const updatedData = {
             role: 'coreMember',
             roleDetails: {
@@ -152,15 +173,15 @@ export const AuthProvider = ({ children }) => {
         isCoreMember: isCore
       }
       
-      console.log('✅ Final user data:', completeUserData)
-      console.log('🎯 Is core member?', completeUserData.role === 'coreMember')
+      // console.log('✅ Final user data:', completeUserData)
+      // console.log('🎯 Is core member?', completeUserData.role === 'coreMember')
       
       // Set user state immediately to ensure navbar gets updated data
       setUser(completeUserData)
       
       return user
     } catch (error) {
-      console.error('❌ Error signing in:', error)
+      // console.error('❌ Error signing in:', error)
       toast.error('Failed to sign in. Please try again.')
       throw error
     } finally {
@@ -175,7 +196,7 @@ export const AuthProvider = ({ children }) => {
       await signOut(auth)
       toast.success('Signed out successfully')
     } catch (error) {
-      console.error('Error signing out:', error)
+      // console.error('Error signing out:', error)
       toast.error('Failed to sign out')
       throw error
     } finally {
@@ -206,7 +227,7 @@ export const AuthProvider = ({ children }) => {
       toast.success('Profile updated successfully')
       return true
     } catch (error) {
-      console.error('Error updating profile:', error)
+      // console.error('Error updating profile:', error)
       toast.error('Failed to update profile')
       return false
     }
@@ -241,7 +262,7 @@ export const AuthProvider = ({ children }) => {
       setIsProfileIncomplete(isIncomplete)
       return !isIncomplete
     } catch (error) {
-      console.error('Error checking profile completion:', error)
+      // console.error('Error checking profile completion:', error)
       setIsProfileIncomplete(false)
       return false
     }
@@ -258,7 +279,7 @@ export const AuthProvider = ({ children }) => {
       }
       return null
     } catch (error) {
-      console.error('Error fetching user data:', error)
+      // console.error('Error fetching user data:', error)
       return null
     }
   }
@@ -272,9 +293,17 @@ export const AuthProvider = ({ children }) => {
   // Get user's role display name
   const getUserRoleDisplay = () => {
     if (!user) return null
-    if (user.role === 'coreMember' && user.roleDetails) {
+    
+    // First check if user has selected a role in their profile
+    if (user.profile?.role) {
+      return user.profile.role
+    }
+    
+    // Then check roleDetails
+    if (user.role === 'coreMember' && user.roleDetails?.position) {
       return user.roleDetails.position
     }
+    
     if (user.role === 'admin') return 'Administrator'
     return 'Member'
   }

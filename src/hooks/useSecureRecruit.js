@@ -188,7 +188,7 @@ export const useSecureRecruit = () => {
         (result) => {
           // Success callback
           toast.success('Payment successful! Welcome to CSI NMAMIT!')
-          console.log('Payment verified:', result)
+          // console.log('Payment verified:', result)
           
           // Reset attempts on success
           paymentAttempts.current = 0
@@ -205,7 +205,7 @@ export const useSecureRecruit = () => {
         }
       )
     } catch (error) {
-      console.error('Payment error:', error)
+      // console.error('Payment error:', error)
       toast.error(error.message || 'Something went wrong. Please try again.')
       setLoading(false)
     }
@@ -225,7 +225,7 @@ export const useSecureRecruit = () => {
         toast.success('Signed in successfully!')
       }
     } catch (error) {
-      console.error('Sign in error:', error)
+      // console.error('Sign in error:', error)
       toast.error('Failed to sign in. Please try again.')
     }
   }

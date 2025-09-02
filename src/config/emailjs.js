@@ -37,8 +37,8 @@ export const validateEmailJSConfig = () => {
   }
   
   if (missingConfigs.length > 0) {
-    console.warn('⚠️ EmailJS configuration missing:', missingConfigs.join(', '))
-    console.warn('Please add these to your .env file')
+    // console.warn('⚠️ EmailJS configuration missing:', missingConfigs.join(', '))
+    // console.warn('Please add these to your .env file')
     return false
   }
   

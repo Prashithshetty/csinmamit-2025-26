@@ -3,28 +3,11 @@ import { Link } from "react-router-dom";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { getEventTypeColor, formatEventDate } from "../../utils/eventUtils";
 
-const EventCard = ({ event, index, onViewDetails }) => {
-  const buttonText =
-    event.category === "ONGOING" ? "Register Now" : "View Details";
-
-  // If the event is for viewing details (PREVIOUS or UPCOMING), we render a button that triggers the modal.
-  // If it's for registration (ONGOING), we render a Link to the full page.
-  const ActionComponent =
-    event.category === "PREVIOUS" || event.category === "UPCOMING" ? (
-      <button
-        onClick={() => onViewDetails(event)}
-        className="w-full text-center block mt-4 btn-primary text-sm"
-      >
-        {buttonText}
-      </button>
-    ) : (
-      <Link
-        to={`/events/${event.id}`}
-        className="w-full text-center block mt-4 btn-primary text-sm"
-      >
-        {buttonText}
-      </Link>
-    );
+const EventCard = ({ event, index }) => {
+  const handleRegister = () => {
+    // Handle registration logic
+    // console.log('Register for event:', event.id)
+  };
 
   return (
     <motion.div

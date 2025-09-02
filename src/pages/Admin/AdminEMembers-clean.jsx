@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   UserCheck,
+  Eye,
 } from 'lucide-react'
 import {
   collection,
@@ -101,7 +102,7 @@ const TableHeader = ({ headers, sortField, sortOrder, onSort, selectAll, onSelec
   </thead>
 )
 
-const MemberRow = ({ member, index, isSelected, isEditing, onSelect, onEdit, onUpdate, onRemoveRole }) => (
+const MemberRow = ({ member, index, isSelected, isEditing, onSelect, onEdit, onUpdate, onRemoveRole, onViewDetails }) => (
   <tr className={getRowClassName(index, isSelected)}>
     <td className="px-4 py-2">
       <input
@@ -151,13 +152,22 @@ const MemberRow = ({ member, index, isSelected, isEditing, onSelect, onEdit, onU
     </td>
     <td className="px-4 py-2 text-gray-600">{formatDate(member.createdAt)}</td>
     <td className="px-4 py-2">
-      <button
-        onClick={() => onRemoveRole(member)}
-        className="text-[#ba2121] hover:text-[#8a1919]"
-        title="Remove Executive Role"
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
+      <div className="flex items-center space-x-2">
+        <button
+          onClick={() => onViewDetails(member)}
+          className="text-[#417690] hover:text-[#205067]"
+          title="View Details"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => onRemoveRole(member)}
+          className="text-[#ba2121] hover:text-[#8a1919]"
+          title="Remove Executive Role"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
     </td>
   </tr>
 )
@@ -238,6 +248,173 @@ const RemoveRoleModal = ({ member, onConfirm, onCancel }) => (
     </div>
   </div>
 )
+
+const MemberDetailsModal = ({ member, onClose }) => {
+  if (!member) return null
+
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return '-'
+    if (timestamp?.seconds) {
+      return new Date(timestamp.seconds * 1000).toLocaleString('en-IN', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: 'Asia/Kolkata'
+      })
+    }
+    if (timestamp?.toDate) {
+      return timestamp.toDate().toLocaleString('en-IN', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: 'Asia/Kolkata'
+      })
+    }
+    return '-'
+  }
+
+  const formatCurrency = (amount) => {
+    if (!amount) return '-'
+    return `₹${amount}`
+  }
+
+  const DetailRow = ({ label, value, isHighlighted = false }) => (
+    <div className={`py-2 px-3 ${isHighlighted ? 'bg-[#f0f8ff]' : ''}`}>
+      <div className="text-xs text-gray-500 mb-1">{label}</div>
+      <div className="text-sm text-[#333] font-medium">{value || '-'}</div>
+    </div>
+  )
+
+  const SectionTitle = ({ title }) => (
+    <h3 className="text-sm font-semibold text-[#333] bg-[#f5f5f5] px-3 py-2 border-b border-[#ddd]">
+      {title}
+    </h3>
+  )
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden">
+        {/* Header */}
+        <div className="bg-[#417690] text-white p-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold">{member.name || 'Member Details'}</h2>
+            <p className="text-sm opacity-90 mt-1">{member.role || 'EXECUTIVE MEMBER'}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-white hover:bg-white/20 p-2 rounded transition-colors"
+            title="Close"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+          {/* Basic Information */}
+          <SectionTitle title="Basic Information" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-b border-[#eee]">
+            <DetailRow label="Full Name" value={member.name} isHighlighted />
+            <DetailRow label="Email" value={member.email} />
+            <DetailRow label="Phone" value={member.phone} isHighlighted />
+            <DetailRow label="USN" value={member.usn} />
+            <DetailRow label="Branch" value={member.branch} isHighlighted />
+            <DetailRow label="Year of Study" value={member.year || member.yearOfStudy} />
+            <DetailRow label="Position" value={member.position || 'Executive Member'} isHighlighted />
+            <DetailRow label="Bio" value={member.bio} />
+            <DetailRow label="GitHub" value={member.github} isHighlighted />
+            <DetailRow label="LinkedIn" value={member.linkedin} />
+          </div>
+
+          {/* Membership Information */}
+          <SectionTitle title="Membership Information" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-b border-[#eee]">
+            <DetailRow label="Membership Type" value={member.membershipType} isHighlighted />
+            <DetailRow label="Membership Start Date" value={formatTimestamp(member.membershipStartDate)} />
+            <DetailRow label="Membership End Date" value={formatTimestamp(member.membershipEndDate)} isHighlighted />
+            <DetailRow label="Member Since" value={formatTimestamp(member.createdAt)} />
+            <DetailRow label="Last Updated" value={formatTimestamp(member.updatedAt)} isHighlighted />
+          </div>
+
+          {/* Payment Details */}
+          {member.paymentDetails && (
+            <>
+              <SectionTitle title="Payment Information" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-b border-[#eee]">
+                <DetailRow 
+                  label="Amount Paid" 
+                  value={formatCurrency(member.paymentDetails?.amount)} 
+                  isHighlighted 
+                />
+                <DetailRow 
+                  label="Platform Fee" 
+                  value={formatCurrency(member.paymentDetails?.platformFee)} 
+                />
+                <DetailRow 
+                  label="Total Amount" 
+                  value={formatCurrency(member.paymentDetails?.totalAmount)} 
+                  isHighlighted 
+                />
+                <DetailRow 
+                  label="Currency" 
+                  value={member.paymentDetails?.currency} 
+                />
+                <DetailRow 
+                  label="Payment Date" 
+                  value={formatTimestamp(member.paymentDetails?.paymentDate)} 
+                  isHighlighted 
+                />
+                <DetailRow 
+                  label="Payment Status" 
+                  value={member.paymentStatus || 'Completed'} 
+                />
+                <DetailRow 
+                  label="Razorpay Order ID" 
+                  value={member.paymentDetails?.razorpayOrderId} 
+                  isHighlighted 
+                />
+                <DetailRow 
+                  label="Razorpay Payment ID" 
+                  value={member.paymentDetails?.razorpayPaymentId} 
+                />
+              </div>
+            </>
+          )}
+
+          {/* Additional Information */}
+          <SectionTitle title="Additional Information" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-b border-[#eee]">
+            <DetailRow label="User ID" value={member.id} isHighlighted />
+            <DetailRow label="Certificates Count" value={member.certificates?.length || 0} />
+            <DetailRow label="Account Status" value={member.status || 'Active'} isHighlighted />
+          </div>
+
+          {/* Raw Data (for debugging) */}
+          {process.env.NODE_ENV === 'development' && (
+            <>
+              <SectionTitle title="Raw Data (Development Only)" />
+              <div className="p-3 bg-[#f5f5f5]">
+                <pre className="text-xs overflow-x-auto">
+                  {JSON.stringify(member, null, 2)}
+                </pre>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="bg-[#f5f5f5] px-4 py-3 border-t border-[#ddd] flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-[#417690] text-white rounded hover:bg-[#205067] transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const AddMemberModal = ({ onClose, onCreate }) => {
   const [form, setForm] = useState({
@@ -426,6 +603,8 @@ const AdminEMembers = () => {
   const [memberToRemove, setMemberToRemove] = useState(null)
   const [editingMember, setEditingMember] = useState(null)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
+  const [memberToView, setMemberToView] = useState(null)
 
   // Fetch executive members
   const fetchMembers = useCallback(async () => {
@@ -444,7 +623,7 @@ const AdminEMembers = () => {
       setMembers(membersData)
       await logAdminActivity('executive_members_viewed', { count: membersData.length })
     } catch (error) {
-      console.error('Error fetching executive members:', error)
+      // console.error('Error fetching executive members:', error)
       toast.error('Failed to fetch executive members')
     } finally {
       setLoading(false)
@@ -551,10 +730,15 @@ const AdminEMembers = () => {
       await logAdminActivity('executive_member_updated', { memberId, updates })
       setEditingMember(null)
     } catch (error) {
-      console.error('Error updating member:', error)
+      // console.error('Error updating member:', error)
       toast.error('Failed to update member')
     }
   }, [logAdminActivity])
+
+  const handleViewDetails = useCallback((member) => {
+    setMemberToView(member)
+    setShowDetailsModal(true)
+  }, [])
 
   const removeMemberRole = useCallback(async () => {
     if (!memberToRemove) return
@@ -572,7 +756,7 @@ const AdminEMembers = () => {
       setShowRemoveModal(false)
       setMemberToRemove(null)
     } catch (error) {
-      console.error('Error removing member role:', error)
+      // console.error('Error removing member role:', error)
       toast.error('Failed to remove member role')
     }
   }, [memberToRemove, logAdminActivity])
@@ -585,7 +769,7 @@ const AdminEMembers = () => {
       
       // Check if user is authenticated
       const currentUser = auth.currentUser
-      console.log('Current user:', currentUser?.uid, currentUser?.email)
+      // console.log('Current user:', currentUser?.uid, currentUser?.email)
       
       if (!currentUser) {
         throw new Error('User not authenticated')
@@ -595,10 +779,10 @@ const AdminEMembers = () => {
       const { getDoc } = await import('firebase/firestore')
       const adminRef = doc(db, 'admins', currentUser.uid)
       const adminDoc = await getDoc(adminRef)
-      console.log('Admin document exists:', adminDoc.exists(), adminDoc.data())
+      // console.log('Admin document exists:', adminDoc.exists(), adminDoc.data())
       
       if (!adminDoc.exists()) {
-        console.warn('Admin document does not exist in admins collection')
+        // console.warn('Admin document does not exist in admins collection')
       }
       
       // Validate date before creating timestamp
@@ -623,10 +807,10 @@ const AdminEMembers = () => {
         updatedAt: new Date()
       }
       
-      console.log('Creating user document with ID:', userId)
+      // console.log('Creating user document with ID:', userId)
       const userRef = doc(db, 'users', userId)
       await setDoc(userRef, { ...newUser, email: payload.personalEmail.trim() })
-      console.log('User document created:', userId)
+      // console.log('User document created:', userId)
 
       // Create recruit application (this should work with authenticated user)
       const recruitDoc = {
@@ -647,16 +831,16 @@ const AdminEMembers = () => {
         updatedAt: Timestamp.now()
       }
       
-      console.log('Creating recruit document:', recruitDoc)
+      // console.log('Creating recruit document:', recruitDoc)
       const recruitRef = await addDoc(collection(db, 'recruits'), recruitDoc)
-      console.log('Recruit document created:', recruitRef.id)
+      // console.log('Recruit document created:', recruitRef.id)
 
       setMembers(prev => [{ id: userId, ...newUser, email: payload.personalEmail.trim(), position: 'Executive Member' }, ...prev])
       toast.success('Executive member created successfully')
       await logAdminActivity('executive_member_created', { userId: userId, recruitId: recruitRef.id })
       setShowAddModal(false)
     } catch (error) {
-      console.error('Error creating executive member:', error.message)
+      // console.error('Error creating executive member:', error.message)
       toast.error(`Failed to create executive member: ${error}`)
     }
   }, [logAdminActivity])
@@ -784,6 +968,7 @@ const AdminEMembers = () => {
                 onEdit={setEditingMember}
                 onUpdate={updateMember}
                 onRemoveRole={setMemberToRemove}
+                onViewDetails={handleViewDetails}
               />
             ))}
           </tbody>
@@ -828,6 +1013,17 @@ const AdminEMembers = () => {
       {/* Add Member Modal */}
       {showAddModal && (
         <AddMemberModal onClose={() => setShowAddModal(false)} onCreate={createMember} />
+      )}
+
+      {/* Member Details Modal */}
+      {showDetailsModal && memberToView && (
+        <MemberDetailsModal 
+          member={memberToView} 
+          onClose={() => {
+            setShowDetailsModal(false)
+            setMemberToView(null)
+          }} 
+        />
       )}
     </div>
   )

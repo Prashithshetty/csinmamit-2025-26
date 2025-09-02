@@ -72,7 +72,7 @@ export const useProfileFirestore = () => {
           setOriginalData(profile)
         }
       } catch (error) {
-        console.error('Error fetching profile:', error)
+        // console.error('Error fetching profile:', error)
         toast.error('Failed to load profile data')
       } finally {
         setLoading(false)
@@ -147,7 +147,7 @@ export const useProfileFirestore = () => {
       setIsEditing(false)
       toast.success('Profile updated successfully!')
     } catch (error) {
-      console.error('Error saving profile:', error)
+      // console.error('Error saving profile:', error)
       
       // Provide more specific error messages
       if (error.code === 'permission-denied') {

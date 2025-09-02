@@ -10,37 +10,37 @@ export const testCoreMemberDetection = () => {
     'external@gmail.com' // Not a core member
   ];
 
-  console.log('=== Core Member Detection Test ===');
+  // console.log('=== Core Member Detection Test ===');
   
   testEmails.forEach(email => {
     const isCoreResult = isCoreMember(email);
     const roleResult = getRoleByEmail(email);
     
-    console.log(`Email: ${email}`);
-    console.log(`Is Core Member: ${isCoreResult}`);
-    console.log(`Role Data:`, roleResult);
-    console.log('---');
+    // console.log(`Email: ${email}`);
+    // console.log(`Is Core Member: ${isCoreResult}`);
+    // console.log(`Role Data:`, roleResult);
+    // console.log('---');
   });
 };
 
 // Test the current user's role detection
 export const testCurrentUserRole = (user) => {
   if (!user) {
-    console.log('No user logged in');
+    // console.log('No user logged in');
     return;
   }
 
-  console.log('=== Current User Role Test ===');
-  console.log('User Email:', user.email);
-  console.log('User Role:', user.role);
-  console.log('Is Core Member:', user.isCoreMember);
-  console.log('Role Details:', user.roleDetails);
+  // console.log('=== Current User Role Test ===');
+  // console.log('User Email:', user.email);
+  // console.log('User Role:', user.role);
+  // console.log('Is Core Member:', user.isCoreMember);
+  // console.log('Role Details:', user.roleDetails);
   
   // Test the helper functions
   const isCoreResult = isCoreMember(user.email);
   const roleResult = getRoleByEmail(user.email);
   
-  console.log('Helper Function Results:');
-  console.log('isCoreMember():', isCoreResult);
-  console.log('getRoleByEmail():', roleResult);
+  // console.log('Helper Function Results:');
+  // console.log('isCoreMember():', isCoreResult);
+  // console.log('getRoleByEmail():', roleResult);
 };

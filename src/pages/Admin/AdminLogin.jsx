@@ -52,7 +52,7 @@ const AdminLogin = () => {
       await signInAdminWithGoogle()
       setResendTimer(60) // Start 60 second timer for resend
     } catch (error) {
-      console.error('Sign in error:', error)
+      // console.error('Sign in error:', error)
     }
   }
 
@@ -107,7 +107,7 @@ const AdminLogin = () => {
         navigate('/admin/dashboard')
       }
     } catch (error) {
-      console.error('OTP verification error:', error)
+      // console.error('OTP verification error:', error)
     } finally {
       setVerifying(false)
     }
@@ -123,7 +123,7 @@ const AdminLogin = () => {
       setOtp(['', '', '', '', '', ''])
       toast.success('OTP resent successfully!')
     } catch (error) {
-      console.error('Resend OTP error:', error)
+      // console.error('Resend OTP error:', error)
     }
   }
 

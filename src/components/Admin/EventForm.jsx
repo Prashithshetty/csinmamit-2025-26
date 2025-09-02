@@ -17,6 +17,7 @@ import {
   CloudUpload
 } from 'lucide-react'
 import { uploadToCloudinary } from '../../services/eventService'
+import { isCloudinaryConfigured, getCloudinaryStatus } from '../../config/cloudinary'
 import { toast } from 'react-hot-toast'
 
 const EventForm = ({ event, onSubmit, onCancel, loading }) => {
@@ -105,6 +106,18 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
       return
     }
 
+    // Check Cloudinary configuration before attempting upload
+    if (!isCloudinaryConfigured()) {
+      const status = getCloudinaryStatus();
+      // console.error('Cloudinary configuration:', status);
+      toast.error(`Cloudinary is not properly configured. Cloud name: ${status.cloudName}`);
+      setErrors(prev => ({ 
+        ...prev, 
+        image: 'Cloudinary configuration error. Please contact administrator.' 
+      }))
+      return;
+    }
+
     setImageUploading(true)
     try {
       const folder = `csi-events/${formData.year || new Date().getFullYear()}`
@@ -114,9 +127,20 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
       toast.success('Image uploaded successfully! You can now fill in the event details.')
       setErrors(prev => ({ ...prev, image: '' }))
     } catch (error) {
-      console.error('Error uploading image:', error)
-      toast.error('Failed to upload image. Please try again.')
-      setErrors(prev => ({ ...prev, image: 'Failed to upload image' }))
+      // console.error('Error uploading image:', error)
+      
+      // Provide more specific error messages
+      let errorMessage = 'Failed to upload image. ';
+      if (error.message.includes('preset')) {
+        errorMessage += 'Upload preset not configured in Cloudinary. Please create "csi-events" preset or contact administrator.';
+      } else if (error.message.includes('cloud name')) {
+        errorMessage += 'Invalid Cloudinary cloud name configuration.';
+      } else {
+        errorMessage += error.message || 'Please try again.';
+      }
+      
+      toast.error(errorMessage)
+      setErrors(prev => ({ ...prev, image: errorMessage }))
     } finally {
       setImageUploading(false)
     }
@@ -157,11 +181,14 @@ const EventForm = ({ event, onSubmit, onCancel, loading }) => {
     e.preventDefault()
     if (validateForm()) {
       // Pass the cloudinary URL along with form data
+      // Ensure entryFee is a number, not a string
       const submitData = {
         ...formData,
-        cloudinaryUrl: cloudinaryUrl
+        cloudinaryUrl: cloudinaryUrl,
+        entryFee: Number(formData.entryFee) || 0,
+        year: Number(formData.year) || new Date().getFullYear()
       }
-      console.log(submitData)
+      // console.log(submitData)
       onSubmit(submitData, null) // No need to pass imageFile since it's already uploaded
     }
   }

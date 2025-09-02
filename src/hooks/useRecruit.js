@@ -101,7 +101,7 @@ export const useRecruit = () => {
         handler: function (response) {
           // Handle successful payment
           toast.success('Payment successful! Welcome to CSI NMAMIT!')
-          console.log('Payment ID:', response.razorpay_payment_id)
+          // console.log('Payment ID:', response.razorpay_payment_id)
           
           // Update user membership status (in production, verify payment on backend)
           // Then redirect to profile
@@ -123,7 +123,7 @@ export const useRecruit = () => {
       const paymentObject = new window.Razorpay(options)
       paymentObject.open()
     } catch (error) {
-      console.error('Payment error:', error)
+      // console.error('Payment error:', error)
       toast.error('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
