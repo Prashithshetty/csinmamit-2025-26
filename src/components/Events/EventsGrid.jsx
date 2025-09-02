@@ -5,7 +5,7 @@ const EventsGrid = ({ events, loading, onOpenModal }) => {
   // Accept onOpenModal
   if (loading) {
     return (
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {[...Array(6)].map((_, i) => (
           <div key={i} className="skeleton h-96 rounded-xl" />
         ))}
@@ -19,7 +19,7 @@ const EventsGrid = ({ events, loading, onOpenModal }) => {
 
   return (
     <motion.div
-      className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+      className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
       initial="hidden"
       animate="visible"
       variants={{

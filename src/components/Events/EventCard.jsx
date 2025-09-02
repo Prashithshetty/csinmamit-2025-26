@@ -49,7 +49,7 @@ const EventCard = ({ event, onOpenModal }) => {
     >
       <div className="h-full glass-card rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col">
         {/* Event Image */}
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-40 sm:h-48 overflow-hidden">
           <img
             src={event.image}
             alt={event.title}
@@ -72,10 +72,10 @@ const EventCard = ({ event, onOpenModal }) => {
 
         {/* Event Details */}
         <div className="p-6 flex flex-col flex-grow">
-          <h3 className="text-xl font-bold mb-2 group-hover:text-primary-500 transition-colors">
+          <h3 className="text-lg sm:text-xl font-bold mb-2 group-hover:text-primary-500 transition-colors">
             {event.title}
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
             {event.description}
           </p>
 
@@ -100,8 +100,8 @@ const EventCard = ({ event, onOpenModal }) => {
           </div>
 
           {/* --- RESOLVED ACTION BUTTONS CONTAINER --- */}
-          <div className="mt-auto pt-4 flex items-center gap-2">
-            {/* Main Action Button */}
+          <div className="mt-auto pt-4 flex items-center justify-between gap-2">
+           {/* Main Action Button */}
             <div className="flex-grow">
               {isActionable ? (
                 <Link
@@ -123,10 +123,10 @@ const EventCard = ({ event, onOpenModal }) => {
             {/* Share Button */}
             <button
               onClick={() => handleShare(event)}
-              className="p-2.5 btn-secondary" // Adjusted padding for better size
+              className="px-3 py-2 btn-secondary flex items-center justify-center"
               aria-label="Share event"
             >
-              <Share2 size={16} />
+              <Share2 size={18} />
             </button>
           </div>
         </div>

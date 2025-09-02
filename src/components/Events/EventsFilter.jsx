@@ -6,7 +6,7 @@ import { EVENT_TYPES, EVENT_YEARS } from '../../constants/eventConstants'
 const EventsNavigator = ({ selectedYear, setSelectedYear, selectedType, setSelectedType }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   return (
-    <section className="py-16 dark:from-gray-900 dark:via-gray-950 dark:to-slate-900">
+    <section className="py-10 sm:py-16 dark:from-gray-900 dark:via-gray-950 dark:to-slate-900">
       <div className="container-custom max-w-6xl mx-auto px-6">
         
         {/* Year Selector */}
@@ -14,7 +14,7 @@ const EventsNavigator = ({ selectedYear, setSelectedYear, selectedType, setSelec
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="-mt-28"
+          className="-mt-16 sm:-mt-28"
         >
           <div className="flex flex-wrap justify-center gap-3 p-4 rounded-2xl ">
             {EVENT_YEARS.map((year, index) => (
@@ -26,7 +26,7 @@ const EventsNavigator = ({ selectedYear, setSelectedYear, selectedType, setSelec
                 transition={{ delay: index * 0.05 }}
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className={`relative border-2 px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold transition-all duration-300 text-sm md:text-base ${
+                className={`relative border-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-xl font-semibold transition-all duration-300 text-xs sm:text-sm md:text-base ${
                   selectedYear === year
                     ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl shadow-purple-500/25'
                     : 'bg-white/90 dark:bg-gray-700/80 text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-gray-600 hover:shadow-lg hover:shadow-indigo-500/10'
