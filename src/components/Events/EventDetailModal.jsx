@@ -1,87 +1,110 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Ticket } from "lucide-react";
-import { Link } from "react-router-dom";
-import { formatEventDate } from "../../utils/eventUtils";
+import { AnimatePresence, motion } from "framer-motion";
+import { X, Calendar, MapPin } from "lucide-react";
 
-const EventDetailModal = ({ event, onClose }) => {
-  if (!event) return null;
+const EventDetailModal = ({ isOpen, onClose, event, onRegister }) => {
+  if (!isOpen || !event) return null;
 
-  const description = event.brief || event.description;
+  const formattedDate = event.date?.toDate
+    ? event.date.toDate().toLocaleString("en-IN", {
+        dateStyle: "full",
+        timeStyle: "short",
+      })
+    : "Date to be announced";
+
+  // // --- SHARE LOGIC ---
+  // // This function handles the sharing of the event link.
+  // const handleShare = async () => {
+  //   // Share a stable URL that exists in the app to avoid 404s.
+  //   const eventUrl = `${window.location.origin}/events`;
+
+  //   // Use the Web Share API if the browser supports it
+  //   if (navigator.share) {
+  //     try {
+  //       await navigator.share({
+  //         title: event.title,
+  //         text: `Check out this event: ${event.title}`,
+  //         url: eventUrl,
+  //       });
+  //       toast.success("Event shared successfully!");
+  //     } catch (error) {
+  //       // This can happen if the user cancels the share action
+  //       // console.error('Error sharing:', error);
+  //     }
+  //   } else {
+  //     // Fallback for browsers that do not support the Web Share API
+  //     try {
+  //       await navigator.clipboard.writeText(eventUrl);
+  //       toast.success("Event link copied to clipboard!");
+  //     } catch (err) {
+  //       toast.error("Failed to copy link.");
+  //     }
+  //   }
+  // };
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[999] flex items-center justify-center p-4 backdrop-blur-lg"
-        onClick={onClose}
-      >
+      <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <motion.div
-          initial={{ y: 50, opacity: 0, scale: 0.95 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: 30, opacity: 0, scale: 0.9 }}
-          transition={{ type: "spring", stiffness: 120, damping: 14 }}
-          className="relative w-full max-w-4xl h-auto md:h-[80vh] rounded-2xl overflow-hidden bg-black/70 border border-white/20 shadow-2xl flex flex-col md:flex-row"
-          onClick={(e) => e.stopPropagation()}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col"
         >
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-lg hover:bg-white/20 transition-colors z-10"
-            aria-label="Close modal"
-          >
-            <X className="w-6 h-6 text-white/90 hover:text-white" />
-          </button>
+          <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center flex-shrink-0">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white truncate pr-4">
+              {event.title}
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <X />
+            </button>
+          </div>
 
-          {/* Left Side: Poster */}
-          <div className="w-full md:w-1/2 relative h-64 md:h-full">
+          <div className="p-6 overflow-y-auto">
             <img
-              src={event.image}
+              src={event.bannerUrl}
               alt={event.title}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="w-full h-64 object-cover rounded-lg mb-6"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-            <div className="absolute bottom-6 left-6">
-              <h3 className="text-3xl font-bold text-white drop-shadow-md">
-                {event.title}
-              </h3>
-              <p className="text-primary-300 font-medium">
-                {formatEventDate(event.date)}
-              </p>
+            <div className="flex items-start gap-3 mb-4">
+              <Calendar className="text-blue-500 mt-1" />
+              <div>
+                <h4 className="font-semibold text-gray-800 dark:text-gray-200">
+                  Date & Time
+                </h4>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {formattedDate}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 mb-6">
+              <MapPin className="text-blue-500 mt-1" />
+              <div>
+                <h4 className="font-semibold text-gray-800 dark:text-gray-200">
+                  Location
+                </h4>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {event.location}
+                </p>
+              </div>
+            </div>
+            <div className="prose dark:prose-invert max-w-none">
+              <p>{event.description}</p>
             </div>
           </div>
 
-          {/* Right Side: Details */}
-          <div className="w-full md:w-1/2 h-full overflow-y-auto p-8 flex flex-col text-gray-300">
-            {/* Mobile Heading */}
-            <div className="md:hidden text-center mb-4">
-              <h3 className="text-2xl font-bold text-white">{event.title}</h3>
-              <p className="text-primary-300">{formatEventDate(event.date)}</p>
-            </div>
-
-            {/* About Section */}
-            <div className="flex-grow">
-              <p className="text-lg font-semibold mb-2 text-primary-200">
-                About the Event
-              </p>
-              <p className="text-sm leading-relaxed">{description}</p>
-            </div>
-
-            {/* Action Button */}
-            <div className="mt-auto pt-6">
-              <Link
-                to="/event-registration"
-                state={{ event: event }} // This line passes the event data
-                className="w-full text-center mt-4 btn-primary text-base inline-flex items-center justify-center gap-2"
-              >
-                <Ticket size={20} />
-                Register
-              </Link>
-            </div>
+          <div className="p-4 mt-auto border-t dark:border-gray-700 flex-shrink-0 flex gap-4 items-center">
+            <button
+              onClick={() => onRegister(event)}
+              className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Register Now
+            </button>
           </div>
         </motion.div>
-      </motion.div>
+      </div>
     </AnimatePresence>
   );
 };

@@ -4,10 +4,8 @@ import { db } from "../config/firebase";
 import { mockEvents } from "../data/eventsData";
 import { filterEvents } from "../utils/eventUtils";
 
-/**
- * Custom hook for managing events data and filtering
- */
 export const useEvents = (initialYear = "2024") => {
+  // State variables remain the same
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,14 +14,15 @@ export const useEvents = (initialYear = "2024") => {
   const [selectedType, setSelectedType] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Load events based on selected year
+  // This effect now ONLY handles fetching raw event data
   useEffect(() => {
     const loadEvents = async () => {
       setLoading(true);
       setError(null);
+      let eventsData = [];
 
       try {
-        // Fetch from Firestore
+        // Attempt to fetch from Firestore
         const eventsRef = collection(db, "events");
         const q = query(
           eventsRef,
@@ -31,47 +30,44 @@ export const useEvents = (initialYear = "2024") => {
           where("published", "==", true),
           orderBy("date", "desc")
         );
-
         const snapshot = await getDocs(q);
-        const eventsData = snapshot.docs.map((doc) => ({
+        eventsData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
 
-        setEvents(eventsData);
-        setFilteredEvents(eventsData);
-
-        // Fallback to mock data if Firestore is empty
-        if (eventsData.length === 0 && mockEvents[selectedYear]) {
-          console.log("No events in Firestore, using mock data as a fallback.");
-          const yearEvents = mockEvents[selectedYear] || [];
-          setEvents(yearEvents);
-          setFilteredEvents(yearEvents);
+        // If Firestore returns no data, use mock data instead
+        if (eventsData.length === 0) {
+          console.warn(
+            `No events found in Firestore for ${selectedYear}. Using mock data.`
+          );
+          setEvents(mockEvents[selectedYear] || []);
+        } else {
+          // If data is found, set it
+          setEvents(eventsData);
         }
       } catch (err) {
-        console.error("Error loading events:", err);
-        setError("Failed to load events. Using mock data.");
-
-        // Fallback to mock data on any error
-        const yearEvents = mockEvents[selectedYear] || [];
-        setEvents(yearEvents);
-        setFilteredEvents(yearEvents);
+        console.error("Firestore error, falling back to mock data:", err);
+        setError("Failed to load events. Displaying local data.");
+        // Fallback to mock data on any database error
+        setEvents(mockEvents[selectedYear] || []);
       } finally {
         setLoading(false);
       }
     };
 
     loadEvents();
-  }, [selectedYear]);
+  }, [selectedYear]); // This effect re-runs ONLY when the year changes
 
-  // Filter events when search term or type changes
+  // This effect now handles ALL filtering and sorting
   useEffect(() => {
     const filtered = filterEvents(events, searchTerm, selectedType);
-    setFilteredEvents(filtered);
-  }, [searchTerm, selectedType, events]);
+    const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    setFilteredEvents(sorted);
+  }, [events, searchTerm, selectedType]); // Re-runs when data or filters change
 
+  // The return statement is correct and provides everything needed
   return {
-    events,
     filteredEvents,
     loading,
     error,

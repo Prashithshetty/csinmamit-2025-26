@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { motion } from "framer-motion";
+import { getEventById } from "../services/eventService";
 
 const EventRegistration = () => {
   const { user, signInWithGoogle } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const { id: routeEventId } = useParams();
 
-  // Get the specific event data passed from the modal link
-  const event = location.state?.event;
+  // Event can arrive via state or be fetched via route param
+  const [event, setEvent] = useState(location.state?.event || null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -31,13 +33,23 @@ const EventRegistration = () => {
     }
   }, [user]);
 
-  // Handle cases where a user lands on this page directly without event data
+  // If opened via URL /events/:id/register, fetch the event
   useEffect(() => {
-    if (!event) {
-      // Redirect back to the main events page if no event is selected
-      navigate("/events");
-    }
-  }, [event, navigate]);
+    const load = async () => {
+      if (!event && routeEventId) {
+        try {
+          const fetched = await getEventById(routeEventId);
+          setEvent(fetched);
+        } catch (e) {
+          // Fallback to minimal placeholder to keep the form accessible
+          setEvent({ id: routeEventId, title: "Event" });
+        }
+      } else if (!event && !routeEventId) {
+        navigate("/events");
+      }
+    };
+    load();
+  }, [event, routeEventId, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -93,10 +105,12 @@ const EventRegistration = () => {
         <h1 className="text-4xl font-bold text-center mb-2 gradient-text-animated">
           Event Registration
         </h1>
-        {/* This title is now dynamic */}
-        <p className="text-center text-xl text-gray-600 dark:text-gray-400 mb-8">
-          For: {event.title}
-        </p>
+        {/* This title is dynamic if available */}
+        {event?.title && (
+          <p className="text-center text-xl text-gray-600 dark:text-gray-400 mb-8">
+            For: {event.title}
+          </p>
+        )}
 
         <form
           onSubmit={handleSubmit}

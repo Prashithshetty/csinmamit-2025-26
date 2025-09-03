@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { EVENT_TYPES, EVENT_YEARS } from '../../constants/eventConstants'
 
-const EventsNavigator = ({ selectedYear, setSelectedYear, selectedType, setSelectedType }) => {
+const EventsNavigator = ({ selectedYear, onYearChange, selectedType, onTypeChange }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   return (
     <section className="py-16 dark:from-gray-900 dark:via-gray-950 dark:to-slate-900">
@@ -20,7 +20,7 @@ const EventsNavigator = ({ selectedYear, setSelectedYear, selectedType, setSelec
             {EVENT_YEARS.map((year, index) => (
               <motion.button
                 key={year}
-                onClick={() => setSelectedYear(year)}
+                onClick={() => onYearChange && onYearChange(year)}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}

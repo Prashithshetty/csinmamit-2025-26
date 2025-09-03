@@ -66,11 +66,11 @@ function AppContent() {
 
   return (
     <>
-      <ProfileCompletionModal
+      {/* <ProfileCompletionModal
         isOpen={showProfileModal}
         onComplete={handleProfileComplete}
         onClose={() => setShowProfileModal(false)}
-      />
+      /> */}
 
       <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors duration-300">
         <Toaster
@@ -89,9 +89,10 @@ function AppContent() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="events" element={<Events />} />
+            <Route path="events/:id/register" element={<EventRegistration />} />
             <Route path="team" element={<Team />} />
             <Route path="recruit" element={<Recruit />} />
-            <Route path="event-registration" element={<EventRegistration />} />
+            {/* <Route path="event-registration" element={<EventRegistration />} /> */}
             <Route path="*" element={<NotFound />} />
           </Route>
 
