@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEvents } from "@/hooks/useEvents";
+import { useAuth } from "@/contexts/AuthContext"; // Import useAuth
 import EventsHero from "@/components/Events/EventsHero";
 import EventsFilter from "@/components/Events/EventsFilter";
 import EventsGrid from "@/components/Events/EventsGrid";
 import EventDetailModal from "@/components/Events/EventDetailModal";
-import { getEventById } from "@/services/eventService";
+import { getEventById, registerUserForEvent } from "@/services/eventService"; // Import registerUserForEvent
+import toast from "react-hot-toast"; // Import toast for notifications
 
 const Events = () => {
   const navigate = useNavigate();
+  const { user, isProfileIncomplete } = useAuth(); // Get user and profile status from context
   const {
     filteredEvents,
     loading,
@@ -25,23 +28,48 @@ const Events = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const handleRegister = (event) => {
-    // Navigate to event-specific registration route
-    navigate(`/events/${event.id}/register`, { state: { event } });
+  // --- UPDATED REGISTRATION LOGIC ---
+  const handleRegister = async (event) => {
+    // 1. Check if user is logged in
+    if (!user) {
+      toast.error("Please sign in to register for events.");
+      navigate("/profile"); // Redirect to profile/login page
+      return;
+    }
+
+    // 2. Check if the user's profile is complete
+    if (isProfileIncomplete) {
+      toast.error("Please complete your profile before registering.", {
+        icon: "📝",
+      });
+      navigate("/profile"); // Redirect to profile page to complete it
+      return;
+    }
+
+    // 3. Proceed with registration
+    const toastId = toast.loading(`Registering for ${event.title}...`);
+    const success = await registerUserForEvent(event, user);
+
+    if (success) {
+      toast.success(`Successfully registered for ${event.title}!`, {
+        id: toastId,
+        icon: "🎉",
+      });
+      handleCloseModal(); // Close the modal on success
+    } else {
+      toast.error("Registration failed. Please try again.", { id: toastId });
+    }
   };
 
   const handleViewDetails = (event) => {
-    // This function opens the details modal
     setSelectedEvent(event);
     setIsModalOpen(true);
-    // Put eventId in URL for deep-linking
     setSearchParams({ eventId: event.id }, { replace: true });
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedEvent(null);
-    // Remove eventId from URL
     const next = new URLSearchParams(searchParams);
     next.delete("eventId");
     setSearchParams(next, { replace: true });

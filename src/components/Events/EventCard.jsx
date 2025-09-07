@@ -4,7 +4,6 @@ import { Calendar, Clock, MapPin, Tag, Share2 } from "lucide-react";
 const EventCard = ({ event, onRegister, onViewDetails }) => {
   if (!event) return null;
 
-
   const { title, date, location, type, bannerUrl, status } = event;
 
   const formattedDate = date?.toDate
@@ -28,7 +27,7 @@ const EventCard = ({ event, onRegister, onViewDetails }) => {
       case "upcoming":
         return (
           <button
-            onClick={() => onRegister(event)}
+            onClick={() => onViewDetails(event)}
             className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Register Now
@@ -101,7 +100,9 @@ const EventCard = ({ event, onRegister, onViewDetails }) => {
               <button
                 aria-label="Share event"
                 onClick={async () => {
-                  const url = `${window.location.origin}/events/${encodeURIComponent(event.id)}/register`;
+                  const url = `${
+                    window.location.origin
+                  }/events/${encodeURIComponent(event.id)}/register`;
                   try {
                     if (navigator.share) {
                       await navigator.share({
