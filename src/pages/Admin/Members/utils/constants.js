@@ -8,8 +8,16 @@ export const TABLE_HEADERS = [
   { key: 'branch', label: 'Branch', sortable: false },
   { key: 'year', label: 'Year', sortable: false },
   { key: 'phone', label: 'Phone', sortable: false },
-  { key: 'position', label: 'Position', sortable: false },
+  { key: 'role', label: 'Role', sortable: true },
   { key: 'createdAt', label: 'Joined', sortable: true },
+]
+
+export const ROLE_OPTIONS = [
+  { value: 'all', label: 'All Roles' },
+  { value: 'EXECUTIVE MEMBER', label: 'Executive Member' },
+  { value: 'coreMember', label: 'Core Member' },
+  { value: 'member', label: 'Member' },
+  { value: 'User', label: 'User' },
 ]
 
 // Form field configurations

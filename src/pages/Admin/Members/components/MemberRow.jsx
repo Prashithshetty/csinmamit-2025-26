@@ -10,7 +10,8 @@ const MemberRow = ({
   onEdit, 
   onUpdate, 
   onRemoveRole, 
-  onViewDetails 
+  onViewDetails,
+  onOpenEdit
 }) => (
   <tr className={getRowClassName(index, isSelected)}>
     <td className="px-4 py-2">
@@ -55,8 +56,13 @@ const MemberRow = ({
       ) : '-'}
     </td>
     <td className="px-4 py-2">
-      <span className="inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800">
-        {member.position || 'Executive Member'}
+      <span className={`inline-block px-2 py-1 text-xs rounded ${
+        member.role === 'EXECUTIVE MEMBER' ? 'bg-green-100 text-green-800' :
+        member.role === 'coreMember' ? 'bg-blue-100 text-blue-800' :
+        member.role === 'member' ? 'bg-yellow-100 text-yellow-800' :
+        'bg-gray-100 text-gray-800'
+      }`}>
+        {member.role || 'User'}
       </span>
     </td>
     <td className="px-4 py-2 text-gray-600">{formatDate(member.createdAt)}</td>
@@ -68,6 +74,13 @@ const MemberRow = ({
           title="View Details"
         >
           <Eye className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => onOpenEdit && onOpenEdit(member)}
+          className="px-2 py-1 text-xs bg-[#417690] text-white rounded hover:bg-[#205067]"
+          title="Edit Member"
+        >
+          Edit
         </button>
         <button
           onClick={() => onRemoveRole(member)}

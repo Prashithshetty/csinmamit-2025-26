@@ -25,9 +25,10 @@ import Pagination from './components/Pagination'
 import MemberDetailsModal from './components/MemberDetailsModal'
 import RemoveRoleModal from './components/RemoveRoleModal'
 import AddMemberModal from './components/AddMemberModal'
+import EditMemberModal from './components/EditMemberModal'
 
 // Utility imports
-import { MEMBERS_PER_PAGE, TABLE_HEADERS } from './utils/constants'
+import { MEMBERS_PER_PAGE, TABLE_HEADERS, ROLE_OPTIONS } from './utils/constants'
 import { exportMembersToCSV, exportMembersToJSON } from './utils/helpers'
 
 const AdminEMembers = () => {
@@ -39,6 +40,7 @@ const AdminEMembers = () => {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterBranch, setFilterBranch] = useState('all')
+  const [filterRole, setFilterRole] = useState('all')
   const [selectedMembers, setSelectedMembers] = useState([])
   const [selectAll, setSelectAll] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -53,15 +55,13 @@ const AdminEMembers = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [memberToView, setMemberToView] = useState(null)
   const [showExportMenu, setShowExportMenu] = useState(false)
+  const [memberToEdit, setMemberToEdit] = useState(null)
 
-  // Fetch executive members
+  // Fetch all members
   const fetchMembers = useCallback(async () => {
     try {
       setLoading(true)
-      const membersQuery = query(
-        collection(db, 'users'),
-        where('role', '==', 'EXECUTIVE MEMBER')
-      )
+      const membersQuery = query(collection(db, 'users'))
       const snapshot = await getDocs(membersQuery)
       const membersData = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -69,10 +69,10 @@ const AdminEMembers = () => {
       }))
       
       setMembers(membersData)
-      await logAdminActivity('executive_members_viewed', { count: membersData.length })
+      await logAdminActivity('all_members_viewed', { count: membersData.length })
     } catch (error) {
-      // console.error('Error fetching executive members:', error)
-      toast.error('Failed to fetch executive members')
+      // console.error('Error fetching members:', error)
+      toast.error('Failed to fetch members')
     } finally {
       setLoading(false)
     }
@@ -88,9 +88,13 @@ const AdminEMembers = () => {
     setShowAddModal(params.get('modal') === 'add')
   }, [location.search])
 
-  // Get unique branches
+  // Get unique branches and roles
   const uniqueBranches = useMemo(() => {
     return [...new Set(members.map(m => m.branch).filter(Boolean))]
+  }, [members])
+
+  const uniqueRoles = useMemo(() => {
+    return [...new Set(members.map(m => m.role).filter(Boolean))]
   }, [members])
 
   // Filter and sort members
@@ -113,6 +117,11 @@ const AdminEMembers = () => {
       filtered = filtered.filter(member => member.branch === filterBranch)
     }
 
+    // Role filter
+    if (filterRole !== 'all') {
+      filtered = filtered.filter(member => member.role === filterRole)
+    }
+
     // Sorting
     filtered.sort((a, b) => {
       let aVal = a[sortField] || ''
@@ -129,7 +138,7 @@ const AdminEMembers = () => {
     })
 
     return filtered
-  }, [members, searchQuery, filterBranch, sortField, sortOrder])
+  }, [members, searchQuery, filterBranch, filterRole, sortField, sortOrder])
 
   // Pagination
   const paginatedMembers = useMemo(() => {
@@ -294,7 +303,7 @@ const AdminEMembers = () => {
     setCurrentPage(1)
     setSelectedMembers([])
     setSelectAll(false)
-  }, [searchQuery, filterBranch])
+  }, [searchQuery, filterBranch, filterRole])
 
   // Loading state
   if (loading) {
@@ -309,8 +318,8 @@ const AdminEMembers = () => {
     <div className="p-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-normal text-[#333]">Executive Members</h1>
-        <p className="text-sm text-gray-600 mt-1">Manage CSI NMAMIT executive committee members</p>
+        <h1 className="text-2xl font-normal text-[#333]">All Members</h1>
+        <p className="text-sm text-gray-600 mt-1">Manage all CSI NMAMIT members</p>
       </div>
 
       {/* Stats */}
@@ -319,12 +328,17 @@ const AdminEMembers = () => {
           <div className="flex items-center">
             <UserCheck className="w-5 h-5 text-[#417690] mr-2" />
             <span className="text-sm font-medium text-[#333]">
-              Total Executive Members: {members.length}
+              Total Members: {members.length}
             </span>
           </div>
           {uniqueBranches.length > 0 && (
             <div className="text-sm text-gray-600">
               Branches: {uniqueBranches.join(', ')}
+            </div>
+          )}
+          {uniqueRoles.length > 0 && (
+            <div className="text-sm text-gray-600">
+              Roles: {uniqueRoles.join(', ')}
             </div>
           )}
         </div>
@@ -342,6 +356,17 @@ const AdminEMembers = () => {
                 onChange={setFilterBranch} 
               />
             )}
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="px-3 py-2 border border-[#ccc] rounded text-sm"
+            >
+              {ROLE_OPTIONS.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
             <button className="px-4 py-2 bg-[#417690] text-white rounded hover:bg-[#205067]">
               <Filter className="inline w-4 h-4 mr-2" />
               Filter
@@ -379,7 +404,7 @@ const AdminEMembers = () => {
 
       {/* Results Summary */}
       <div className="text-sm text-gray-600 mb-2">
-        {filteredMembers.length} executive member{filteredMembers.length !== 1 ? 's' : ''} found
+        {filteredMembers.length} member{filteredMembers.length !== 1 ? 's' : ''} found
       </div>
 
       {/* Members Table */}
@@ -409,6 +434,7 @@ const AdminEMembers = () => {
                   setShowRemoveModal(true)
                 }}
                 onViewDetails={handleViewDetails}
+                onOpenEdit={setMemberToEdit}
               />
             ))}
           </tbody>
@@ -417,7 +443,7 @@ const AdminEMembers = () => {
         {/* Empty State */}
         {paginatedMembers.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            No executive members found matching your criteria
+            No members found matching your criteria
           </div>
         )}
 
@@ -464,6 +490,17 @@ const AdminEMembers = () => {
             setShowDetailsModal(false)
             setMemberToView(null)
           }} 
+        />
+      )}
+
+      {memberToEdit && (
+        <EditMemberModal
+          member={memberToEdit}
+          onClose={() => setMemberToEdit(null)}
+          onSave={async (updates) => {
+            await updateMember(memberToEdit.id, updates)
+            setMemberToEdit(null)
+          }}
         />
       )}
     </div>

@@ -102,14 +102,19 @@ const ProfileForm = ({ formData, handleChange, handleSubmit, isUploading }) => {
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Year
           </label>
-          <input
-            type="text"
+          <select
             name="year"
             value={formData.year}
             onChange={handleChange}
             disabled={isUploading}
             className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          />
+          >
+            <option value="">Select Year</option>
+            <option value="2nd year">2nd year</option>
+            <option value="3rd year">3rd year</option>
+            <option value="4th year">4th year</option>
+            <option value="Alumni">Alumni</option>
+          </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

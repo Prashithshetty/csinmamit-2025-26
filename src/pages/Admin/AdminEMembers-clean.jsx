@@ -32,8 +32,16 @@ const TABLE_HEADERS = [
   { key: 'branch', label: 'Branch', sortable: false },
   { key: 'year', label: 'Year', sortable: false },
   { key: 'phone', label: 'Phone', sortable: false },
-  { key: 'position', label: 'Position', sortable: false },
+  { key: 'role', label: 'Role', sortable: true },
   { key: 'createdAt', label: 'Joined', sortable: true },
+]
+
+const ROLE_OPTIONS = [
+  { value: 'all', label: 'All Roles' },
+  { value: 'EXECUTIVE MEMBER', label: 'Executive Member' },
+  { value: 'coreMember', label: 'Core Member' },
+  { value: 'member', label: 'Member' },
+  { value: 'User', label: 'User' },
 ]
 
 // Utility functions
@@ -56,7 +64,7 @@ const SearchBar = ({ value, onChange }) => (
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      placeholder="Search executive members..."
+      placeholder="Search all members..."
       className="pl-10 pr-4 py-2 border border-[#ccc] rounded bg-white focus:outline-none focus:border-[#79aec8] w-64"
     />
   </div>
@@ -71,6 +79,18 @@ const BranchFilter = ({ branches, value, onChange }) => (
     <option value="all">All Branches</option>
     {branches.map(branch => (
       <option key={branch} value={branch}>{branch}</option>
+    ))}
+  </select>
+)
+
+const RoleFilter = ({ value, onChange }) => (
+  <select
+    value={value}
+    onChange={(e) => onChange(e.target.value)}
+    className="px-3 py-2 border border-[#ccc] rounded bg-white focus:outline-none focus:border-[#79aec8]"
+  >
+    {ROLE_OPTIONS.map(option => (
+      <option key={option.value} value={option.value}>{option.label}</option>
     ))}
   </select>
 )
@@ -146,8 +166,13 @@ const MemberRow = ({ member, index, isSelected, isEditing, onSelect, onEdit, onU
       ) : '-'}
     </td>
     <td className="px-4 py-2">
-      <span className="inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800">
-        {member.position || 'Executive Member'}
+      <span className={`inline-block px-2 py-1 text-xs rounded ${
+        member.role === 'EXECUTIVE MEMBER' ? 'bg-green-100 text-green-800' :
+        member.role === 'coreMember' ? 'bg-blue-100 text-blue-800' :
+        member.role === 'member' ? 'bg-yellow-100 text-yellow-800' :
+        'bg-gray-100 text-gray-800'
+      }`}>
+        {member.role || 'User'}
       </span>
     </td>
     <td className="px-4 py-2 text-gray-600">{formatDate(member.createdAt)}</td>
@@ -159,6 +184,13 @@ const MemberRow = ({ member, index, isSelected, isEditing, onSelect, onEdit, onU
           title="View Details"
         >
           <Eye className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => onEdit && onEdit(member)}
+          className="px-2 py-1 text-xs bg-[#417690] text-white rounded hover:bg-[#205067]"
+          title="Edit Member"
+        >
+          Edit
         </button>
         <button
           onClick={() => onRemoveRole(member)}
@@ -594,6 +626,7 @@ const AdminEMembers = () => {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterBranch, setFilterBranch] = useState('all')
+  const [filterRole, setFilterRole] = useState('all')
   const [selectedMembers, setSelectedMembers] = useState([])
   const [selectAll, setSelectAll] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -605,15 +638,13 @@ const AdminEMembers = () => {
   const [showAddModal, setShowAddModal] = useState(false)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [memberToView, setMemberToView] = useState(null)
+  const [memberToEdit, setMemberToEdit] = useState(null)
 
-  // Fetch executive members
+  // Fetch all members
   const fetchMembers = useCallback(async () => {
     try {
       setLoading(true)
-      const membersQuery = query(
-        collection(db, 'users'),
-        where('role', '==', 'EXECUTIVE MEMBER')
-      )
+      const membersQuery = query(collection(db, 'users'))
       const snapshot = await getDocs(membersQuery)
       const membersData = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -621,10 +652,10 @@ const AdminEMembers = () => {
       }))
       
       setMembers(membersData)
-      await logAdminActivity('executive_members_viewed', { count: membersData.length })
+      await logAdminActivity('all_members_viewed', { count: membersData.length })
     } catch (error) {
-      // console.error('Error fetching executive members:', error)
-      toast.error('Failed to fetch executive members')
+      // console.error('Error fetching members:', error)
+      toast.error('Failed to fetch members')
     } finally {
       setLoading(false)
     }
@@ -665,6 +696,11 @@ const AdminEMembers = () => {
       filtered = filtered.filter(member => member.branch === filterBranch)
     }
 
+    // Role filter
+    if (filterRole !== 'all') {
+      filtered = filtered.filter(member => member.role === filterRole)
+    }
+
     // Sorting
     filtered.sort((a, b) => {
       let aVal = a[sortField] || ''
@@ -681,7 +717,7 @@ const AdminEMembers = () => {
     })
 
     return filtered
-  }, [members, searchQuery, filterBranch, sortField, sortOrder])
+  }, [members, searchQuery, filterBranch, filterRole, sortField, sortOrder])
 
   // Pagination
   const paginatedMembers = useMemo(() => {
@@ -878,12 +914,12 @@ const AdminEMembers = () => {
     setCurrentPage(1)
     setSelectedMembers([])
     setSelectAll(false)
-  }, [searchQuery, filterBranch])
+  }, [searchQuery, filterBranch, filterRole])
 
   if (loading) {
     return (
       <div className="p-8">
-        <div className="text-center text-gray-500">Loading executive members...</div>
+        <div className="text-center text-gray-500">Loading all members...</div>
       </div>
     )
   }
@@ -892,8 +928,8 @@ const AdminEMembers = () => {
     <div className="p-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-normal text-[#333]">Executive Members</h1>
-        <p className="text-sm text-gray-600 mt-1">Manage CSI NMAMIT executive committee members</p>
+        <h1 className="text-2xl font-normal text-[#333]">All Members</h1>
+        <p className="text-sm text-gray-600 mt-1">Manage all CSI NMAMIT members</p>
       </div>
 
       {/* Stats */}
@@ -902,7 +938,7 @@ const AdminEMembers = () => {
           <div className="flex items-center">
             <UserCheck className="w-5 h-5 text-[#417690] mr-2" />
             <span className="text-sm font-medium text-[#333]">
-              Total Executive Members: {members.length}
+              Total Members: {members.length}
             </span>
           </div>
           {uniqueBranches.length > 0 && (
@@ -925,6 +961,10 @@ const AdminEMembers = () => {
                 onChange={setFilterBranch} 
               />
             )}
+            <RoleFilter 
+              value={filterRole} 
+              onChange={setFilterRole} 
+            />
             <button className="px-4 py-2 bg-[#417690] text-white rounded hover:bg-[#205067]">
               <Filter className="inline w-4 h-4 mr-2" />
               Filter
@@ -942,7 +982,7 @@ const AdminEMembers = () => {
 
       {/* Results Summary */}
       <div className="text-sm text-gray-600 mb-2">
-        {filteredMembers.length} executive member{filteredMembers.length !== 1 ? 's' : ''} found
+        {filteredMembers.length} member{filteredMembers.length !== 1 ? 's' : ''} found
       </div>
 
       {/* Members Table */}
@@ -965,7 +1005,7 @@ const AdminEMembers = () => {
                 isSelected={selectedMembers.includes(member.id)}
                 isEditing={editingMember === member.id}
                 onSelect={handleSelectMember}
-                onEdit={setEditingMember}
+                onEdit={setMemberToEdit}
                 onUpdate={updateMember}
                 onRemoveRole={setMemberToRemove}
                 onViewDetails={handleViewDetails}
@@ -977,7 +1017,7 @@ const AdminEMembers = () => {
         {/* Empty State */}
         {paginatedMembers.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            No executive members found matching your criteria
+            No members found matching your criteria
           </div>
         )}
 
@@ -1024,6 +1064,114 @@ const AdminEMembers = () => {
             setMemberToView(null)
           }} 
         />
+      )}
+
+      {/* Edit Member Modal */}
+      {memberToEdit && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white w-full max-w-2xl rounded shadow-lg">
+            <div className="px-5 py-3 border-b border-[#eee] flex items-center justify-between">
+              <h3 className="text-[#333] text-lg">Edit Member</h3>
+              <button onClick={() => setMemberToEdit(null)} className="text-gray-500 hover:text-[#333]">✕</button>
+            </div>
+
+            <form onSubmit={async (e) => {
+              e.preventDefault()
+              const formData = new FormData(e.target)
+              const updates = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                usn: formData.get('usn'),
+                branch: formData.get('branch'),
+                year: formData.get('year'),
+                role: formData.get('role'),
+                paymentStatus: formData.get('paymentStatus'),
+                paymentId: formData.get('paymentId'),
+                orderId: formData.get('orderId')
+              }
+              
+              try {
+                await updateDoc(doc(db, 'users', memberToEdit.id), {
+                  ...updates,
+                  updatedAt: new Date()
+                })
+                
+                setMembers(prev => prev.map(member =>
+                  member.id === memberToEdit.id ? { ...member, ...updates } : member
+                ))
+                
+                toast.success('Member updated successfully')
+                setMemberToEdit(null)
+              } catch (error) {
+                toast.error('Failed to update member')
+              }
+            }} className="p-5 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Name</label>
+                  <input name="name" defaultValue={memberToEdit.name} className="w-full px-3 py-2 border border-[#ddd] rounded bg-white text-gray-900" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Email</label>
+                  <input name="email" defaultValue={memberToEdit.email} className="w-full px-3 py-2 border border-[#ddd] rounded bg-white text-gray-900" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Phone</label>
+                  <input name="phone" defaultValue={memberToEdit.phone} className="w-full px-3 py-2 border border-[#ddd] rounded bg-white text-gray-900" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">USN</label>
+                  <input name="usn" defaultValue={memberToEdit.usn} className="w-full px-3 py-2 border border-[#ddd] rounded bg-white text-gray-900" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Branch</label>
+                  <input name="branch" defaultValue={memberToEdit.branch} className="w-full px-3 py-2 border border-[#ddd] rounded bg-white text-gray-900" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Year</label>
+                  <input name="year" defaultValue={memberToEdit.year} className="w-full px-3 py-2 border border-[#ddd] rounded bg-white text-gray-900" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Role</label>
+                  <select name="role" defaultValue={memberToEdit.role} className="w-full px-3 py-2 border border-[#ddd] rounded bg-white text-gray-900">
+                    <option value="User">User</option>
+                    <option value="member">Member</option>
+                    <option value="EXECUTIVE MEMBER">Executive Member</option>
+                    <option value="coreMember">Core Member</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-[#eee]">
+                <h4 className="text-sm text-[#333] mb-3">Payment</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Payment Status</label>
+                    <select name="paymentStatus" defaultValue={memberToEdit.paymentStatus || 'pending'} className="w-full px-3 py-2 border border-[#ddd] rounded bg-white text-gray-900">
+                      <option value="pending">Pending</option>
+                      <option value="completed">Completed</option>
+                      <option value="failed">Failed</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Payment ID</label>
+                    <input name="paymentId" defaultValue={memberToEdit.paymentDetails?.razorpayPaymentId || memberToEdit.paymentId} className="w-full px-3 py-2 border border-[#ddd] rounded bg-white text-gray-900" placeholder="pay_..." />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Order ID</label>
+                    <input name="orderId" defaultValue={memberToEdit.paymentDetails?.razorpayOrderId || memberToEdit.orderId} className="w-full px-3 py-2 border border-[#ddd] rounded bg-white text-gray-900" placeholder="order_..." />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-2">
+                <button type="button" onClick={() => setMemberToEdit(null)} className="px-4 py-2 border border-[#ccc] rounded bg-white hover:bg-[#f5f5f5]">Cancel</button>
+                <button type="submit" className="px-4 py-2 rounded bg-[#417690] text-white hover:bg-[#205067]">Save</button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   )
