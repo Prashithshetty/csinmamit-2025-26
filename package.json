@@ -13,7 +13,7 @@
     "cloudinary": "^2.7.0",
     "crypto-js": "^4.2.0",
     "firebase": "^10.8.0",
-    "framer-motion": "^11.0.3",
+    "framer-motion": "^12.23.15",
     "gsap": "^3.13.0",
     "lucide-react": "^0.358.0",
     "particles.js": "^2.0.0",

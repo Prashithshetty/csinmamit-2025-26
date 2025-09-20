@@ -13,6 +13,7 @@ export const mockEvents = {
       participants: 120,
       status: "upcoming",
       image: "/highlights/event (1).jpg",
+      published: true, 
     },
     {
       id: 2,
@@ -25,6 +26,7 @@ export const mockEvents = {
       participants: 80,
       status: "upcoming",
       image: "/highlights/event (2).jpg",
+      published: true, 
     },
     {
       id: 3,
@@ -37,6 +39,7 @@ export const mockEvents = {
       participants: 200,
       status: "upcoming",
       image: "/highlights/event (3).jpg",
+      published: true, 
     },
   ],
   2023: [
@@ -51,6 +54,7 @@ export const mockEvents = {
       participants: 100,
       status: "upcoming",
       image: "/highlights/event (4).jpg",
+      published: true, 
     },
     {
       id: 5,
@@ -63,6 +67,7 @@ export const mockEvents = {
       participants: 90,
       status: "completed",
       image: "/highlights/event (5).jpg",
+      published: true, 
     },
   ],
   2022: [],
