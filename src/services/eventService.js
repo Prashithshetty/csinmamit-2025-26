@@ -14,12 +14,17 @@ import {
   arrayUnion,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
-import { isCloudinaryConfigured, getCloudinaryStatus } from "../config/cloudinary";
+import {
+  isCloudinaryConfigured,
+  getCloudinaryStatus,
+} from "../config/cloudinary";
 import { mockEvents } from "../data/eventsData";
 
 // Cloudinary config
-const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || "dqnlrrcgb";
-const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "csi-events";
+const CLOUDINARY_CLOUD_NAME =
+  import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || "dqnlrrcgb";
+const CLOUDINARY_UPLOAD_PRESET =
+  import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "csi-events";
 
 // Upload to Cloudinary
 export const uploadToCloudinary = async (file, folder = "csi-events") => {
@@ -29,13 +34,17 @@ export const uploadToCloudinary = async (file, folder = "csi-events") => {
     }
     const formData = new FormData();
     formData.append("file", file);
-    if (CLOUDINARY_UPLOAD_PRESET) formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    if (CLOUDINARY_UPLOAD_PRESET)
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
     formData.append("folder", folder);
 
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-      method: "POST",
-      body: formData,
-    });
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
     const data = await res.json();
     return data.secure_url;
   } catch (error) {
@@ -47,7 +56,11 @@ export const uploadToCloudinary = async (file, folder = "csi-events") => {
 export const getEventsByYear = async (year) => {
   try {
     const eventsRef = collection(db, "events");
-    let q = query(eventsRef, where("year", "==", parseInt(year)), where("published", "==", true));
+    let q = query(
+      eventsRef,
+      where("year", "==", parseInt(year)),
+      where("published", "==", true)
+    );
 
     // Use createdAt for ordering to avoid missing date issues
     q = query(q, orderBy("createdAt", "desc"));
@@ -75,15 +88,22 @@ export const getEventById = async (eventId) => {
 
     // Fallback: check mock data
     for (const year in mockEvents) {
-      const found = mockEvents[year].find((e) => e.id.toString() === eventId.toString());
+      const found = mockEvents[year].find(
+        (e) => e.id.toString() === eventId.toString()
+      );
       if (found) return found;
     }
 
     throw new Error("Event not found");
   } catch (error) {
-    console.warn("Error fetching event by ID, using mock data if available:", error);
+    console.warn(
+      "Error fetching event by ID, using mock data if available:",
+      error
+    );
     for (const year in mockEvents) {
-      const found = mockEvents[year].find((e) => e.id.toString() === eventId.toString());
+      const found = mockEvents[year].find(
+        (e) => e.id.toString() === eventId.toString()
+      );
       if (found) return found;
     }
     throw error;
@@ -103,7 +123,13 @@ export const registerUserForEvent = async (event, user) => {
       registeredAt: serverTimestamp(),
     });
     const userRef = doc(db, "users", user.uid);
-    batch.update(userRef, { registeredEvents: arrayUnion({ eventId: event.id, eventTitle: event.title, eventDate: event.date }) });
+    batch.update(userRef, {
+      registeredEvents: arrayUnion({
+        eventId: event.id,
+        eventTitle: event.title,
+        eventDate: event.date,
+      }),
+    });
     await batch.commit();
     return true;
   } catch (error) {
