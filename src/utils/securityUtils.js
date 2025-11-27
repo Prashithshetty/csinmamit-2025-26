@@ -5,7 +5,7 @@
 // Input sanitization to prevent XSS attacks
 export const sanitizeInput = (input) => {
   if (typeof input !== 'string') return input;
-  
+
   return input
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -19,7 +19,7 @@ export const sanitizeInput = (input) => {
 // Validate and sanitize form data
 export const sanitizeFormData = (formData) => {
   const sanitized = {};
-  
+
   for (const [key, value] of Object.entries(formData)) {
     if (typeof value === 'string') {
       sanitized[key] = sanitizeInput(value);
@@ -27,7 +27,7 @@ export const sanitizeFormData = (formData) => {
       sanitized[key] = value;
     }
   }
-  
+
   return sanitized;
 };
 
@@ -85,20 +85,20 @@ export const isValidUSN = (usn) => {
 // Rate limiting helper (client-side)
 export const createRateLimiter = (maxAttempts = 5, windowMs = 60000) => {
   const attempts = new Map();
-  
+
   return (key) => {
     const now = Date.now();
     const userAttempts = attempts.get(key) || [];
-    
+
     // Clean old attempts
     const recentAttempts = userAttempts.filter(
       timestamp => now - timestamp < windowMs
     );
-    
+
     if (recentAttempts.length >= maxAttempts) {
       return false; // Rate limit exceeded
     }
-    
+
     recentAttempts.push(now);
     attempts.set(key, recentAttempts);
     return true; // Allowed
@@ -114,7 +114,7 @@ export const getCSPHeaders = () => {
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://api.razorpay.com https://api.cloudinary.com https://res.cloudinary.com",
+      "connect-src 'self' http://localhost:5000 https://pay-hook.anishkumar.tech https://api.razorpay.com https://api.cloudinary.com https://res.cloudinary.com",
       "frame-src https://api.razorpay.com",
       "object-src 'none'",
       "base-uri 'self'",

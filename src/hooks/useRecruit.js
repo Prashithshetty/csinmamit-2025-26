@@ -9,16 +9,18 @@ import { membershipPlans } from '../data/membershipData'
  */
 export const useRecruit = () => {
   const navigate = useNavigate()
-  const { user, signInWithGoogle } = useAuth()
-  const [selectedPlan, setSelectedPlan] = useState('annual')
+  const { user, signInWithGoogle, isProfileIncomplete } = useAuth()
+  const [selectedPlan, setSelectedPlan] = useState('1year')
   const [loading, setLoading] = useState(false)
+
+  // Initialize form data from user profile
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: '',
-    branch: '',
-    year: '',
-    usn: '',
+    phone: user?.profile?.phone || user?.phone || '',
+    branch: user?.profile?.branch || user?.branch || '',
+    year: user?.profile?.year || user?.year || '',
+    usn: user?.profile?.usn || user?.usn || '',
     whyJoin: ''
   })
 
@@ -31,17 +33,17 @@ export const useRecruit = () => {
   }
 
   const validateForm = () => {
-    if (!formData.name || !formData.email || !formData.phone || 
-        !formData.branch || !formData.year || !formData.usn) {
+    if (!formData.name || !formData.email || !formData.phone ||
+      !formData.branch || !formData.year || !formData.usn) {
       toast.error('Please fill all required fields')
       return false
     }
-    
+
     if (!/^\d{10}$/.test(formData.phone)) {
       toast.error('Please enter a valid 10-digit phone number')
       return false
     }
-    
+
     return true
   }
 
@@ -61,9 +63,9 @@ export const useRecruit = () => {
       return
     }
 
-    if (!validateForm()) {
-      return
-    }
+    // if (!validateForm()) {
+    //   return
+    // }
 
     setLoading(true)
 
@@ -77,32 +79,40 @@ export const useRecruit = () => {
 
       // Get selected plan
       const plan = membershipPlans.find(p => p.id === selectedPlan)
-      
-      // Create order (in production, this would be an API call to your backend)
-      const orderData = {
-        amount: plan.price * 100, // Amount in paise
-        currency: 'INR',
-        receipt: `CSI_${Date.now()}`,
-        notes: {
-          userId: user.uid,
-          planId: plan.id,
-          planName: plan.name
-        }
+
+      // Create order via backend
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
+      const response = await fetch(`${backendUrl}/create-order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          planId: selectedPlan,
+          userId: user.uid
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create order')
       }
+
+      const orderData = await response.json()
 
       // Initialize Razorpay
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_key', // Replace with your key
+        key: orderData.keyId, // Key ID from backend
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'CSI NMAMIT',
         description: `${plan.name} - ${plan.duration}`,
         image: '/csi-logo.png',
+        order_id: orderData.orderId, // Order ID from backend
         handler: function (response) {
           // Handle successful payment
           toast.success('Payment successful! Welcome to CSI NMAMIT!')
           // console.log('Payment ID:', response.razorpay_payment_id)
-          
+
           // Update user membership status (in production, verify payment on backend)
           // Then redirect to profile
           setTimeout(() => {
@@ -114,7 +124,11 @@ export const useRecruit = () => {
           email: formData.email,
           contact: formData.phone
         },
-        notes: orderData.notes,
+        notes: {
+          userId: user.uid,
+          planId: plan.id,
+          planName: plan.name
+        },
         theme: {
           color: '#3b82f6'
         }
@@ -142,6 +156,7 @@ export const useRecruit = () => {
     setSelectedPlan,
     handleInputChange,
     handleSubmit,
-    signInWithGoogle
+    signInWithGoogle,
+    isProfileIncomplete
   }
 }

@@ -16,11 +16,10 @@ const MembershipPlans = ({ selectedPlan, setSelectedPlan }) => {
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ y: -5 }}
             onClick={() => setSelectedPlan(plan.id)}
-            className={`relative cursor-pointer rounded-2xl p-6 transition-all ${
-              selectedPlan === plan.id
+            className={`relative cursor-pointer rounded-2xl p-6 transition-all ${selectedPlan === plan.id
                 ? 'glass-card ring-2 ring-primary-500 shadow-xl'
                 : 'glass-card hover:shadow-lg'
-            }`}
+              }`}
           >
             {/* Popular Badge */}
             {plan.popular && (
@@ -28,12 +27,17 @@ const MembershipPlans = ({ selectedPlan, setSelectedPlan }) => {
                 Most Popular
               </div>
             )}
-            
+
             {/* Plan Header */}
             <div className="text-center mb-6">
               <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-              <div className="text-3xl font-bold gradient-text mb-1">
-                ₹{plan.price}
+              <div className="flex flex-col items-center justify-center mb-1">
+                <div className="text-2xl font-bold gradient-text">
+                  ₹{plan.basePrice} <span className="text-sm font-normal text-gray-500">+ ₹{plan.platformFee} fee</span>
+                </div>
+                <div className="text-xl font-bold text-gray-700 dark:text-gray-300">
+                  = ₹{plan.price}
+                </div>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">{plan.duration}</p>
             </div>
@@ -49,9 +53,8 @@ const MembershipPlans = ({ selectedPlan, setSelectedPlan }) => {
             </ul>
 
             {/* Selected Indicator */}
-            <div className={`mt-6 text-center ${
-              selectedPlan === plan.id ? 'block' : 'hidden'
-            }`}>
+            <div className={`mt-6 text-center ${selectedPlan === plan.id ? 'block' : 'hidden'
+              }`}>
               <CheckCircle className="w-8 h-8 mx-auto text-green-500" />
             </div>
           </motion.div>

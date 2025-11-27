@@ -7,22 +7,22 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import toast from 'react-hot-toast'
 import paymentService from '../services/paymentService'
-import { 
-  sanitizeFormData, 
-  isValidEmail, 
-  isValidPhone, 
-  isValidUSN 
+import {
+  sanitizeFormData,
+  isValidEmail,
+  isValidPhone,
+  isValidUSN
 } from '../utils/securityUtils'
 
 export const useSecureRecruit = () => {
   const navigate = useNavigate()
   const { user, signInWithGoogle } = useAuth()
-  const [selectedPlan, setSelectedPlan] = useState('annual')
+  const [selectedPlan, setSelectedPlan] = useState('1year')
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
   const paymentAttempts = useRef(0)
   const lastPaymentTime = useRef(null)
-  
+
   // Initialize form with sanitized user data
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -37,9 +37,9 @@ export const useSecureRecruit = () => {
   // Secure input change handler with validation
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target
-    
+
     // Sanitize input immediately
-    const sanitizedValue = typeof value === 'string' 
+    const sanitizedValue = typeof value === 'string'
       ? value.trim().substring(0, 100) // Limit input length
       : value
 
@@ -132,7 +132,7 @@ export const useSecureRecruit = () => {
   // Rate limiting for payment attempts
   const checkPaymentRateLimit = () => {
     const now = Date.now()
-    
+
     // Reset counter after 5 minutes
     if (lastPaymentTime.current && now - lastPaymentTime.current > 300000) {
       paymentAttempts.current = 0
@@ -189,10 +189,10 @@ export const useSecureRecruit = () => {
           // Success callback
           toast.success('Payment successful! Welcome to CSI NMAMIT!')
           // console.log('Payment verified:', result)
-          
+
           // Reset attempts on success
           paymentAttempts.current = 0
-          
+
           // Navigate to profile after delay
           setTimeout(() => {
             navigate('/profile')
