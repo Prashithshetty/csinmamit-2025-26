@@ -3,7 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
-const { db } = require('./config/firebase');
+const { admin, db } = require('./config/firebase');
 
 dotenv.config();
 

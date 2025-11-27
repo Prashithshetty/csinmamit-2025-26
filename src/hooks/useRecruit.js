@@ -81,7 +81,7 @@ export const useRecruit = () => {
       const plan = membershipPlans.find(p => p.id === selectedPlan)
 
       // Create order via backend
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
+      const backendUrl = (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/api\/?$/, '')
       const response = await fetch(`${backendUrl}/create-order`, {
         method: 'POST',
         headers: {

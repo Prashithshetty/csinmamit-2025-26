@@ -114,7 +114,7 @@ export const getCSPHeaders = () => {
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",
-      `connect-src 'self' ${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'} https://api.razorpay.com https://api.cloudinary.com https://res.cloudinary.com`,
+      `connect-src 'self' ${(import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/api\/?$/, '')} https://api.razorpay.com https://api.cloudinary.com https://res.cloudinary.com`,
       "frame-src https://api.razorpay.com",
       "object-src 'none'",
       "base-uri 'self'",
