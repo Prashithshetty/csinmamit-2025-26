@@ -7,7 +7,7 @@ import { useRecruit } from '../hooks/useRecruit'
 
 const Recruit = () => {
   const { user } = useAuth()
-  
+
   const {
     formData,
     loading,
@@ -15,7 +15,8 @@ const Recruit = () => {
     setSelectedPlan,
     handleInputChange,
     handleSubmit,
-    signInWithGoogle
+    signInWithGoogle,
+    isProfileIncomplete
   } = useRecruit()
 
   return (
@@ -27,7 +28,7 @@ const Recruit = () => {
       <BenefitsSection />
 
       {/* Membership Plans */}
-      <MembershipPlans 
+      <MembershipPlans
         selectedPlan={selectedPlan}
         setSelectedPlan={setSelectedPlan}
       />
@@ -38,9 +39,11 @@ const Recruit = () => {
         formData={formData}
         loading={loading}
         selectedPlan={selectedPlan}
+        setSelectedPlan={setSelectedPlan}
         onInputChange={handleInputChange}
         onSubmit={handleSubmit}
         onSignIn={signInWithGoogle}
+        isProfileIncomplete={isProfileIncomplete}
       />
     </div>
   )

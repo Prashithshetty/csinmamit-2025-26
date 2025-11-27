@@ -19,7 +19,8 @@ export const useProfileFirestore = () => {
     bio: '',
     usn: '',
     github: '',
-    linkedin: ''
+    linkedin: '',
+    membership: null
   })
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
@@ -37,7 +38,7 @@ export const useProfileFirestore = () => {
         setLoading(true)
         const userRef = doc(db, 'users', user.uid)
         const userSnap = await getDoc(userRef)
-        
+
         if (userSnap.exists()) {
           const data = userSnap.data()
           const profile = {
@@ -50,7 +51,8 @@ export const useProfileFirestore = () => {
             bio: data.bio || data.profile?.bio || '',
             usn: data.usn || '',
             github: data.github || '',
-            linkedin: data.linkedin || ''
+            linkedin: data.linkedin || '',
+            membership: data.membership || null
           }
           setProfileData(profile)
           setOriginalData(profile)
@@ -101,11 +103,11 @@ export const useProfileFirestore = () => {
     setLoading(true)
     try {
       const userRef = doc(db, 'users', user.uid)
-      
+
       // Get existing document to preserve fields we don't update
       const existingDoc = await getDoc(userRef)
       const existingData = existingDoc.exists() ? existingDoc.data() : {}
-      
+
       // Prepare the update data according to Firestore rules
       const updateData = {
         // Core fields that match Firestore rules
@@ -116,12 +118,12 @@ export const useProfileFirestore = () => {
         github: profileData.github || null,
         linkedin: profileData.linkedin || null,
         phone: profileData.phone || null,
-        
+
         // Preserve existing fields
         email: existingData.email || user.email || profileData.email,
         role: existingData.role || 'member',
         certificates: existingData.certificates || [],
-        
+
         // Also update the nested profile object for backward compatibility
         profile: {
           phone: profileData.phone || '',
@@ -130,11 +132,11 @@ export const useProfileFirestore = () => {
           year: profileData.year || '',
           bio: profileData.bio || ''
         },
-        
+
         // Timestamps
         updatedAt: serverTimestamp()
       }
-      
+
       // Add createdAt only if it's a new document
       if (!existingDoc.exists()) {
         updateData.createdAt = serverTimestamp()
@@ -142,13 +144,13 @@ export const useProfileFirestore = () => {
 
       // Update Firestore document
       await setDoc(userRef, updateData, { merge: true })
-      
+
       setOriginalData(profileData)
       setIsEditing(false)
       toast.success('Profile updated successfully!')
     } catch (error) {
       // console.error('Error saving profile:', error)
-      
+
       // Provide more specific error messages
       if (error.code === 'permission-denied') {
         toast.error('Permission denied. Please make sure you are logged in.')

@@ -109,9 +109,8 @@ const TableHeader = ({ headers, sortField, sortOrder, onSort, selectAll, onSelec
       {headers.map(({ key, label, sortable }) => (
         <th
           key={key}
-          className={`px-4 py-2 text-left font-normal text-[#666] ${
-            sortable ? 'cursor-pointer hover:text-[#333]' : ''
-          }`}
+          className={`px-4 py-2 text-left font-normal text-[#666] ${sortable ? 'cursor-pointer hover:text-[#333]' : ''
+            }`}
           onClick={sortable ? () => onSort(key) : undefined}
         >
           {label} {sortable && sortField === key && (sortOrder === 'asc' ? '↑' : '↓')}
@@ -166,12 +165,11 @@ const MemberRow = ({ member, index, isSelected, isEditing, onSelect, onEdit, onU
       ) : '-'}
     </td>
     <td className="px-4 py-2">
-      <span className={`inline-block px-2 py-1 text-xs rounded ${
-        member.role === 'EXECUTIVE MEMBER' ? 'bg-green-100 text-green-800' :
-        member.role === 'coreMember' ? 'bg-blue-100 text-blue-800' :
-        member.role === 'member' ? 'bg-yellow-100 text-yellow-800' :
-        'bg-gray-100 text-gray-800'
-      }`}>
+      <span className={`inline-block px-2 py-1 text-xs rounded ${member.role === 'EXECUTIVE MEMBER' ? 'bg-green-100 text-green-800' :
+          member.role === 'coreMember' ? 'bg-blue-100 text-blue-800' :
+            member.role === 'member' ? 'bg-yellow-100 text-yellow-800' :
+              'bg-gray-100 text-gray-800'
+        }`}>
         {member.role || 'User'}
       </span>
     </td>
@@ -208,10 +206,10 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const renderButtons = () => {
     const buttons = []
     const maxButtons = 5
-    
+
     let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2))
     let endPage = Math.min(totalPages, startPage + maxButtons - 1)
-    
+
     if (endPage - startPage < maxButtons - 1) {
       startPage = Math.max(1, endPage - maxButtons + 1)
     }
@@ -221,11 +219,10 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <button
           key={i}
           onClick={() => onPageChange(i)}
-          className={`px-3 py-1 border rounded ${
-            currentPage === i
+          className={`px-3 py-1 border rounded ${currentPage === i
               ? 'bg-[#417690] text-white border-[#417690]'
               : 'bg-white border-[#ccc] hover:bg-[#f5f5f5]'
-          }`}
+            }`}
         >
           {i}
         </button>
@@ -260,7 +257,7 @@ const RemoveRoleModal = ({ member, onConfirm, onCancel }) => (
     <div className="bg-white rounded p-6 max-w-md w-full">
       <h2 className="text-lg font-semibold text-[#333] mb-4">Remove Executive Member Role</h2>
       <p className="text-gray-600 mb-6">
-        Are you sure you want to remove the executive member role from "{member?.name || member?.email}"? 
+        Are you sure you want to remove the executive member role from "{member?.name || member?.email}"?
         They will become a regular user.
       </p>
       <div className="flex items-center justify-end space-x-3">
@@ -373,41 +370,41 @@ const MemberDetailsModal = ({ member, onClose }) => {
             <>
               <SectionTitle title="Payment Information" />
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-b border-[#eee]">
-                <DetailRow 
-                  label="Amount Paid" 
-                  value={formatCurrency(member.paymentDetails?.amount)} 
-                  isHighlighted 
+                <DetailRow
+                  label="Amount Paid"
+                  value={formatCurrency(member.paymentDetails?.amount)}
+                  isHighlighted
                 />
-                <DetailRow 
-                  label="Platform Fee" 
-                  value={formatCurrency(member.paymentDetails?.platformFee)} 
+                <DetailRow
+                  label="Platform Fee"
+                  value={formatCurrency(member.paymentDetails?.platformFee)}
                 />
-                <DetailRow 
-                  label="Total Amount" 
-                  value={formatCurrency(member.paymentDetails?.totalAmount)} 
-                  isHighlighted 
+                <DetailRow
+                  label="Total Amount"
+                  value={formatCurrency(member.paymentDetails?.totalAmount)}
+                  isHighlighted
                 />
-                <DetailRow 
-                  label="Currency" 
-                  value={member.paymentDetails?.currency} 
+                <DetailRow
+                  label="Currency"
+                  value={member.paymentDetails?.currency}
                 />
-                <DetailRow 
-                  label="Payment Date" 
-                  value={formatTimestamp(member.paymentDetails?.paymentDate)} 
-                  isHighlighted 
+                <DetailRow
+                  label="Payment Date"
+                  value={formatTimestamp(member.paymentDetails?.paymentDate)}
+                  isHighlighted
                 />
-                <DetailRow 
-                  label="Payment Status" 
-                  value={member.paymentStatus || 'Completed'} 
+                <DetailRow
+                  label="Payment Status"
+                  value={member.paymentStatus || 'Completed'}
                 />
-                <DetailRow 
-                  label="Razorpay Order ID" 
-                  value={member.paymentDetails?.razorpayOrderId} 
-                  isHighlighted 
+                <DetailRow
+                  label="Razorpay Order ID"
+                  value={member.paymentDetails?.razorpayOrderId}
+                  isHighlighted
                 />
-                <DetailRow 
-                  label="Razorpay Payment ID" 
-                  value={member.paymentDetails?.razorpayPaymentId} 
+                <DetailRow
+                  label="Razorpay Payment ID"
+                  value={member.paymentDetails?.razorpayPaymentId}
                 />
               </div>
             </>
@@ -577,9 +574,9 @@ const AddMemberModal = ({ onClose, onCreate }) => {
                 <label className={labelClass}>Membership Plan (Amount)<span className="text-[#ba2121]">*</span></label>
                 <select name="membershipPlan" value={form.membershipPlan} onChange={(e) => setField('membershipPlan', e.target.value)} className={inputClass(errors.membershipPlan)}>
                   <option value="">Select plan</option>
-                  <option value="350">350</option>
-                  <option value="650">650</option>
-                  <option value="900">900</option>
+                  <option value="358">1 Year (₹358)</option>
+                  <option value="664">2 Years (₹664)</option>
+                  <option value="919">3 Years (₹919)</option>
                 </select>
                 {errors.membershipPlan && <div className="text-xs text-[#ba2121] mt-1">{errors.membershipPlan}</div>}
               </div>
@@ -620,7 +617,7 @@ const AddMemberModal = ({ onClose, onCreate }) => {
 const AdminEMembers = () => {
   const { logAdminActivity } = useAdminAuth()
   const location = useLocation()
-  
+
   // State
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -650,7 +647,7 @@ const AdminEMembers = () => {
         id: doc.id,
         ...doc.data()
       }))
-      
+
       setMembers(membersData)
       await logAdminActivity('all_members_viewed', { count: membersData.length })
     } catch (error) {
@@ -705,13 +702,13 @@ const AdminEMembers = () => {
     filtered.sort((a, b) => {
       let aVal = a[sortField] || ''
       let bVal = b[sortField] || ''
-      
+
       if (sortField === 'createdAt') {
         aVal = a.createdAt?.seconds || 0
         bVal = b.createdAt?.seconds || 0
       }
-      
-      return sortOrder === 'asc' 
+
+      return sortOrder === 'asc'
         ? (aVal > bVal ? 1 : -1)
         : (aVal < bVal ? 1 : -1)
     })
@@ -757,11 +754,11 @@ const AdminEMembers = () => {
         ...updates,
         updatedAt: new Date()
       })
-      
+
       setMembers(prev => prev.map(member =>
         member.id === memberId ? { ...member, ...updates } : member
       ))
-      
+
       toast.success('Member updated successfully')
       await logAdminActivity('executive_member_updated', { memberId, updates })
       setEditingMember(null)
@@ -784,11 +781,11 @@ const AdminEMembers = () => {
         role: 'User',
         updatedAt: new Date()
       })
-      
+
       setMembers(prev => prev.filter(member => member.id !== memberToRemove.id))
       toast.success('Member role removed successfully')
       await logAdminActivity('executive_member_role_removed', { memberId: memberToRemove.id })
-      
+
       setShowRemoveModal(false)
       setMemberToRemove(null)
     } catch (error) {
@@ -802,25 +799,25 @@ const AdminEMembers = () => {
       const { addDoc, collection, doc, updateDoc, setDoc, serverTimestamp, Timestamp } = await import('firebase/firestore')
       const { db } = await import('../../config/firebase')
       const { auth } = await import('../../config/firebase')
-      
+
       // Check if user is authenticated
       const currentUser = auth.currentUser
       // console.log('Current user:', currentUser?.uid, currentUser?.email)
-      
+
       if (!currentUser) {
         throw new Error('User not authenticated')
       }
-      
+
       // Check if admin document exists
       const { getDoc } = await import('firebase/firestore')
       const adminRef = doc(db, 'admins', currentUser.uid)
       const adminDoc = await getDoc(adminRef)
       // console.log('Admin document exists:', adminDoc.exists(), adminDoc.data())
-      
+
       if (!adminDoc.exists()) {
         // console.warn('Admin document does not exist in admins collection')
       }
-      
+
       // Validate date before creating timestamp
       const birthDate = new Date(payload.dateOfBirth)
       if (isNaN(birthDate.getTime())) {
@@ -830,7 +827,7 @@ const AdminEMembers = () => {
       // Create a new user with EXECUTIVE MEMBER role first
       // Generate a unique ID for the user
       const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      
+
       const newUser = {
         name: payload.name.trim(),
         branch: payload.branch?.trim() || null,
@@ -842,7 +839,7 @@ const AdminEMembers = () => {
         createdAt: new Date(),
         updatedAt: new Date()
       }
-      
+
       // console.log('Creating user document with ID:', userId)
       const userRef = doc(db, 'users', userId)
       await setDoc(userRef, { ...newUser, email: payload.personalEmail.trim() })
@@ -866,7 +863,7 @@ const AdminEMembers = () => {
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       }
-      
+
       // console.log('Creating recruit document:', recruitDoc)
       const recruitRef = await addDoc(collection(db, 'recruits'), recruitDoc)
       // console.log('Recruit document created:', recruitRef.id)
@@ -905,7 +902,7 @@ const AdminEMembers = () => {
     link.href = url
     link.download = `executive_members_${new Date().toISOString().split('T')[0]}.csv`
     link.click()
-    
+
     toast.success('Executive members exported successfully')
   }, [filteredMembers])
 
@@ -955,15 +952,15 @@ const AdminEMembers = () => {
           <div className="flex items-center space-x-4">
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
             {uniqueBranches.length > 0 && (
-              <BranchFilter 
-                branches={uniqueBranches} 
-                value={filterBranch} 
-                onChange={setFilterBranch} 
+              <BranchFilter
+                branches={uniqueBranches}
+                value={filterBranch}
+                onChange={setFilterBranch}
               />
             )}
-            <RoleFilter 
-              value={filterRole} 
-              onChange={setFilterRole} 
+            <RoleFilter
+              value={filterRole}
+              onChange={setFilterRole}
             />
             <button className="px-4 py-2 bg-[#417690] text-white rounded hover:bg-[#205067]">
               <Filter className="inline w-4 h-4 mr-2" />
@@ -1057,12 +1054,12 @@ const AdminEMembers = () => {
 
       {/* Member Details Modal */}
       {showDetailsModal && memberToView && (
-        <MemberDetailsModal 
-          member={memberToView} 
+        <MemberDetailsModal
+          member={memberToView}
           onClose={() => {
             setShowDetailsModal(false)
             setMemberToView(null)
-          }} 
+          }}
         />
       )}
 
@@ -1090,17 +1087,17 @@ const AdminEMembers = () => {
                 paymentId: formData.get('paymentId'),
                 orderId: formData.get('orderId')
               }
-              
+
               try {
                 await updateDoc(doc(db, 'users', memberToEdit.id), {
                   ...updates,
                   updatedAt: new Date()
                 })
-                
+
                 setMembers(prev => prev.map(member =>
                   member.id === memberToEdit.id ? { ...member, ...updates } : member
                 ))
-                
+
                 toast.success('Member updated successfully')
                 setMemberToEdit(null)
               } catch (error) {

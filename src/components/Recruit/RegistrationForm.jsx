@@ -7,9 +7,11 @@ const RegistrationForm = ({
   formData,
   loading,
   selectedPlan,
+  setSelectedPlan,
   onInputChange,
   onSubmit,
-  onSignIn
+  onSignIn,
+  isProfileIncomplete
 }) => {
   const selectedPlanData = membershipPlans.find(p => p.id === selectedPlan)
 
@@ -36,114 +38,90 @@ const RegistrationForm = ({
             </button>
           </div>
         ) : (
-          <form onSubmit={onSubmit}>
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Full Name */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={onInputChange}
-                  required
-                  className="input-field"
-                />
-              </div>
+          isProfileIncomplete ? (
+            <div className="text-center py-8">
+              <Info className="w-16 h-16 mx-auto text-yellow-500 mb-4" />
+              <h3 className="text-xl font-bold mb-2">Profile Incomplete</h3>
+              <p className="mb-6 text-gray-600 dark:text-gray-400">
+                Please complete your profile details before joining CSI.
+              </p>
+              <a
+                href="/profile"
+                className="btn-primary inline-flex items-center gap-2"
+              >
+                Go to Profile
+              </a>
+            </div>
+          ) : (
+            <form onSubmit={onSubmit}>
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl mb-8 border border-blue-100 dark:border-blue-800">
+                {/* <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Info className="w-5 h-5 text-blue-500" />
+                  Confirm Your Details
+                </h3>
+                <div className="grid md:grid-cols-2 gap-y-4 gap-x-8">
+                  <div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 block">Full Name</span>
+                    <span className="font-medium">{formData.name}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 block">Email</span>
+                    <span className="font-medium">{formData.email}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 block">Phone</span>
+                    <span className="font-medium">{formData.phone}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 block">USN</span>
+                    <span className="font-medium">{formData.usn}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 block">Branch</span>
+                    <span className="font-medium">{formData.branch}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 block">Year</span>
+                    <span className="font-medium">{formData.year}</span>
+                  </div>
+                </div> */}
 
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={onInputChange}
-                  required
-                  className="input-field"
-                />
-              </div>
+                {/* Plan Selection */}
+                <div className="mt-6 pt-6 border-t border-blue-100 dark:border-blue-800">
+                  <label className="block text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
+                    Select Membership Duration
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {membershipPlans.map((plan) => (
+                      <div
+                        key={plan.id}
+                        onClick={() => setSelectedPlan(plan.id)}
+                        className={`cursor-pointer rounded-lg p-3 border transition-all relative ${selectedPlan === plan.id
+                          ? 'bg-blue-100 border-blue-500 ring-1 ring-blue-500 dark:bg-blue-900/40'
+                          : 'bg-white border-gray-200 hover:border-blue-300 dark:bg-gray-800 dark:border-gray-700'
+                          }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-semibold text-sm">{plan.duration}</span>
+                          {selectedPlan === plan.id && (
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                          )}
+                        </div>
+                        <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                          ₹{plan.price}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-              {/* Phone */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={onInputChange}
-                  placeholder="10-digit number"
-                  required
-                  className="input-field"
-                />
-              </div>
-
-              {/* USN */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  USN *
-                </label>
-                <input
-                  type="text"
-                  name="usn"
-                  value={formData.usn}
-                  onChange={onInputChange}
-                  placeholder="4NM21CS000"
-                  required
-                  className="input-field"
-                />
-              </div>
-
-              {/* Branch */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Branch *
-                </label>
-                <select
-                  name="branch"
-                  value={formData.branch}
-                  onChange={onInputChange}
-                  required
-                  className="input-field"
-                >
-                  <option value="">Select Branch</option>
-                  <option value="Computer Science">Computer Science</option>
-                  <option value="Information Science">Information Science</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Mechanical">Mechanical</option>
-                  <option value="Civil">Civil</option>
-                  <option value="Electrical">Electrical</option>
-                </select>
-              </div>
-
-              {/* Year */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Year *
-                </label>
-                <select
-                  name="year"
-                  value={formData.year}
-                  onChange={onInputChange}
-                  required
-                  className="input-field"
-                >
-                  <option value="">Select Year</option>
-                  <option value="First Year">First Year</option>
-                  <option value="Second Year">Second Year</option>
-                  <option value="Third Year">Third Year</option>
-                  <option value="Final Year">Final Year</option>
-                </select>
+                <div className="mt-4 text-sm text-gray-500 italic">
+                  * To change these details, please update your profile.
+                </div>
               </div>
 
               {/* Why Join */}
-              <div className="md:col-span-2">
+              <div className="mb-6">
                 <label className="block text-sm font-medium mb-2">
                   Why do you want to join CSI? (Optional)
                 </label>
@@ -156,33 +134,33 @@ const RegistrationForm = ({
                   placeholder="Tell us about your interests and what you hope to gain..."
                 />
               </div>
-            </div>
 
-            {/* Payment Section */}
-            <div className="mt-8 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <Shield className="w-4 h-4" />
-                <span>Secure payment via Razorpay</span>
+              {/* Payment Section */}
+              <div className="mt-8 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <Shield className="w-4 h-4" />
+                  <span>Secure payment via Razorpay</span>
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-primary flex items-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <Loader className="w-5 h-5 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-5 h-5" />
+                      Pay ₹{selectedPlanData?.price}
+                    </>
+                  )}
+                </button>
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary flex items-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <Loader className="w-5 h-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="w-5 h-5" />
-                    Pay ₹{selectedPlanData?.price}
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+            </form>
+          )
         )}
       </motion.div>
     </section>

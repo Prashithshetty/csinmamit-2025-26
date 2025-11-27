@@ -51,7 +51,11 @@ const Profile = () => {
                   onSave={handleSave}
                   onInputChange={handleInputChange}
                 />
-                <MembershipDetails user={user} />
+                <MembershipDetails
+                  membershipStatus={profileData.membership?.status}
+                  membershipType={profileData.membership?.planId}
+                  membershipExpiry={profileData.membership?.expiryDate?.toDate()}
+                />
               </div>
             </div>
           </>

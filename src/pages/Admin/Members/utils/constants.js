@@ -30,9 +30,9 @@ export const YEAR_OPTIONS = [
 ]
 
 export const MEMBERSHIP_PLANS = [
-  { value: '350', label: '350' },
-  { value: '650', label: '650' },
-  { value: '900', label: '900' },
+  { value: '358', label: '1 Year (₹358)' },
+  { value: '664', label: '2 Years (₹664)' },
+  { value: '919', label: '3 Years (₹919)' },
 ]
 
 export const PAYMENT_STATUS_OPTIONS = [
