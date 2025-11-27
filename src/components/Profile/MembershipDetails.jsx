@@ -1,6 +1,15 @@
 import { motion } from 'framer-motion'
 
 const MembershipDetails = ({ membershipStatus, membershipType, membershipExpiry }) => {
+  const planNames = {
+    '1year': '1-Year Executive Membership',
+    '2year': '2-Year Executive Membership',
+    '3year': '3-Year Executive Membership'
+  };
+
+  const displayType = planNames[membershipType] || membershipType || 'Standard Member';
+  const status = membershipStatus || 'inactive';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -13,11 +22,13 @@ const MembershipDetails = ({ membershipStatus, membershipType, membershipExpiry 
         <div className="flex justify-between items-center p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
           <div>
             <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
-            <p className="font-semibold capitalize">{membershipStatus}</p>
+            <p className={`font-semibold capitalize ${status === 'active' ? 'text-green-600' : 'text-gray-600'}`}>
+              {status}
+            </p>
           </div>
           <div>
             <p className="text-sm text-gray-600 dark:text-gray-400">Type</p>
-            <p className="font-semibold">{membershipType}</p>
+            <p className="font-semibold">{displayType}</p>
           </div>
           {membershipExpiry && (
             <div>
@@ -28,9 +39,9 @@ const MembershipDetails = ({ membershipStatus, membershipType, membershipExpiry 
             </div>
           )}
         </div>
-        
-        {membershipStatus === 'inactive' && (
-          <button className="w-full btn-primary">
+
+        {status === 'inactive' && (
+          <button className="w-full btn-primary" onClick={() => window.location.href = '/recruit'}>
             Activate Membership
           </button>
         )}
